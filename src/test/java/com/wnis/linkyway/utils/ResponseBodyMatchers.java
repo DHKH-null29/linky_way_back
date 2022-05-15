@@ -34,7 +34,7 @@ public class ResponseBodyMatchers {
     private ObjectMapper objectMapper = new ObjectMapper();
     /**
      * <p>Validate that the field name and value of the ResponseBody object are the same as expected</p>
-     * <p>you do not need to create Object for test. just use *.class</p>
+     * <p>You do not need to create Object for test. just use *.class</p>
      * @param expectedObject Object created for test
      * @param targetClass Expected class structure (*.class)
      */
@@ -50,7 +50,7 @@ public class ResponseBodyMatchers {
 
     /**
      * <p>Verify that the field name of the ResponseBody object matches the field name of the expected class.</p>
-     * @param targetClass expected class structure (*.class)
+     * @param targetClass Expected class structure (*.class)
      * @throws UnrecognizedPropertyException If the format of the target class and the response object does not match,
      * an exception is generated.
      */
