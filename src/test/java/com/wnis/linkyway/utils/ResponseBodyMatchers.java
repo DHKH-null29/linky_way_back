@@ -57,7 +57,7 @@ public class ResponseBodyMatchers {
     public <T>ResultMatcher containsPropertiesAsJson(
             Class<T> targetClass) {
         return mvcResult -> {
-            String json =mvcResult.getResponse().getContentAsString();
+            String json = mvcResult.getResponse().getContentAsString();
             T actualObject = objectMapper.readValue(json, targetClass);
             for (Field field : targetClass.getFields()) {
                 assertThat(actualObject).hasFieldOrProperty(field.getName());
