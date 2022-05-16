@@ -44,7 +44,9 @@ public class ResponseBodyMatchers {
         return mvcResult -> {
             String json =mvcResult.getResponse().getContentAsString();
             T actualObject = objectMapper.readValue(json, targetClass);
-            assertThat(actualObject).extracting("errors").isEqualToComparingFieldByField(expectedObject);
+        assertThat(actualObject)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedObject);
         };
     }
 
