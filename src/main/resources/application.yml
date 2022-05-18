@@ -8,3 +8,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     properties.hibernate.hbm2ddl.auto: create-drop
     showSql: true
+  config:
+    import:
+      - classpath:jwt.yml
