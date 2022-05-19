@@ -62,6 +62,24 @@ class JwtProviderTest {
 
     }
 
+    @Test
+    @DisplayName("정상적인 토큰에서 인증정보를 얻는 동작 테스트")
+    void getAuthenticationTest() {
+        String normalAccessToken = jwtProvider.createAccessToken(authentication);
+        assertThat(jwtProvider.getAuthentication(normalAccessToken))
+                .isNotNull()
+                .isInstanceOfSatisfying(JwtAuthenticationToken.class, jwtAuthenticationToken -> {
+                    assertThat(jwtAuthenticationToken).isNotNull();
+                    assertThat(jwtAuthenticationToken.getPrincipal())
+                            .isNotNull()
+                            .isInstanceOfSatisfying(JwtPrincipal.class, jwtPrincipal -> {
+                                assertThat(jwtPrincipal)
+                                        .usingRecursiveComparison()
+                                        .isEqualTo(authentication.getPrincipal());
+                            });
+                });
+    }
+
     static class SampleAuthenticationImpl extends AbstractAuthenticationToken {
 
         private final Object principal;

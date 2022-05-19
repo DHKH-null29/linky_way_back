@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
-
 @Slf4j
 @Component
 public class JwtProvider {
@@ -37,6 +36,14 @@ public class JwtProvider {
                 )
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
+    }
+
+    public Authentication getAuthentication(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        JwtPrincipal jwtPrincipal = new JwtPrincipal(
+                Long.parseLong(claims.getSubject()),
+                claims.get(CLAIM_NAME).toString());
+        return new JwtAuthenticationToken(jwtPrincipal, "", null);
     }
 
     public boolean validateToken(String token) {
