@@ -31,13 +31,13 @@ public class Card {
     private Boolean shareable;
 
     ////********************연관 관게  ***************************/////
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "folder_folder_id")
     private Folder folder;
 
 
     // ***** 1 : N *****
-    @OneToMany(mappedBy = "card")
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardTag> cardTags = new ArrayList<>();
 
 
