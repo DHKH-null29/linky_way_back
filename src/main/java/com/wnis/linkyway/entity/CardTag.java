@@ -18,11 +18,11 @@ public class CardTag {
 
     ////********************연관 관게  ***************************/////
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_card_id")
     private Card card;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_tag_id")
     private Tag tag;
 

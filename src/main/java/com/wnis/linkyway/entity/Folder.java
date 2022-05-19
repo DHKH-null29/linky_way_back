@@ -21,19 +21,19 @@ public class Folder {
     ////********************연관 관게  ***************************/////
 
     // ***** 1 : N *****
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent")
     private List<Folder> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "folder")
     private List<Card> cards = new ArrayList<>();
 
 
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_folder_id")
     private Folder parent;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_member_id")
     private Member member;
 
