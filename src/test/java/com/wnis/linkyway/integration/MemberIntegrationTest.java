@@ -60,9 +60,15 @@ class MemberIntegrationTest {
                     new ParameterizedTypeReference<Response<LoginResponse>>() {
                     }))
                     .isNotNull()
-                    .isInstanceOfSatisfying(ResponseEntity.class, re -> {
-                        assertThat(re.getStatusCode()).isEqualTo(HttpStatus.OK);
-                        System.out.println(re.getBody());
+                    .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
+                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                        assertThat(responseEntity.getBody())
+                                .isNotNull()
+                                .isInstanceOfSatisfying(Response.class, response -> {
+                                    assertThat(response).isNotNull();
+                                    assertThat(response.getData())
+                                            .hasFieldOrProperty("accessToken");
+                                });
                     });
         }
 
@@ -79,7 +85,7 @@ class MemberIntegrationTest {
                     }))
                     .isNotNull()
                     .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
-                       assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                     });
         }
 
