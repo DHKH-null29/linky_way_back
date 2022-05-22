@@ -31,6 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http
                 .csrf().disable()
+                .antMatcher("/h2-console/**").headers().frameOptions().disable().and()
                 .logout().disable()
                 .httpBasic().disable()
                 .formLogin().disable()
