@@ -1,7 +1,10 @@
 package com.wnis.linkyway.config;
 
+import com.wnis.linkyway.security.annotation.CurrentMember;
+import com.wnis.linkyway.security.jwt.JwtPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -14,6 +17,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 // swagger 접속 방법  http://localhost:8080/swagger-ui/index.html
@@ -26,9 +30,9 @@ public class SwaggerConfiguration {
         String title = "Swagger API Document";
         
         return new Docket(DocumentationType.OAS_30)
-                
-                .securityContexts(Arrays.asList(securityContext()))
-                .securitySchemes(Arrays.asList(apiKey()))
+                .ignoredParameterTypes(CurrentMember.class)
+                .securityContexts(Collections.singletonList(securityContext()))
+                .securitySchemes(Collections.singletonList(apiKey()))
                 .apiInfo(swaggerInfo(title, version)).select()
                 // 제목 설명 등에 필요한 문서 제공
                 .apis(RequestHandlerSelectors.basePackage("com.wnis.linkyway.controller")) // controller mapping 된 resource 문서화
@@ -58,7 +62,7 @@ public class SwaggerConfiguration {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("Authorization", authorizationScopes));
+        return Collections.singletonList(new SecurityReference("Authorization", authorizationScopes));
     }
     
 }
