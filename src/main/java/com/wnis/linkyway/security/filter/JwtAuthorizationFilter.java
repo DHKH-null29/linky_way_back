@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -34,6 +35,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private Authentication getAuthenticationFromHeader(HttpServletRequest request) {
         String accessToken = request.getHeader(AUTHORIZATION_HEADER);
         return jwtProvider.validateToken(accessToken) ? jwtProvider.getAuthentication(accessToken) : null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String url = request.getServletPath();
+        return Stream.of("/api").noneMatch(url::startsWith);
     }
 
 }
