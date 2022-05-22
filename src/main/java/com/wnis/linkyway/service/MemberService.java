@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-    
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    
+
     @Transactional(readOnly = true)
     public Member login(LoginRequest loginRequest) {
         Member member = memberRepository.findByEmail(loginRequest.getEmail())
@@ -28,31 +28,28 @@ public class MemberService {
         validPassword(loginRequest.getPassword(), member.getPassword());
         return member;
     }
-    
-    public Response<JoinResponse> join(JoinRequest joinRequest) {
-        Member joinMember = Member.builder().nickname(joinRequest.getNickname())
+
+    public Long join(JoinRequest joinRequest) {
+        validEmailDuplication(joinRequest.getEmail());
+        Member joinMember = Member.builder()
+                .nickname(joinRequest.getNickname())
                 .email(joinRequest.getEmail())
                 .password(passwordEncoder.encode(joinRequest.getPassword()))
                 .build();
-        
-        Member existMember = memberRepository.findByEmail(joinRequest.getEmail()).orElse(null);
-        if (existMember != null) {
-            throw new ResourceConflictException("중복된 이메일/아이디가 존재합니다.");
-        }
-        
-        Member member = memberRepository.save(joinMember);
-        JoinResponse joinResponse = JoinResponse.builder().memberId(member.getId()).build();
-        return Response.<JoinResponse>builder()
-                .code(200)
-                .message("회원가입 성공")
-                .data(joinResponse)
-                .build();
+        memberRepository.save(joinMember);
+        return joinMember.getId();
     }
-    
+
+    private void validEmailDuplication(String email) {
+        if (memberRepository.existsByEmail(email)) {
+            throw new ResourceConflictException("이미 중복되는 이메일이 있습니다.");
+        }
+    }
+
     private void validPassword(String inputPassword, String encodedPassword) {
         if (!passwordEncoder.matches(inputPassword, encodedPassword)) {
             throw new BadCredentialsException("이메일 또는 비밀번호를 확인하세요");
         }
     }
-    
+
 }
