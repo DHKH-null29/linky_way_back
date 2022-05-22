@@ -3,16 +3,26 @@ package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.entity.Folder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
-    @Query("select f from Folder as f left outer join fetch f.parent")
-    public List<Folder> findAllEagerly();
-
-    @Query("select f from Folder f join fetch f.member")
-    public List<Folder> findAllIncludeMember();
-
-
+    
+    @Query("select f from Folder f join f.member as m " +
+            "left outer join fetch f.parent" +
+            " where m.id = :memberId")
+    public List<Folder> findFoldersByMemberId(@Param("memberId") Long memberId);
+    
+    @Query("select f from Folder f left outer join fetch f.parent " +
+            "where f.id = :folderId")
+    public Folder findFolderById(@Param("folderId") Long folderId);
+    
+    @Modifying
+    @Query(value = "insert into folder (name, depth, parent_folder_id, member_member_id) " +
+            "values ('default', 1, null, :memberId)", nativeQuery = true)
+    public void addSuperFolder(@Param("memberId") Long memberId);
+    
 }
