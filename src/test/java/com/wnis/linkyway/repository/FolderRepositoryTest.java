@@ -15,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,13 +24,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql("/sqltest/initialize-test.sql")
 class FolderRepositoryTest {
     
+    private final Logger logger = LoggerFactory.getLogger(FolderRepositoryTest.class);
     @Autowired
     FolderRepository folderRepository;
     @Autowired
     MemberRepository memberRepository;
     @Autowired
     EntityManager entityManager;
-    private final Logger logger = LoggerFactory.getLogger(FolderRepositoryTest.class);
     
     @BeforeEach
     void setup() {
@@ -76,25 +75,11 @@ class FolderRepositoryTest {
         folderRepository.saveAll(Arrays.asList(folder1, folder2, folder3, folder4, folder6));
     }
     
-    @Test
-    @DisplayName("findFolderByMemberId 테스트")
-    void findFolderByMemberIdTest() {
-        List<Folder> folders = folderRepository.findFoldersByMemberId(1L);
-        folders.forEach((f) -> logger.info("폴더 id = {}, 폴더 이름 = {}, 폴더 부모 = {}, 폴더 자식 = {}",
-                f.getId(), f.getName(), f.getParent(), f.getChildren()));
-        assertThat(folders.get(1)).isInstanceOfSatisfying(Folder.class, f -> {
-            assertThat(f.getId()).isEqualTo(2);
-            assertThat(f.getName()).isEqualTo("f2");
-            assertThat(f.getParent().getId()).isEqualTo(1);
-            assertThat(f.getChildren().size()).isEqualTo(2);
-        });
-        
-    }
     
     @Test
     @DisplayName("findFolderByFolderId 테스트")
     void findFolderByIdTest() {
-        Folder folder = folderRepository.findFolderById(2L);
+        Folder folder = folderRepository.findFolderById(2L).get();
         logger.info("폴더 id = {}, 폴더 이름 = {}, 폴더 부모 = {}, 폴더 자식 = {}",
                 folder.getId(), folder.getName(), folder.getParent(), folder.getChildren());
         
@@ -109,7 +94,7 @@ class FolderRepositoryTest {
     @Test
     @DisplayName("폴더 추가 테스트")
     void insertFolder() {
-        Folder parent = folderRepository.findFolderById(1L);
+        Folder parent = folderRepository.findFolderById(1L).get();
         assertThat(parent.getChildren().size()).isEqualTo(2);
         
         Folder newFolder = Folder.builder()
@@ -123,7 +108,7 @@ class FolderRepositoryTest {
         folderRepository.flush();
         entityManager.clear();
         
-        parent = folderRepository.findFolderById(1L);
+        parent = folderRepository.findFolderById(1L).get();
         assertThat(parent.getChildren().size()).isEqualTo(3);
     }
     
@@ -132,8 +117,8 @@ class FolderRepositoryTest {
     void modifyMyParent() {
         entityManager.clear();
         
-        Folder folder2 = folderRepository.findFolderById(2L);
-        Folder folder6 = folderRepository.findFolderById(5L);
+        Folder folder2 = folderRepository.findFolderById(2L).get();
+        Folder folder6 = folderRepository.findFolderById(5L).get();
         
         
         folder2.modifyParent(folder6);
@@ -145,9 +130,9 @@ class FolderRepositoryTest {
         // 영속성 컨테이너가 깨끗한 상태에서 DB에 수정이 반영되었는지 테스트
         entityManager.clear();
         
-        Folder newFolder1 = folderRepository.findFolderById(1L);
-        Folder newFolder2 = folderRepository.findFolderById(2L);
-        Folder newFolder6 = folderRepository.findFolderById(5L);
+        Folder newFolder1 = folderRepository.findFolderById(1L).get();
+        Folder newFolder2 = folderRepository.findFolderById(2L).get();
+        Folder newFolder6 = folderRepository.findFolderById(5L).get();
         
         logger.info("폴더2 부모 이름: {}", newFolder2.getParent().getName());
         logger.info("폴더6 자식 이름: {}", newFolder6.getChildren().get(newFolder6.getChildren().size() - 1).getName());
@@ -163,8 +148,8 @@ class FolderRepositoryTest {
     void failModifyMyParent() {
         entityManager.clear();
         
-        Folder folder2 = folderRepository.findFolderById(2L);
-        Folder folder4 = folderRepository.findFolderById(4L);
+        Folder folder2 = folderRepository.findFolderById(2L).get();
+        Folder folder4 = folderRepository.findFolderById(4L).get();
         
         Assertions.assertThatThrownBy(() -> folder2.modifyParent(folder4)).isInstanceOf(IllegalStateException.class);
         
@@ -173,23 +158,15 @@ class FolderRepositoryTest {
     @Test
     @DisplayName("폴더 이름 수정 테스트")
     void modifyFolderName() {
-        Folder folder = folderRepository.findFolderById(1L);
+        Folder folder = folderRepository.findFolderById(1L).get();
         folder.updateName("hello");
         folderRepository.saveAndFlush(folder);
         entityManager.clear();
         
-        Folder newFolder = folderRepository.findFolderById(1L);
+        Folder newFolder = folderRepository.findFolderById(1L).get();
         assertThat(newFolder.getName()).isEqualTo("hello");
     }
     
-    @Test
-    @DisplayName("회원가입시 기본 폴더 생성 테스트")
-    void addSuperFolder() {
-        folderRepository.addSuperFolder(1L);
-        List<Folder> folders = folderRepository.findFoldersByMemberId(1L);
-        folders.forEach((f) -> logger.info("폴더 이름: {}, 폴더 부모 id: {}", f.getName(), f.getParent()));
-        assertThat(folders.get(5).getParent()).isNull();
-    }
     
     @Test
     @DisplayName("폴더 삭제 테스트")
