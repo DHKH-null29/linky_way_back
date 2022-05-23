@@ -26,10 +26,9 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> findFolder(Long folderId) {
-        Folder folder = folderRepository.findFolderById(folderId);
-        if (folder == null) {
+        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> {
             throw new ResourceConflictException("해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다.");
-        }
+        });
         FolderResponse folderResponse = new FolderResponse(folder);
         return Response.of(HttpStatus.OK, folderResponse, "폴더를 성공적으로 조회했습니다.");
     }
@@ -42,14 +41,12 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElse(null);
-        if (member == null) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> {
             throw new ResourceConflictException("회원이 존재하지 않습니다.");
-        }
-        Folder parent = folderRepository.findFolderById(addFolderRequest.getParentFolderId());
-        if (parent == null) {
+        });
+        Folder parent = folderRepository.findFolderById(addFolderRequest.getParentFolderId()).orElseThrow(() -> {
             throw new ResourceConflictException("존재 하지 않는 상위 폴더입니다.");
-        }
+        });
         Folder folder = Folder.builder()
                 .member(member)
                 .name(addFolderRequest.getName())
@@ -67,40 +64,37 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> setFolderPath(SetFolderPathRequest setFolderPathRequest, Long folderId) {
-        Folder folder = folderRepository.findFolderById(folderId);
-        if (folder == null) {
+        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> {
             throw new ResourceConflictException("수정 하려는 폴더가 존재하지 않습니다.");
-        }
-        Folder destinationFolder = folderRepository.findFolderById(setFolderPathRequest.getTargetFolderId());
-        if (destinationFolder == null) {
-            throw new ResourceConflictException("목표 부모 폴더가 존재하지 않습니다.");
-        }
+        });
+        
+        Folder destinationFolder = folderRepository.findFolderById(setFolderPathRequest.getTargetFolderId())
+                .orElseThrow(() -> {
+                    throw new ResourceConflictException("목표 부모 폴더가 존재하지 않습니다.");
+                });
+        
         if (destinationFolder.isDirectAncestor(folder)) {
             throw new ResourceConflictException("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다.");
         }
         folder.modifyParent(destinationFolder);
-        folderRepository.save(folder);
         return Response.of(HttpStatus.OK, null, "폴더 경로가 성공적으로 수정되었습니다.");
         
     }
     
     @Override
     public Response<FolderResponse> setFolderName(SetFolderNameRequest setFolderNameRequest, Long folderId) {
-        Folder folder = folderRepository.findById(folderId).orElse(null);
-        if (folder == null) {
-            throw new ResourceConflictException("해당 폴더가 존재하지 않아 수정을 할 수 없습니다.");
-        }
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new ResourceConflictException("해당 폴더가 존재하지 않아 수정을 할 수 없습니다."));
+        
         folder.updateName(setFolderNameRequest.getName());
-        folderRepository.save(folder);
         return Response.of(HttpStatus.OK, null, "폴더 이름이 성공적으로 수정되었습니다.");
     }
     
     @Override
     public Response<FolderResponse> deleteFolder(Long folderId) {
-        Folder folder = folderRepository.findById(folderId).orElse(null);
-        if (folder == null) {
-            throw new ResourceConflictException("해당 폴더가 존재하지 않아 삭제 할 수 없습니다.");
-        }
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new ResourceConflictException("해당 폴더가 존재하지 않아 삭제 할 수 없습니다."));
+        
         folderRepository.deleteById(folderId);
         return Response.of(HttpStatus.OK, null, "폴더와 하위 폴더가 성공적으로 삭제되었습니다.");
     }
