@@ -1,7 +1,5 @@
 package com.wnis.linkyway.dto.card;
 
-
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wnis.linkyway.entity.Tag;
 import lombok.Builder;
