@@ -3,26 +3,18 @@ package com.wnis.linkyway.security.filter;
 import com.wnis.linkyway.security.jwt.JwtAuthenticationToken;
 import com.wnis.linkyway.security.jwt.JwtPrincipal;
 import com.wnis.linkyway.security.jwt.JwtProvider;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.mockito.BDDMockito;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.context.support.HttpRequestHandlerServlet;
 
 import javax.servlet.*;
-
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -80,7 +72,29 @@ class JwtAuthorizationFilterTest {
                             .isEqualTo(authentication.getPrincipal());
                 });
 
-        verify(filterChain,times(1)).doFilter(httpServletRequest,httpServletResponse);
+        verify(filterChain, times(1)).doFilter(httpServletRequest, httpServletResponse);
+    }
+
+    @Nested
+    @DisplayName("필터 동작 제외 메소드 테스트")
+    class ShouldNotFilterTest {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"/api", "/api/members"})
+        @DisplayName("비즈니스 요청에 대해서 true를 반환한다.")
+        void shouldReturnTrue(String path) throws Exception {
+            httpServletRequest.setServletPath(path);
+            assertThat(jwtAuthorizationFilter.shouldNotFilter(httpServletRequest)).isFalse();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"/swagger-ui", "/h2-console", "/"})
+        @DisplayName("비즈니스 이외의 요청에 대해서 false를 반환한다.")
+        void shouldReturnFalse(String path) throws Exception {
+            httpServletRequest.setServletPath(path);
+            assertThat(jwtAuthorizationFilter.shouldNotFilter(httpServletRequest)).isTrue();
+        }
+
     }
 
 }
