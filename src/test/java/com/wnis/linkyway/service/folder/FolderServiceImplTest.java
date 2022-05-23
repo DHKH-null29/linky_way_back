@@ -116,21 +116,6 @@ class FolderServiceImplTest {
         
     }
     
-    @Nested
-    @DisplayName("Default 폴더 추가")
-    class AddSuperFolderTest {
-        
-        @Test
-        @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            Response<FolderResponse> response = folderService.addSuperFolder(1L);
-            List<Folder> folders = folderRepository.findFoldersByMemberId(1L);
-            folders.forEach((f) -> logger.info("폴더 이름: {}", f.getName()));
-            
-            logger.info(objectMapper.writeValueAsString(response));
-        }
-    }
-    
     
     @Nested
     @DisplayName("폴더 추가")
