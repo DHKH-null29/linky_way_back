@@ -23,7 +23,7 @@ public class TagController {
     @GetMapping("/tags/table")
     @ApiOperation(value = "태그 조회", notes = "해당 회원이 가지고 있는 태그 리스트를 조회한다.")
     @Authenticated
-    public ResponseEntity<Response> searchTags(@ApiIgnore @CurrentMember Long memberId) {
+    public ResponseEntity<Response> searchTags(@CurrentMember Long memberId) {
         Response response = tagService.searchTags(memberId);
         return ResponseEntity.ok(response);
     }
