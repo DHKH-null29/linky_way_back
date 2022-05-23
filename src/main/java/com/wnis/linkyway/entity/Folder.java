@@ -60,11 +60,7 @@ public class Folder {
         }
     }
     
-    public Folder modifyParent(Folder destination) {
-        if (destination == null) {
-            throw new NullPointerException("널 폴더에 연결 할 수 없습니다.");
-        }
-        
+    public void modifyParent(Folder destination) {
         if (destination.isDirectAncestor(this)) {
             throw new IllegalStateException("순환 참조 위험성이 있습니다.");
         }
@@ -76,7 +72,6 @@ public class Folder {
         this.parent = destination; // 현재 폴더의 부모를 destination 설정
         destination.getChildren().add(this); // destination 자식에 현재 폴더 엔티티 추가
         
-        return this;
     }
     
     public boolean isDirectAncestor(Folder folder) {
