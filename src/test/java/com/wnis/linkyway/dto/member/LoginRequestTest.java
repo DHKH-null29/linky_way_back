@@ -53,15 +53,14 @@ public class LoginRequestTest {
                     .build();
 
             Set<ConstraintViolation<LoginRequest>> constraintViolations = validator.validate(loginRequest, NotBlankGroup.class);
-            int errorSize = result;
             constraintViolations.forEach((error)->
                     logger.debug(error.getMessage()));
-            assertThat(errorSize).isEqualTo(result);
+            assertThat(result).isEqualTo(result);
         }
 
         @ParameterizedTest
         @CsvSource(value = {
-                "'', '', 1",
+                "'', '', 2",
                 "adg@naa, asdfa, 2",
                 "'asd12@co.kr', 'aA1!aa121', 0"
         })
