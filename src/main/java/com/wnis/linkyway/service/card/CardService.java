@@ -9,4 +9,6 @@ public interface CardService {
     public AddCardResponse addCard(CardRequest cardRequest);
 
     public CardResponse findCardByCardId(Long cardId);
+    
+    public void updateCard(Long cardId, CardRequest cardRequest);
 }
