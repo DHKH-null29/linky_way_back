@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +33,7 @@ public class CardController {
     @PostMapping
     public ResponseEntity<Response> addCard(
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
-
+        
         AddCardResponse addCardResponse = cardService.addCard(cardRequest);
 
         return ResponseEntity.created(URI.create("/card/" + addCardResponse))
@@ -66,6 +67,18 @@ public class CardController {
                 .body(Response.builder()
                         .code(HttpStatus.OK.value())
                         .message("카드 변경 완료")
+                        .build());
+    }
+    
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
+        
+        cardService.deleteCard(cardId);
+        
+        return ResponseEntity.ok()
+                .body(Response.builder()
+                        .code(HttpStatus.OK.value())
+                        .message("카드 삭제 완료")
                         .build());
     }
 }
