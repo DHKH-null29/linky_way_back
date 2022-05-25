@@ -3,6 +3,7 @@ package com.wnis.linkyway.service.card;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
@@ -19,8 +20,12 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public Long addCard(CardRequest cardRequest) {
-        return cardRepository.save(cardRequest.toEntity()).getId();
+    public AddCardResponse addCard(CardRequest cardRequest) {
+        Long cardId = cardRepository.save(cardRequest.toEntity()).getId();
+        AddCardResponse addCardResponse = AddCardResponse.builder()
+                                                         .cardId(cardId)
+                                                         .build();
+        return addCardResponse;
     }
 
     @Override

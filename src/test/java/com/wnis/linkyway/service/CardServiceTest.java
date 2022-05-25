@@ -1,5 +1,6 @@
 package com.wnis.linkyway.service;
 
+import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Folder;
@@ -36,14 +37,15 @@ public class CardServiceTest {
     private final Folder folder = null;
 
     private Card card() {
-        return Card.builder()
-                   .id(3L)
-                   .link(link)
-                   .title(title)
-                   .content(content)
-                   .shareable(shareable)
-                   .folder(folder)
-                   .build();
+        Card newCard = Card.builder()
+                           .link(link)
+                           .title(title)
+                           .content(content)
+                           .shareable(shareable)
+                           .folder(folder)
+                           .build();
+        newCard.setId(3L);
+        return newCard;
     }
 
     private CardRequest cardRequest() {
@@ -61,16 +63,14 @@ public class CardServiceTest {
     public void addCardSuccess() {
         // given
         Card card = card();
-
         CardRequest cardRequest = cardRequest();
-
         BDDMockito.given(cardRepository.save(any(Card.class))).willReturn(card);
 
         // when
-        Long result = cardService.addCard(cardRequest);
+        AddCardResponse addCardResponse = cardService.addCard(cardRequest);
 
         // then
-        assertThat(result).isNotNull();
+        assertThat(addCardResponse).isNotNull();
         verify(cardRepository).save(Mockito.any(Card.class));
     }
 }
