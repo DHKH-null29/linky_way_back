@@ -4,6 +4,7 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.repository.CardRepository;
+import com.wnis.linkyway.service.card.CardServiceImpl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
