@@ -47,7 +47,7 @@ class CardRequestTest {
                 "'', '', false, '', 2",
                 "'', '', '', '', 3"
         }, delimiter = ',')
-        void notBlankTest(String link, String title, Boolean shareable, String folderId, int result) {
+        void notBlankTest(String link, String title, Boolean shareable, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
                     .link(link)
                     .title(title)
@@ -71,7 +71,7 @@ class CardRequestTest {
                 "'', '', 'true', '', 0",
                 "'', '', 'trye1', '', 1"
         }, delimiter = ',')
-        void patternTest(String link, String title, Boolean shareable, String folderId, int result) {
+        void patternTest(String link, String title, Boolean shareable, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
                     .link(link)
                     .title(title)

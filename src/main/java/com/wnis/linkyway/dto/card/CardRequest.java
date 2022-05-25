@@ -1,6 +1,7 @@
 package com.wnis.linkyway.dto.card;
 
 import com.wnis.linkyway.dto.tag.TagResponse;
+import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.validation.ValidationGroup;
 import lombok.*;
 
@@ -11,7 +12,6 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 import static com.wnis.linkyway.validation.ValidationGroup.*;
-
 
 @Getter
 @NoArgsConstructor
@@ -31,6 +31,15 @@ public class CardRequest {
 
     private List<TagResponse> tagResponseList;
 
-    @NotBlank(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
-    private String folderId;
+    @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
+    private Long folderId;
+
+    public Card toEntity() {
+        return Card.builder()
+                   .link(link)
+                   .title(title)
+                   .content(content)
+                   .shareable(shareable)
+                   .build();
+    }
 }

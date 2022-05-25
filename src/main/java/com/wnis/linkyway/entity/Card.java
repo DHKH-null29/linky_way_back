@@ -1,14 +1,20 @@
 package com.wnis.linkyway.entity;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 @Getter
 @Table(name = "card")
@@ -16,6 +22,7 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "card_id", nullable = false)
+    @Setter
     private Long id;
 
     @Column(name = "link")
@@ -31,13 +38,13 @@ public class Card {
     private Boolean shareable;
 
     ////********************연관 관게  ***************************/////
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_folder_id")
     private Folder folder;
 
 
     // ***** 1 : N *****
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "card")
     private List<CardTag> cardTags = new ArrayList<>();
 
 
