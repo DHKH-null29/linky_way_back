@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +38,19 @@ public class CardController {
                                            .code(HttpStatus.CREATED.value())
                                            .data(addCardResponse)
                                            .message("카드가 생성되었습니다.")
+                                           .build());
+    }
+
+    @GetMapping("/{cardId}")
+    public ResponseEntity<Response> findCardByCardId(Long cardId) {
+
+        CardResponse cardResponse = cardService.findCardByCardId(cardId);
+
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .data(cardResponse)
+                                           .message("카드를 찾았습니다.")
                                            .build());
     }
 }
