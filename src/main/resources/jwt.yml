@@ -1,0 +1,5 @@
+jwt:
+  secret-key: linkywayteamisgoodlinkywayteamisgoodlinkywayteamisgoodlinkywayteamisgoodlinkywayteamisgoodlinkywayteamisgoodlinkywayteamisgood
+  access-token:
+    name: access_token
+    valid-time: 6
