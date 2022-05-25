@@ -29,7 +29,7 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
-    public ResponseEntity<Response> addNewCard(
+    public ResponseEntity<Response> addCard(
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
         AddCardResponse addCardResponse = cardService.addCard(cardRequest);
