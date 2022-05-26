@@ -12,23 +12,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wnis.linkyway.dto.Response;
+import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
-import com.wnis.linkyway.exception.error.ErrorResponse;
-import com.wnis.linkyway.service.CardService;
+import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
 
 @ExtendWith(MockitoExtension.class)
 public class CardControllerTest {
 
-    @Autowired
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private CardController cardController;
@@ -43,7 +42,7 @@ public class CardControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(cardController).build();
     }
 
-    @DisplayName("카드(북마크) 생성 성공")
+    @DisplayName("카드(북마크) 추가 성공")
     @Test
     void addCardSuccess() throws Exception {
         // given
@@ -54,24 +53,26 @@ public class CardControllerTest {
                                                 .shareable(true)
                                                 .folderId(1L)
                                                 .build();
-        Long addCardResponse = 3L;
+        AddCardResponse addCardResponse = AddCardResponse.builder()
+                                                         .cardId(3L)
+                                                         .build();
 
         doReturn(addCardResponse).when(cardService)
                                  .addCard(Mockito.any(CardRequest.class));
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/tags").contentType("application/json")
-                                 .content(objectMapper.writeValueAsString(
-                                         addCardRequest)));
+                post("/api/cards").contentType("application/json")
+                                  .content(objectMapper.writeValueAsString(
+                                          addCardRequest)));
 
         // then
-        MvcResult mvcResult = resultActions.andExpect(status().isOk())
+        MvcResult mvcResult = resultActions.andExpect(status().isCreated())
                                            .andExpect(
                                                    ResponseBodyMatchers.responseBody() // create
                                                                        // ResponseBodyMatcher
                                                                        .containsPropertiesAsJson(
-                                                                               ErrorResponse.class)) // method
+                                                                               Response.class)) // method
                                            .andReturn();
     }
 
