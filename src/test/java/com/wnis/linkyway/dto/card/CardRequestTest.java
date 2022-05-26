@@ -43,9 +43,9 @@ class CardRequestTest {
     class ValidationTest {
         @ParameterizedTest
         @CsvSource(value = {
-                "www.google.co.kr, '', '', 1, 1",
-                "'', '', false, '', 2",
-                "'', '', '', '', 3"
+                "www.google.co.kr, '', '', 1, 0",
+                "'', '', false, '1', 1",
+                "'', '', '', '0', 1"
         }, delimiter = ',')
         void notBlankTest(String link, String title, Boolean shareable, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
@@ -66,10 +66,10 @@ class CardRequestTest {
 
         @ParameterizedTest
         @CsvSource(value = {
-                "www.google.co.kr, '', '', 1, 1",
-                "'', '', false, '', 0",
-                "'', '', 'true', '', 0",
-                "'', '', 'trye1', '', 1"
+                "www.google.co.kr, '', '', 1, 0",
+                "'', '', false, '1', 0",
+                "'', '', 'true', '1', 0",
+                "'', '', 'trye1', '1', 0"
         }, delimiter = ',')
         void patternTest(String link, String title, Boolean shareable, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
