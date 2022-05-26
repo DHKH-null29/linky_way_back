@@ -58,4 +58,20 @@ public class Card {
         if (folder != null)
             folder.getCards().add(this);
     }
+    
+    public void updateLink(String link) {
+        this.link = link;
+    }
+    
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+    
+    public void updateContent(String content) {
+        this.content = content;
+    }
+    
+    public void updateShareable(boolean shareable) {
+        this.shareable = shareable;
+    }
 }
