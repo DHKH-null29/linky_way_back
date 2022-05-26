@@ -58,7 +58,7 @@ class MemberMapperTest {
     
     @Test
     @DisplayName("Member -> Response 매핑 테스트")
-    void shouldReturnMemberResponseFormMember() throws JsonProcessingException {
+    void shouldReturnJoinResponseFromMember() throws JsonProcessingException {
         Member member = Member.builder()
                 .email("hellowolrd@naver.com")
                 .password("aasaq!12@qA")
@@ -71,4 +71,33 @@ class MemberMapperTest {
         logger.info("리턴 값 : {}", objectMapper.writeValueAsString(memberResponse));
         
     }
+    
+    @Test
+    @DisplayName("member -> email 매핑 테스트")
+    void shouldReturnEmailResponseFromMember() throws JsonProcessingException {
+        Member member = Member.builder()
+                .email("hellowolrd@naver.com")
+                .password("aasaq!12@qA")
+                .nickname("hello")
+                .build();
+    
+        memberRepository.save(member);
+        MemberResponse memberResponse = MemberMapper.instance.memberToEmailResponse(member);
+        logger.info("리턴 값 : {}", objectMapper.writeValueAsString(memberResponse));
+    }
+    
+    @Test
+    @DisplayName("member -> myPage 매핑 테스트")
+    void shouldReturnMyPageResponseFromMember() throws JsonProcessingException {
+        Member member = Member.builder()
+                .email("hellowolrd@naver.com")
+                .password("aasaq!12@qA")
+                .nickname("hello")
+                .build();
+    
+        memberRepository.save(member);
+        MemberResponse memberResponse = MemberMapper.instance.memberToMyPageResponse(member);
+        logger.info("리턴 값 : {}", objectMapper.writeValueAsString(memberResponse));
+    }
+    
 }

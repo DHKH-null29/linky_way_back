@@ -20,7 +20,8 @@ import static com.wnis.linkyway.validation.ValidationGroup.*;
 public class LoginRequest {
 
     @NotBlank(message = "email을 입력해주세요.", groups = NotBlankGroup.class)
-    @Email(message = "email 형식을 확인해주세요", groups = PatternCheckGroup.class)
+    @Pattern(regexp = "^[a-zA-Z\\d]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+            message = "email 형식을 확인해주세요", groups = PatternCheckGroup.class)
     private String email;
 
     @NotBlank(message = "password를 입력해주세요.", groups = NotBlankGroup.class)

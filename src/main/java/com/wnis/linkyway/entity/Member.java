@@ -71,4 +71,8 @@ public class Member {
         this.password = password;
         this.email = email;
     }
+    
+    public void changePassword(String encode) {
+        this.password = encode;
+    }
 }
