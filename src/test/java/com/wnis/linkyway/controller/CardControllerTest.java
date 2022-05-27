@@ -1,11 +1,15 @@
 package com.wnis.linkyway.controller;
 
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,11 +20,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
+import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.exception.GlobalExceptionHandler;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
 
@@ -74,6 +81,72 @@ public class CardControllerTest {
                                                                        .containsPropertiesAsJson(
                                                                                Response.class)) // method
                                            .andReturn();
+    }
+
+    @Nested
+    @DisplayName("단일 북마크(카드) 상세 조회")
+    class findCardByCardId {
+
+        Long cardId;
+        CardResponse cardResponse;
+
+        @BeforeEach
+        void setCard() {
+            cardId = 3L;
+            cardResponse = CardResponse.builder()
+                                       .cardId(cardId)
+                                       .link("https://www.naver.com/")
+                                       .title("title1")
+                                       .content("content1")
+                                       .shareable(true)
+                                       .build();
+        }
+
+        @Test
+        @DisplayName("상세 조회 성공: 올바른 URL")
+        void CardExistFindingSuccess() throws Exception {
+            // given
+            doReturn(cardResponse).when(cardService).findCardByCardId(cardId);
+
+            // when
+            ResultActions resultActions = mockMvc.perform(get("/api/cards/"
+                    + cardId).contentType("application/json")
+                             .content(objectMapper.writeValueAsString(
+                                     cardResponse)));
+
+            // then
+            MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                               .andExpect(
+                                                       ResponseBodyMatchers.responseBody()
+                                                                           .containsPropertiesAsJson(
+                                                                                   Response.class))
+                                               .andReturn();
+            verify(cardService).findCardByCardId(Mockito.anyLong());
+        }
+
+        @Test
+        @DisplayName("상세 조회 실패: 잘못된 URL")
+        void CardNotExistFindingFail() throws Exception {
+            // given
+            doReturn(cardResponse).when(cardService)
+                                  .findCardByCardId(Mockito.anyLong());
+
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    get("/api/cards/").contentType("application/json")
+                                      .content(objectMapper.writeValueAsString(
+                                              cardResponse)));
+
+            // then
+            MvcResult mvcResult = resultActions.andExpect(
+                    status().isMethodNotAllowed())
+                                               .andExpect(
+                                                       ResponseBodyMatchers.responseBody()
+                                                                           .containsPropertiesAsJson(
+                                                                                   GlobalExceptionHandler.class))
+                                               .andReturn();
+            verify(cardService).findCardByCardId(Mockito.anyLong());
+        }
     }
 
 }
