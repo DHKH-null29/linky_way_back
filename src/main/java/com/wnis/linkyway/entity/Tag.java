@@ -43,7 +43,10 @@ public class Tag {
 
 
     //******************* setter ******************************////
-    
+    public Tag updateId(Long id) {
+        this.id = id;
+        return this;
+    }
     
     public Tag updateName(String name) {
         this.name = name;
