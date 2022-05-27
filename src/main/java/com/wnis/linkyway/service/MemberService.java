@@ -3,6 +3,7 @@ package com.wnis.linkyway.service;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.*;
 import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.exception.common.InvalidValueException;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.FolderRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class MemberService {
     @Transactional
     public Response<MemberResponse> join(JoinRequest joinRequest) {
         validEmailDuplication(joinRequest.getEmail());
+        validNicknameDuplication(joinRequest.getNickname());
         
         Member joinMember = MemberMapper.instance.joinRequestToMember(joinRequest);
         joinMember.changePassword(passwordEncoder.encode(joinMember.getPassword()));
@@ -81,7 +84,22 @@ public class MemberService {
         memberRepository.deleteById(memberId);
         return Response.of(HttpStatus.OK, null, "삭제 성공");
     }
-    
+
+    public Response<DuplicationResponse> isValidNickname(String nickname) {
+        if (!StringUtils.hasText(nickname)) {
+            throw new InvalidValueException("닉네임을 입력하세요");
+        }
+
+        return Response.of(HttpStatus.OK,
+                new DuplicationResponse(!memberRepository.existsByNickname(nickname)),
+                "닉네임 사용가능 여부 조회 성공");
+    }
+
+    private void validNicknameDuplication(String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new ResourceConflictException("이미 중복되는 닉네임이 있습니다");
+        }
+    }
     
     private void validEmailDuplication(String email) {
         if (memberRepository.existsByEmail(email)) {
