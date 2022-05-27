@@ -36,6 +36,12 @@ public class MemberController {
         Response<MemberResponse> response = memberService.searchEmail(email);
         return ResponseEntity.status(response.getCode()).body(response);
     }
+
+    @GetMapping("/nickname")
+    public ResponseEntity<Response<DuplicationResponse>> searchNicknameDuplicationInfo(@RequestParam String nickname) {
+        Response<DuplicationResponse> response = memberService.isValidNickname(nickname);
+        return  ResponseEntity.status(response.getCode()).body(response);
+    }
     
     @GetMapping("/mypage")
     @Authenticated
