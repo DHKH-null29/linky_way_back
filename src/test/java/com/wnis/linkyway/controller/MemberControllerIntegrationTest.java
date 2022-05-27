@@ -206,5 +206,20 @@ class MemberControllerIntegrationTest {
                     .andReturn();
         }
     }
+
+    @Nested
+    @DisplayName("닉네임 중복 여부 조회 테스트")
+    class searchNicknameDuplicationInfoTest {
+
+        @Test
+        @DisplayName("응답 테스트")
+        void responseTest() throws Exception {
+            mockMvc.perform(
+                    get("/api/members/nickname")
+                            .param("nickname","Zeratu1"))
+                    .andExpect(status().isOk())
+                    .andDo(print());
+        }
+    }
     
 }
