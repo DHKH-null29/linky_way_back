@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:test;MODE=mysql;  # http://localhost:8080/h2-console
+    url: jdbc:h2:mem:test;MODE=mysql;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;  # http://localhost:8080/h2-console
     driver-class-name: org.h2.Driver
     username: sa
     password: sa
@@ -11,7 +11,9 @@ spring:
         show_sql: true
         format_sql: true
         highlight_sql: true
+        ddl-auto: update
 #        use_sql_comments: true
+    open-in-view: false
   config:
     import:
       - classpath:jwt.yml

@@ -13,8 +13,8 @@ import com.wnis.linkyway.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 @Service("folderService")
 @RequiredArgsConstructor
@@ -26,9 +26,9 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> findFolder(Long folderId) {
-        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> {
-            throw new ResourceConflictException("해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다.");
-        });
+        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() ->
+             new ResourceConflictException("해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다.")
+        );
         FolderResponse folderResponse = new FolderResponse(folder);
         return Response.of(HttpStatus.OK, folderResponse, "폴더를 성공적으로 조회했습니다.");
     }
@@ -41,12 +41,12 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-            throw new ResourceConflictException("회원이 존재하지 않습니다.");
-        });
-        Folder parent = folderRepository.findFolderById(addFolderRequest.getParentFolderId()).orElseThrow(() -> {
-            throw new ResourceConflictException("존재 하지 않는 상위 폴더입니다.");
-        });
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+            new ResourceConflictException("회원이 존재하지 않습니다.")
+        );
+        Folder parent = folderRepository.findFolderById(addFolderRequest.getParentFolderId()).orElseThrow(() ->
+            new ResourceConflictException("존재 하지 않는 상위 폴더입니다.")
+        );
         Folder folder = Folder.builder()
                 .member(member)
                 .name(addFolderRequest.getName())
@@ -64,14 +64,14 @@ public class FolderServiceImpl implements FolderService {
     
     @Override
     public Response<FolderResponse> setFolderPath(SetFolderPathRequest setFolderPathRequest, Long folderId) {
-        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() -> {
-            throw new ResourceConflictException("수정 하려는 폴더가 존재하지 않습니다.");
-        });
+        Folder folder = folderRepository.findFolderById(folderId).orElseThrow(() ->
+            new ResourceConflictException("수정 하려는 폴더가 존재하지 않습니다.")
+        );
         
         Folder destinationFolder = folderRepository.findFolderById(setFolderPathRequest.getTargetFolderId())
-                .orElseThrow(() -> {
-                    throw new ResourceConflictException("목표 부모 폴더가 존재하지 않습니다.");
-                });
+                .orElseThrow(() ->
+                    new ResourceConflictException("목표 부모 폴더가 존재하지 않습니다.")
+                );
         
         if (destinationFolder.isDirectAncestor(folder)) {
             throw new ResourceConflictException("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다.");

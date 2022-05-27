@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service("tagService")
@@ -49,9 +49,9 @@ public class TagServiceImpl implements TagService {
     
     @Override
     public Response setTag(TagRequest tagRequest, Long tagId) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> {
-            throw new ResourceConflictException("태그가 존재하지 않아 수정 할 수 없습니다.");
-        });
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() ->
+            new ResourceConflictException("태그가 존재하지 않아 수정 할 수 없습니다.")
+        );
         
         tag.updateName(tagRequest.getTagName()).updateShareable(Boolean.parseBoolean(tagRequest.getShareable()));
         return Response.of(HttpStatus.OK, null, "태그가 성공적으로 수정되었습니다");
@@ -59,9 +59,9 @@ public class TagServiceImpl implements TagService {
     
     @Override
     public Response deleteTag(Long tagId) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(()-> {
-            throw new ResourceConflictException("태그가 존재하지 않아 삭제 할 수 없습니다.");
-        });
+        Tag tag = tagRepository.findById(tagId).orElseThrow(()->
+            new ResourceConflictException("태그가 존재하지 않아 삭제 할 수 없습니다.")
+        );
         
         tagRepository.deleteById(tagId);
         return Response.of(HttpStatus.OK, null, "성공적으로 삭제되었습니다");

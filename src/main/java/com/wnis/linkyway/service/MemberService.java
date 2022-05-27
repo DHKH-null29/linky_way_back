@@ -50,7 +50,7 @@ public class MemberService {
     @Transactional
     public Response<MemberResponse> searchEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(()->
-                {throw new ResourceNotFoundException("조회한 이메일이 존재하지 않습니다");}
+                {return new ResourceNotFoundException("조회한 이메일이 존재하지 않습니다");}
         );
         
         return Response.of(HttpStatus.OK,
@@ -59,7 +59,7 @@ public class MemberService {
     @Transactional
     public Response<MemberResponse> searchMyPage(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-            throw new ResourceNotFoundException("회원을 찾을 수 없습니다");
+            return new ResourceNotFoundException("회원을 찾을 수 없습니다");
         });
        
         return Response.of(HttpStatus.OK,
@@ -68,7 +68,7 @@ public class MemberService {
     @Transactional
     public Response<MemberResponse> setPassword(PasswordRequest passwordRequest, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(()-> {
-            throw new ResourceNotFoundException("회원을 찾을 수 없습니다");
+            return new ResourceNotFoundException("회원을 찾을 수 없습니다");
         });
         member.changePassword(passwordEncoder.encode(passwordRequest.getPassword()));
         return Response.of(HttpStatus.OK,null, "비밀번호 변경 성공");
