@@ -40,4 +40,36 @@ public class CardRepositoryTest {
         assertThat(result.getShareable()).isEqualTo(true);
         assertThat(result.getFolder()).isNull();
     }
+    
+    @Test
+    @DisplayName("지정된 카드 조회 성공")
+    public void findCardByIdSuccess() {
+        // given
+        final Card card = Card.builder()
+                .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
+                .title("카드 조회")
+                .content("카드 조회 issue")
+                .shareable(true)
+                .folder(null)
+                .build();
+        final Card savedCard = cardRepository.save(card);
+
+        // when
+        Card findCard = cardRepository.findById(savedCard.getId())
+                              .orElseThrow(() -> new IllegalArgumentException(
+                                      "Wrong CardId"));
+        
+        // then
+        cardRepository.findById(findCard.getId()).ifPresent(selectCard -> { // 카드 존재 시 출력
+            System.out.println(
+                    "card:" + selectCard.getId() + selectCard.getTitle());
+        });
+        
+        assertThat(findCard.getLink()).isEqualTo(
+                "https://github.com/DHKH-null29/linky_way_back/issues/12");
+        assertThat(findCard.getTitle()).isEqualTo("카드 조회");
+        assertThat(findCard.getContent()).isEqualTo("카드 조회 issue");
+        assertThat(findCard.getShareable()).isEqualTo(true);
+        assertThat(findCard.getFolder()).isNull();
+    }
 }
