@@ -6,6 +6,7 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.MemberResponse;
 import com.wnis.linkyway.dto.member.PasswordRequest;
+import com.wnis.linkyway.exception.common.InvalidValueException;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.MemberRepository;
@@ -13,6 +14,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -169,5 +174,36 @@ class MemberServiceTest {
             }).isInstanceOf(ResourceConflictException.class).hasMessage("삭제 할 수 없습니다");
         }
     }
-    
+
+    @Nested
+    @DisplayName("중복 닉네임 여부 조회")
+    class IsValidNicknameTest {
+
+        @Test
+        @DisplayName("사용 가능한 닉네임 요청에 대한 응답: True")
+        void shouldReturnTrue() {
+            assertThat(memberService.isValidNickname("최번개").getData())
+                    .isNotNull()
+                    .hasFieldOrPropertyWithValue("usable",true);
+        }
+
+        @Test
+        @DisplayName("중복되는 닉네임 요청에 대한 응답: False")
+        void shouldReturnFalse() {
+            assertThat(memberService.isValidNickname("Zeratu1").getData())
+                    .isNotNull()
+                    .hasFieldOrPropertyWithValue("usable",false);
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "  "})
+        @DisplayName("공백 닉네임 요청에 대해 예외 발생")
+        void shouldThrowInvalidValueException(String nickname) {
+            assertThatThrownBy(() -> memberService.isValidNickname(nickname))
+                    .isInstanceOf(InvalidValueException.class);
+        }
+
+    }
+
 }
