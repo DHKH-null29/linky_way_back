@@ -17,66 +17,73 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/folders")
 public class FolderController {
     
     private final FolderService folderService;
     
-    @GetMapping("/folders/{folderId}")
+    @GetMapping("/super")
+    @Authenticated
+    public ResponseEntity<Response> searchFolderSuper(@CurrentMember Long memberId) {
+        Response<FolderResponse> response = folderService.findFolderSuper(memberId);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+    
+    @GetMapping("/{folderId}")
     @ApiOperation(value = "폴더 조회", notes = "해당 회원이 가지고 있는 폴더를 ID를 통해 조회한다.")
     @Authenticated
     public ResponseEntity<Response> searchFolder(@PathVariable(value = "folderId") Long folderId) {
-        Response<FolderResponse> folderResponse = folderService.findFolder(folderId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.findFolder(folderId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @PostMapping("/folders/super") // 삭제 예정
+    @PostMapping("/super") // 삭제 예정
     @Authenticated
     public ResponseEntity<Response> addSuperFolder(
             @CurrentMember Long memberId) {
         
-        Response<FolderResponse> folderResponse = folderService.addSuperFolder(memberId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.addSuperFolder(memberId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @PostMapping("/folders")
+    @PostMapping
     @ApiOperation(value = "폴더 추가", notes = "회원이 지정한 폴더에 하위 폴더를 추가한다.")
     @Authenticated
     public ResponseEntity<Response> addFolder(
             @Validated(ValidationSequence.class) @RequestBody AddFolderRequest addFolderRequest,
             @CurrentMember Long memberId) {
         
-        Response<FolderResponse> folderResponse = folderService.addFolder(addFolderRequest, memberId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.addFolder(addFolderRequest, memberId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @PutMapping("/folders/{folderId}/name")
+    @PutMapping("/{folderId}/name")
     @ApiOperation(value = "폴더 이름 수정", notes = "해당 폴더의 이름을 수정한다.")
     @Authenticated
     public ResponseEntity<Response> setFolderName(
             @Validated(ValidationSequence.class) @RequestBody SetFolderNameRequest setFolderNameRequest,
             @PathVariable Long folderId) {
         
-        Response<FolderResponse> folderResponse = folderService.setFolderName(setFolderNameRequest, folderId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.setFolderName(setFolderNameRequest, folderId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @PutMapping("/folders/{folderId}/path")
+    @PutMapping("/{folderId}/path")
     @ApiOperation(value = "폴더 경로 수정", notes = "해당 폴더의 경로를 수정한다.")
     @Authenticated
     public ResponseEntity<Response> setFolderPath(
             @Validated(ValidationSequence.class) @RequestBody SetFolderPathRequest setFolderPathRequest,
             @PathVariable(value = "folderId") Long folderId) {
         
-        Response<FolderResponse> folderResponse = folderService.setFolderPath(setFolderPathRequest, folderId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.setFolderPath(setFolderPathRequest, folderId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @DeleteMapping("/folders/{folderId}")
+    @DeleteMapping("/{folderId}")
     @ApiOperation(value = "폴더 삭제", notes = "해당 폴더를 삭제한다")
     @Authenticated
     public ResponseEntity<Response> deleteFolder(@PathVariable(value = "folderId") Long folderId) {
-        Response<FolderResponse> folderResponse = folderService.deleteFolder(folderId);
-        return ResponseEntity.ok(folderResponse);
+        Response<FolderResponse> response = folderService.deleteFolder(folderId);
+        return ResponseEntity.status(response.getCode()).body(response);
     }
 }
