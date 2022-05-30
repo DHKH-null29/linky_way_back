@@ -5,6 +5,7 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Folder;
+import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.service.card.CardServiceImpl;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +85,7 @@ public class CardServiceTest {
         assertThat(addCardResponse).isNotNull();
         verify(cardRepository).save(Mockito.any(Card.class));
     }
-    
+
     @Nested
     @DisplayName("단일 북마크(카드) 상세 조회")
     class findCardByCardId {
@@ -93,7 +95,8 @@ public class CardServiceTest {
         @BeforeEach
         void setCard() {
             Card card = card();
-            BDDMockito.given(cardRepository.save(Mockito.any(Card.class))).willReturn(card);
+            BDDMockito.given(cardRepository.save(Mockito.any(Card.class)))
+                      .willReturn(card);
             savedCard = cardRepository.save(card);
         }
 
@@ -123,10 +126,64 @@ public class CardServiceTest {
         @DisplayName("상세 조회 실패: 카드가 없음")
         void CardNotExistFindingFail() throws Exception {
             // when
-            doReturn(Optional.empty()).when(cardRepository).findById(Mockito.anyLong());
-            
+            doReturn(Optional.empty()).when(cardRepository)
+                                      .findById(Mockito.anyLong());
+
             // then
-            Assertions.assertThrows(ResourceNotFoundException.class, () -> cardService.findCardByCardId(Mockito.anyLong()));
+            Assertions.assertThrows(ResourceNotFoundException.class,
+                    () -> cardService.findCardByCardId(Mockito.anyLong()));
+            verify(cardRepository).findById(Mockito.anyLong());
+        }
+    }
+
+    @Nested
+    @DisplayName("카드(북마크) 수정")
+    class updateCard {
+
+        private Card savedCard;
+        private CardRequest cardRequest;
+
+        @BeforeEach
+        void setCard() {
+            Card card = card();
+            BDDMockito.given(cardRepository.save(Mockito.any(Card.class)))
+                      .willReturn(card);
+            savedCard = cardRepository.save(card);
+
+            cardRequest = CardRequest.builder()
+                                     .link(link + 2)
+                                     .title(title + 2)
+                                     .content(content + 2)
+                                     .shareable(!shareable)
+                                     .folderId(1L)
+                                     .build();
+        }
+
+        @Test
+        @Transactional
+        @DisplayName("카드 수정 성공: 카드가 존재함")
+        void CardExistFindingSuccess() throws Exception {
+            // given
+            doReturn(Optional.of(savedCard)).when(cardRepository)
+                                            .findById(savedCard.getId());
+            // when
+            Card updatedCard = cardService.updateCard(savedCard.getId(),
+                    cardRequest);
+            // then
+            Assertions.assertNotNull(updatedCard);
+        }
+
+        @Test
+        @DisplayName("카드 수정 실패: 카드가 없음")
+        void CardNotExistFindingFail() throws Exception {
+            // when
+            doReturn(Optional.empty()).when(cardRepository)
+                                      .findById(Mockito.anyLong());
+
+            // then
+            Assertions.assertThrows(ResourceConflictException.class,
+                    () -> cardService.updateCard(savedCard.getId(),
+                            cardRequest));
             verify(cardRepository).findById(Mockito.anyLong());
         }
     }
