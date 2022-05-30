@@ -3,6 +3,7 @@ package com.wnis.linkyway.service.card;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.entity.Card;
 
 public interface CardService {
 
@@ -10,7 +11,7 @@ public interface CardService {
 
     public CardResponse findCardByCardId(Long cardId);
     
-    public void updateCard(Long cardId, CardRequest cardRequest);
+    public Card updateCard(Long cardId, CardRequest cardRequest);
     
     public void deleteCard(Long cardId);
 }

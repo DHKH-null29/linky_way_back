@@ -46,7 +46,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void updateCard(Long cardId, CardRequest cardRequest) {
+    public Card updateCard(Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(
                                           () -> new ResourceConflictException(
@@ -55,6 +55,8 @@ public class CardServiceImpl implements CardService {
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateShareable(cardRequest.getShareable());
+        
+        return card;
     }
 
     @Override
