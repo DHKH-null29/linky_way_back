@@ -81,7 +81,6 @@ public class CardRepositoryTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("카드(북마크) 수정 성공")
     public void updateCardSuccess() {
         // given

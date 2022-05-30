@@ -160,7 +160,6 @@ public class CardServiceTest {
         }
 
         @Test
-        @Transactional
         @DisplayName("카드 수정 성공: 카드가 존재함")
         void CardExistFindingSuccess() throws Exception {
             // given
