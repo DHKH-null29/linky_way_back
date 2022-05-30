@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -34,7 +35,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private Authentication getAuthenticationFromHeader(HttpServletRequest request) {
         String accessToken = request.getHeader(AUTHORIZATION_HEADER);
-        return jwtProvider.validateToken(accessToken) ? jwtProvider.getAuthentication(accessToken) : null;
+        return (!StringUtils.hasText(accessToken) || !jwtProvider.validateToken(accessToken))
+                ? null : jwtProvider.getAuthentication(accessToken);
     }
 
     @Override

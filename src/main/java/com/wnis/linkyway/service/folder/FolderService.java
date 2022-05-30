@@ -9,7 +9,10 @@ import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
 
 public interface FolderService {
     
+    Response<FolderResponse> findFolderSuper(Long memberId);
+    
     Response<FolderResponse> findFolder(Long folderId);
+    
     Response<FolderResponse> addSuperFolder(Long memberId);
     
     Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId);

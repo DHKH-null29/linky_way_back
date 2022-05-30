@@ -44,29 +44,34 @@ class FolderRepositoryTest {
         
         Folder folder1 = Folder.builder()
                 .member(member1)
+                .depth(1L)
                 .name("f1")
                 .build();
         
         Folder folder2 = Folder.builder()
                 .member(member1)
+                .depth(2L)
                 .name("f2")
                 .parent(folder1)
                 .build();
         
         Folder folder3 = Folder.builder()
                 .member(member1)
+                .depth(3L)
                 .name("f3")
                 .parent(folder2)
                 .build();
         
         Folder folder4 = Folder.builder()
                 .member(member1)
+                .depth(3L)
                 .name("f4")
                 .parent(folder2)
                 .build();
         
         Folder folder6 = Folder.builder()
                 .member(member1)
+                .depth(2L)
                 .name("f6")
                 .parent(folder1)
                 .build();
@@ -75,6 +80,14 @@ class FolderRepositoryTest {
         folderRepository.saveAll(Arrays.asList(folder1, folder2, folder3, folder4, folder6));
     }
     
+    @Test
+    @DisplayName("findFolderByMemberId 테스트")
+    void findFolderByMemberIdTest() {
+        Folder folder = folderRepository.findFolderByMemberId(1L).orElse(null);
+        logger.info(String.valueOf(folder));
+        assertThat(folder.getId()).isEqualTo(1L);
+        assertThat(folder.getName()).isEqualTo("f1");
+    }
     
     @Test
     @DisplayName("findFolderByFolderId 테스트")

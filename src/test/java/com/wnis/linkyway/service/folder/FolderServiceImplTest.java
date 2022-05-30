@@ -10,8 +10,10 @@ import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
+import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,8 +27,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
-import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Import({FolderServiceImpl.class, ObjectMapper.class})
 class FolderServiceImplTest {
     
+    private final Logger logger = LoggerFactory.getLogger(FolderServiceImplTest.class);
     @Autowired
     FolderService folderService;
     @Autowired
@@ -43,7 +46,6 @@ class FolderServiceImplTest {
     MemberRepository memberRepository;
     @Autowired
     ObjectMapper objectMapper;
-    private final Logger logger = LoggerFactory.getLogger(FolderServiceImplTest.class);
     
     @BeforeEach
     void setup() {
@@ -93,6 +95,27 @@ class FolderServiceImplTest {
         folderRepository.saveAll(Arrays.asList(folder1, folder2, folder3, folder4, folder6));
     }
     
+    @Nested
+    @DisplayName("최상위 폴더 조회")
+    class FolderTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void responseTest() throws JsonProcessingException {
+            Response<FolderResponse> response = folderService.findFolderSuper(1L);
+            String s = objectMapper.writeValueAsString(response.getData());
+            logger.info(s);
+            assertThat(response.getCode()).isEqualTo(200);
+        }
+        
+        @Test
+        @DisplayName("핸들러 테스트")
+        void shouldThrowNotFoundException() {
+            Assertions.assertThatThrownBy(() -> {
+                folderService.findFolderSuper(100L);
+            }).isInstanceOf(ResourceNotFoundException.class);
+        }
+    }
     
     @Nested
     @DisplayName("폴더 조회")
@@ -100,7 +123,7 @@ class FolderServiceImplTest {
         
         @Test
         @DisplayName("응답 테스트")
-        void Test() throws JsonProcessingException {
+        void responseTest() throws JsonProcessingException {
             Response<FolderResponse> folder = folderService.findFolder(1L);
             String s = objectMapper.writeValueAsString(folder);
             logger.info(s);

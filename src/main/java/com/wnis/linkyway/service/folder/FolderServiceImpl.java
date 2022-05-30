@@ -8,6 +8,7 @@ import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
+import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,14 @@ public class FolderServiceImpl implements FolderService {
     
     private final FolderRepository folderRepository;
     private final MemberRepository memberRepository;
+    
+    @Override
+    public Response<FolderResponse> findFolderSuper(Long memberId) {
+        Folder folder = folderRepository.findFolderByMemberId(memberId).orElseThrow(()->
+                new ResourceNotFoundException("해당 회원의 최상위 폴더를 조회 할 수 없습니다"));
+        FolderResponse folderResponse = new FolderResponse(folder);
+        return Response.of(HttpStatus.OK, folderResponse, "폴더 조회 성공");
+    }
     
     @Override
     public Response<FolderResponse> findFolder(Long folderId) {
@@ -54,11 +63,10 @@ public class FolderServiceImpl implements FolderService {
                 .parent(parent)
                 .build();
         
-        Folder outputFolder = folderRepository.save(folder);
+        folderRepository.save(folder);
         FolderResponse response = FolderResponse.builder()
-                .folderId(outputFolder.getParent().getId())
+                .folderId(folder.getParent().getId())
                 .build();
-        
         return Response.of(HttpStatus.OK, response, "폴더 생성 성공");
     }
     
