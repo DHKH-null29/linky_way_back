@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Objects;
@@ -135,6 +136,77 @@ public class CardControllerTest {
                     get("/api/cards/").contentType("application/json")
                                       .content(objectMapper.writeValueAsString(
                                               cardResponse)));
+
+            // then
+            resultActions.andExpect(status().isMethodNotAllowed())
+                         .andExpect(
+                                 result -> Assertions.assertThat(
+                                         Objects.requireNonNull(
+                                                 result.getResolvedException())
+                                                .getClass())
+                                                     .isEqualTo(
+                                                             HttpRequestMethodNotSupportedException.class))
+                         .andReturn();
+        }
+    }
+
+    @Nested
+    @DisplayName("북마크(카드) 수정")
+    class updateCard {
+
+        Long cardId;
+        CardResponse cardResponse;
+        CardRequest cardRequest;
+
+        @BeforeEach
+        void setCard() {
+            cardId = 3L;
+            cardResponse = CardResponse.builder()
+                                       .cardId(3L)
+                                       .link("https://www.naver.com/")
+                                       .title("title1")
+                                       .content("content1")
+                                       .shareable(true)
+                                       .build();
+            cardRequest = CardRequest.builder()
+                                     .link("https://www.daum.net/")
+                                     .title("title2")
+                                     .content("content2")
+                                     .shareable(false)
+                                     .folderId(1L)
+                                     .build();
+        }
+
+        @Test
+        @DisplayName("카드 수정 성공: 올바른 URL")
+        void updateCardSuccess() throws Exception {
+            // when
+            ResultActions resultActions = mockMvc.perform(put("/api/cards/"
+                    + cardId).contentType("application/json")
+                             .content(objectMapper.writeValueAsString(
+                                     cardRequest)));
+
+            // then
+            resultActions.andExpect(status().isOk())
+                         .andExpect(
+                                 ResponseBodyMatchers.responseBody()
+                                                     .containsPropertiesAsJson(
+                                                             Response.class))
+                         .andReturn();
+
+            verify(cardService).updateCard(Mockito.anyLong(),
+                    Mockito.any(CardRequest.class));
+        }
+
+        @Test
+        @DisplayName("카드 수정 실패: 잘못된 URL")
+        void updateCardFail() throws Exception {
+            // when
+            ResultActions resultActions = mockMvc.perform(
+                    patch("/api/cards/").contentType("application/json")
+                                        .content(
+                                                objectMapper.writeValueAsString(
+                                                        cardRequest)));
 
             // then
             resultActions.andExpect(status().isMethodNotAllowed())
