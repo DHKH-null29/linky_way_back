@@ -1,5 +1,6 @@
 package com.wnis.linkyway.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -110,7 +111,7 @@ public class CardControllerTest {
         @DisplayName("상세 조회 성공: 올바른 URL")
         void CardExistFindingSuccess() throws Exception {
             // given
-            doReturn(cardResponse).when(cardService).findCardByCardId(cardId);
+            doReturn(cardResponse).when(cardService).findCardByCardId(any());
 
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/"
@@ -125,7 +126,7 @@ public class CardControllerTest {
                                                                            .containsPropertiesAsJson(
                                                                                    Response.class))
                                                .andReturn();
-            verify(cardService).findCardByCardId(Mockito.anyLong());
+            verify(cardService).findCardByCardId(any());
         }
 
         @Test
@@ -195,7 +196,7 @@ public class CardControllerTest {
                          .andReturn();
 
             verify(cardService).updateCard(Mockito.anyLong(),
-                    Mockito.any(CardRequest.class));
+                    any(CardRequest.class));
         }
 
         @Test
