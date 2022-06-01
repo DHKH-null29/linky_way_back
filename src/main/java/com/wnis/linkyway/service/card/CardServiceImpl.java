@@ -1,15 +1,22 @@
 package com.wnis.linkyway.service.card;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.entity.CardTag;
+import com.wnis.linkyway.entity.Tag;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
+import com.wnis.linkyway.repository.CardTagRepository;
+import com.wnis.linkyway.repository.TagRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,12 +26,29 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
 
+    private final TagRepository tagRepository;
+
+    private final CardTagRepository cardTagRepository;
+
     @Override
     @Transactional
     public AddCardResponse addCard(CardRequest cardRequest) {
-        Long cardId = cardRepository.save(cardRequest.toEntity()).getId();
+        Card savedCard = cardRepository.save(cardRequest.toEntity());
+
+        List<TagResponse> tagResponseList = cardRequest.getTagResponseList();
+        for (TagResponse tagResponse : tagResponseList) {
+            Tag tag = tagRepository.findById(tagResponse.getTagId())
+                                   .orElseThrow(
+                                           () -> new ResourceNotFoundException(
+                                                   "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
+            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
+                                  .isPresent()) {
+                cardTagRepository.save(
+                        CardTag.builder().card(savedCard).tag(tag).build());
+            }
+        }
         AddCardResponse addCardResponse = AddCardResponse.builder()
-                                                         .cardId(cardId)
+                                                         .cardId(savedCard.getId())
                                                          .build();
         return addCardResponse;
     }
@@ -55,7 +79,7 @@ public class CardServiceImpl implements CardService {
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateShareable(cardRequest.getShareable());
-        
+
         return card;
     }
 

@@ -1,17 +1,14 @@
 package com.wnis.linkyway.repository;
 
-
+import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.wnis.linkyway.entity.Tag;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 public interface CardTagRepository extends JpaRepository<CardTag, Long> {
 
-    @Query("select ct from CardTag ct join fetch ct.card")
-    List<CardTag> findAllIncludesCard();
-
-    @Query("select ct from CardTag ct join fetch ct.tag")
-    List<CardTag> findAllIncludesTag();
+    Optional<CardTag> findByCardAndTag(Card card, Tag tag);
 }
