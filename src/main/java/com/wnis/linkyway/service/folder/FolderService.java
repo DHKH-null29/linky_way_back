@@ -13,8 +13,6 @@ public interface FolderService {
     
     Response<FolderResponse> findFolder(Long folderId);
     
-    Response<FolderResponse> addSuperFolder(Long memberId);
-    
     Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId);
     
     Response<FolderResponse> setFolderPath(SetFolderPathRequest setFolderPathRequest, Long folderId);
