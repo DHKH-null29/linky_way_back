@@ -36,7 +36,7 @@ public class TagServiceImpl implements TagService {
     
     @Override
     public Response addTag(TagRequest tagRequest, Long memberId) {
-        if (tagRepository.existsByNameAndId(tagRequest.getTagName(), memberId)) {
+        if (tagRepository.existsByTagNameAndMemberId(tagRequest.getTagName(), memberId)) {
             throw new NotAddDuplicateEntityException("중복된 태그 이름을 추가 할 수 없습니다");
         }
         
