@@ -147,7 +147,7 @@ class MemberServiceTest {
             
             assertThatThrownBy(()-> {
                 memberService.setPassword(passwordRequest, memberId);
-            }).isInstanceOf(ResourceNotFoundException.class).hasMessage("회원을 찾을 수 없습니다");
+            }).isInstanceOf(ResourceConflictException.class).hasMessage("회원이 존재하지 않아 비밀번호를 바꿀 수 없습니다");
         }
     }
     
