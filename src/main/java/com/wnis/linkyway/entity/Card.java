@@ -36,19 +36,18 @@ public class Card {
     @Column(name = "shareable")
     private Boolean shareable;
 
-    ////********************연관 관게  ***************************/////
+    //// ********************연관 관게 ***************************/////
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_folder_id")
     private Folder folder;
-
 
     // ***** 1 : N *****
     @OneToMany(mappedBy = "card")
     private List<CardTag> cardTags = new ArrayList<>();
 
-
     @Builder
-    private Card(String link, String title, String content, Boolean shareable, Folder folder) {
+    private Card(String link, String title, String content, Boolean shareable,
+            Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
@@ -57,19 +56,19 @@ public class Card {
         if (folder != null)
             folder.getCards().add(this);
     }
-    
+
     public void updateLink(String link) {
         this.link = link;
     }
-    
+
     public void updateTitle(String title) {
         this.title = title;
     }
-    
+
     public void updateContent(String content) {
         this.content = content;
     }
-    
+
     public void updateShareable(boolean shareable) {
         this.shareable = shareable;
     }
