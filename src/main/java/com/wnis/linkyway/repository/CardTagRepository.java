@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CardTagRepository extends JpaRepository<CardTag, Long> {
 
     Optional<CardTag> findByCardAndTag(Card card, Tag tag);
+    
+    void deleteByCardAndTag(Card card, Tag tag);
 }

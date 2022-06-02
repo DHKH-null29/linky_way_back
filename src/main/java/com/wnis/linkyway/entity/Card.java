@@ -42,7 +42,7 @@ public class Card {
     private Folder folder;
 
     // ***** 1 : N *****
-    @OneToMany(mappedBy = "card")
+    @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
