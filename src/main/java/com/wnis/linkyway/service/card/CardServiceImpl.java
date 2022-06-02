@@ -1,6 +1,8 @@
 package com.wnis.linkyway.service.card;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
-import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Tag;
@@ -35,9 +36,9 @@ public class CardServiceImpl implements CardService {
     public AddCardResponse addCard(CardRequest cardRequest) {
         Card savedCard = cardRepository.save(cardRequest.toEntity());
 
-        List<TagResponse> tagResponseList = cardRequest.getTagResponseList();
-        for (TagResponse tagResponse : tagResponseList) {
-            Tag tag = tagRepository.findById(tagResponse.getTagId())
+        Set<Long> tagIdList = cardRequest.getTagIdSet();
+        for (Long tagId : tagIdList) {
+            Tag tag = tagRepository.findById(tagId)
                                    .orElseThrow(
                                            () -> new ResourceNotFoundException(
                                                    "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
@@ -54,17 +55,25 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional
     public CardResponse findCardByCardId(Long cardId) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(
                                           () -> new ResourceNotFoundException(
                                                   "해당 카드가 존재하지 않습니다."));
+        List<CardTag> cardTagList = card.getCardTags();
+        List<Tag> tagList = new ArrayList<Tag>();
+        for (CardTag cardTag : cardTagList) {
+            tagList.add(cardTag.getTag());
+        }
+
         return CardResponse.builder()
                            .cardId(card.getId())
                            .link(card.getLink())
                            .title(card.getTitle())
                            .content(card.getContent())
                            .shareable(card.getShareable())
+                           .tags(tagList)
                            .build();
     }
 
