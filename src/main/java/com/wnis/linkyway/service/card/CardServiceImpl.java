@@ -88,8 +88,33 @@ public class CardServiceImpl implements CardService {
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateShareable(cardRequest.getShareable());
-
+        updateCardTagByCard(card, cardRequest);
+        
         return card;
+    }
+
+    private void updateCardTagByCard(Card savedCard, CardRequest newCard) {
+        List<CardTag> oldCardTagList = savedCard.getCardTags();
+        Set<Long> newTagIdList = newCard.getTagIdSet();
+
+        for (Long newTagId : newTagIdList) {
+            Tag tag = tagRepository.findById(newTagId)
+                                   .orElseThrow(
+                                           () -> new ResourceNotFoundException(
+                                                   "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
+            // 새로운 태그가 선택됨 -> 추가
+            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
+                                  .isPresent()) {
+                cardTagRepository.save(
+                        CardTag.builder().card(savedCard).tag(tag).build());
+            }
+        }
+        // 기존 태그가 선택되지 않음 -> 삭제
+        for (CardTag oldCardTag : oldCardTagList) {
+            if (!newTagIdList.contains(oldCardTag.getTag().getId())) {
+                cardTagRepository.deleteById(oldCardTag.getId());
+            }
+        }
     }
 
     @Override
