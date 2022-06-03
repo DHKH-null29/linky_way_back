@@ -14,7 +14,6 @@ import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
 import com.wnis.linkyway.repository.TagRepository;
@@ -35,23 +34,9 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public AddCardResponse addCard(CardRequest cardRequest) {
         Card savedCard = cardRepository.save(cardRequest.toEntity());
+        addCardTagByCard(savedCard, cardRequest.getTagIdSet());
 
-        Set<Long> tagIdList = cardRequest.getTagIdSet();
-        for (Long tagId : tagIdList) {
-            Tag tag = tagRepository.findById(tagId)
-                                   .orElseThrow(
-                                           () -> new ResourceNotFoundException(
-                                                   "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
-            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
-                                  .isPresent()) {
-                cardTagRepository.save(
-                        CardTag.builder().card(savedCard).tag(tag).build());
-            }
-        }
-        AddCardResponse addCardResponse = AddCardResponse.builder()
-                                                         .cardId(savedCard.getId())
-                                                         .build();
-        return addCardResponse;
+        return AddCardResponse.builder().cardId(savedCard.getId()).build();
     }
 
     @Override
@@ -93,22 +78,27 @@ public class CardServiceImpl implements CardService {
         return card;
     }
 
-    private void updateCardTagByCard(Card savedCard, CardRequest newCard) {
-        List<CardTag> oldCardTagList = savedCard.getCardTags();
-        Set<Long> newTagIdList = newCard.getTagIdSet();
-
-        for (Long newTagId : newTagIdList) {
-            Tag tag = tagRepository.findById(newTagId)
+    private void addCardTagByCard(Card savedCard, Set<Long> tagIdList) {
+        for (Long tagId : tagIdList) {
+            Tag tag = tagRepository.findById(tagId)
                                    .orElseThrow(
-                                           () -> new ResourceNotFoundException(
+                                           () -> new NotFoundEntityException(
                                                    "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
-            // 새로운 태그가 선택됨 -> 추가
             if (!cardTagRepository.findByCardAndTag(savedCard, tag)
                                   .isPresent()) {
                 cardTagRepository.save(
                         CardTag.builder().card(savedCard).tag(tag).build());
             }
         }
+    }
+
+    private void updateCardTagByCard(Card savedCard, CardRequest newCard) {
+        List<CardTag> oldCardTagList = savedCard.getCardTags();
+        Set<Long> newTagIdList = newCard.getTagIdSet();
+
+        // 새로운 태그가 선택됨 -> CardTag 추가
+        addCardTagByCard(savedCard, newTagIdList);
+
         // 기존 태그가 선택되지 않음 -> 삭제
         for (CardTag oldCardTag : oldCardTagList) {
             if (!newTagIdList.contains(oldCardTag.getTag().getId())) {
