@@ -142,22 +142,6 @@ public class FolderControllerIntegrationTest {
     }
     
     @Nested
-    @DisplayName("Default 폴더 추가")
-    class AddSuperFolder {
-        
-        @Test
-        @DisplayName("응답 테스트")
-        @WithMockMember(id = 1L, email = "marrin1101@naver.com")
-        void responseTest() throws Exception {
-            MvcResult mvcResult = mockMvc.perform(post("/api/folders/super"))
-                    .andExpect(status().is(200))
-                    .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
-        }
-    }
-    
-    @Nested
     @DisplayName("폴더 추가")
     class AddFolder {
         

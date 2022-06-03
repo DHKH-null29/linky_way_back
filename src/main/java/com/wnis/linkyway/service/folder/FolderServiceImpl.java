@@ -42,12 +42,6 @@ public class FolderServiceImpl implements FolderService {
     }
     
     @Override
-    public Response<FolderResponse> addSuperFolder(Long memberId) {
-        folderRepository.addSuperFolder(memberId);
-        return Response.of(HttpStatus.OK, null, "default 폴더 생성 성공");
-    }
-    
-    @Override
     public Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
             new NotFoundEntityException("회원이 존재하지 않습니다")

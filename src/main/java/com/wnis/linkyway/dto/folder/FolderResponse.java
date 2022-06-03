@@ -48,6 +48,7 @@ public class FolderResponse {
                 .folderId(folder.getId())
                 .parentId(folder.getParent().getId())
                 .level(folder.getDepth())
+                .name(folder.getName())
                 .build();
     }
     

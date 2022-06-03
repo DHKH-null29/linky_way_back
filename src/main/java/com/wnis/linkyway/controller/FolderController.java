@@ -37,15 +37,6 @@ public class FolderController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
     
-    @PostMapping("/super") // 삭제 예정
-    @Authenticated
-    public ResponseEntity<Response> addSuperFolder(
-            @CurrentMember Long memberId) {
-        
-        Response<FolderResponse> response = folderService.addSuperFolder(memberId);
-        return ResponseEntity.status(response.getCode()).body(response);
-    }
-    
     @PostMapping
     @ApiOperation(value = "폴더 추가", notes = "회원이 지정한 폴더에 하위 폴더를 추가한다.")
     @Authenticated

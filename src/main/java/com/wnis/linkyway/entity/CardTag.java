@@ -16,7 +16,7 @@ public class CardTag {
     @Column(name = "card_tag_id", nullable = false)
     private Long id;
 
-    ////********************연관 관게  ***************************/////
+    //// ********************연관 관게 ***************************/////
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_card_id")
@@ -25,7 +25,6 @@ public class CardTag {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_tag_id")
     private Tag tag;
-
 
     @Builder
     public CardTag(Card card, Tag tag) {
