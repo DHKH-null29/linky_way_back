@@ -72,4 +72,8 @@ public class Card {
     public void updateShareable(boolean shareable) {
         this.shareable = shareable;
     }
+    
+    public void updateFolder(Folder folder) {
+        this.folder = folder;
+    }
 }

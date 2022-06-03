@@ -85,6 +85,17 @@ public class CardServiceImpl implements CardService {
                                   .orElseThrow(
                                           () -> new NotModifyEmptyEntityException(
                                                   "해당 카드가 존재하지 않아 수정이 불가능합니다"));
+        Folder oldFolder = card.getFolder();
+        if (cardRequest.getFolderId() != oldFolder.getId()) {
+            Member member = oldFolder.getMember();
+            Folder folder = folderRepository.findByIdAndMember(
+                    cardRequest.getFolderId(), member)
+                                            .orElseThrow(
+                                                    () -> new NotFoundEntityException(
+                                                            "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+            card.updateFolder(folder);
+        }
+
         card.updateLink(cardRequest.getLink());
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
