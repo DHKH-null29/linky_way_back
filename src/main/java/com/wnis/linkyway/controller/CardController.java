@@ -33,7 +33,7 @@ public class CardController {
     @PostMapping
     public ResponseEntity<Response> addCard(
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
-        
+
         AddCardResponse addCardResponse = cardService.addCard(cardRequest);
 
         return ResponseEntity.created(URI.create("/card/" + addCardResponse))
@@ -60,25 +60,25 @@ public class CardController {
     @PutMapping("/{cardId}")
     public ResponseEntity<Response> updateCard(@PathVariable Long cardId,
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
-        
+
         cardService.updateCard(cardId, cardRequest);
-        
+
         return ResponseEntity.ok()
-                .body(Response.builder()
-                        .code(HttpStatus.OK.value())
-                        .message("카드 변경 완료")
-                        .build());
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("카드 변경 완료")
+                                           .build());
     }
-    
+
     @DeleteMapping("/{cardId}")
     public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
-        
+
         cardService.deleteCard(cardId);
-        
+
         return ResponseEntity.ok()
-                .body(Response.builder()
-                        .code(HttpStatus.OK.value())
-                        .message("카드 삭제 완료")
-                        .build());
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("카드 삭제 완료")
+                                           .build());
     }
 }
