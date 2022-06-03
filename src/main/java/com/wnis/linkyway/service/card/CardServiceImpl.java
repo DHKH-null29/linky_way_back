@@ -13,9 +13,13 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
+import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Tag;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
+import com.wnis.linkyway.repository.FolderRepository;
+import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,10 +34,21 @@ public class CardServiceImpl implements CardService {
 
     private final CardTagRepository cardTagRepository;
 
+    private final FolderRepository folderRepository;
+
+    private final MemberRepository memberRepository;
+
     @Override
     @Transactional
     public AddCardResponse addCard(Long memberId, CardRequest cardRequest) {
-        Card savedCard = cardRepository.save(cardRequest.toEntity());
+        Member member = memberRepository.getById(memberId);
+        Folder folder = folderRepository.findByIdAndMember(
+                cardRequest.getFolderId(), member)
+                                        .orElseThrow(
+                                                () -> new NotFoundEntityException(
+                                                        "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+        Card savedCard = cardRepository.save(cardRequest.toEntity(folder));
+
         addCardTagByCard(savedCard, cardRequest.getTagIdSet());
 
         return AddCardResponse.builder().cardId(savedCard.getId()).build();
