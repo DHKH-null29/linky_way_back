@@ -176,11 +176,8 @@ public class FolderControllerIntegrationTest {
             MvcResult mvcResult = mockMvc.perform(post("/api/folders")
                             .contentType("application/json")
                             .content(objectMapper.writeValueAsBytes(addFolderRequest)))
-                    .andExpect(status().is(409))
+                    .andExpect(status().is(404))
                     .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
-            
         }
         
         @Test

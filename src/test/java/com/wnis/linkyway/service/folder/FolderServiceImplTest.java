@@ -111,7 +111,7 @@ class FolderServiceImplTest {
         @Test
         @DisplayName("핸들러 테스트")
         void shouldThrowNotFoundException() {
-            Assertions.assertThatThrownBy(() -> {
+            assertThatThrownBy(() -> {
                 folderService.findFolderSuper(100L);
             }).isInstanceOf(ResourceNotFoundException.class);
         }
@@ -133,7 +133,7 @@ class FolderServiceImplTest {
         @DisplayName("핸들링 테스트")
         void exceptionTest() {
             
-            assertThatThrownBy(() -> folderService.findFolder(30L)).isInstanceOf(ResourceConflictException.class);
+            assertThatThrownBy(() -> folderService.findFolder(30L)).isInstanceOf(ResourceNotFoundException.class);
             
         }
         
@@ -166,7 +166,7 @@ class FolderServiceImplTest {
                     .build();
             
             assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 1L))
-                    .isInstanceOf(ResourceConflictException.class).hasMessage("존재 하지 않는 상위 폴더입니다.");
+                    .isInstanceOf(ResourceConflictException.class).hasMessage("존재 하지 않는 상위 폴더에 새로운 폴더를 추가 할 수 없습니다");
         }
         
         @Test
@@ -178,7 +178,7 @@ class FolderServiceImplTest {
                     .build();
             
             assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 100L))
-                    .isInstanceOf(ResourceConflictException.class).hasMessage("회원이 존재하지 않습니다.");
+                    .isInstanceOf(ResourceNotFoundException.class).hasMessage("회원이 존재하지 않습니다");
         }
     }
     
@@ -206,7 +206,7 @@ class FolderServiceImplTest {
                     .targetFolderId(200L).build();
             
             assertThatThrownBy(() -> folderService.setFolderPath(setFolderPathRequest, 4L))
-                    .isInstanceOf(ResourceConflictException.class).hasMessage("목표 부모 폴더가 존재하지 않습니다.");
+                    .isInstanceOf(ResourceConflictException.class).hasMessage("목표 부모 폴더가 존재하지 않아 수정 작업을 진행할 수 없습니다");
             
         }
         
@@ -218,7 +218,7 @@ class FolderServiceImplTest {
             
             assertThatThrownBy(() -> folderService.setFolderPath(setFolderPathRequest, 2L)).
                     isInstanceOf(ResourceConflictException.class)
-                    .hasMessage("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다.");
+                    .hasMessage("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다");
         }
     }
     
@@ -245,7 +245,7 @@ class FolderServiceImplTest {
                     .name("스프링")
                     .build();
             assertThatThrownBy(() -> folderService.setFolderName(setFolderNameRequest, 100L))
-                    .isInstanceOf(ResourceConflictException.class).hasMessage("해당 폴더가 존재하지 않아 수정을 할 수 없습니다.");
+                    .isInstanceOf(ResourceConflictException.class).hasMessage("해당 폴더가 존재하지 않아 수정을 할 수 없습니다");
         }
     }
     
@@ -266,7 +266,7 @@ class FolderServiceImplTest {
         void exceptionTest() {
             assertThatThrownBy(() -> folderService.deleteFolder(100L)).
                     isInstanceOf(ResourceConflictException.class)
-                    .hasMessage("해당 폴더가 존재하지 않아 삭제 할 수 없습니다.");
+                    .hasMessage("해당 폴더가 존재하지 않아 삭제 할 수 없습니다");
         }
     }
 }

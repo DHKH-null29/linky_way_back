@@ -3,9 +3,7 @@ package com.wnis.linkyway.service;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.*;
 import com.wnis.linkyway.entity.Member;
-import com.wnis.linkyway.exception.common.InvalidValueException;
-import com.wnis.linkyway.exception.common.ResourceConflictException;
-import com.wnis.linkyway.exception.common.ResourceNotFoundException;
+import com.wnis.linkyway.exception.common.*;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.util.mapper.MemberMapper;
@@ -53,7 +51,7 @@ public class MemberService {
     @Transactional
     public Response<MemberResponse> searchEmail(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(()->
-                {return new ResourceNotFoundException("조회한 이메일이 존재하지 않습니다");}
+                 new NotFoundEntityException("조회한 이메일이 존재하지 않습니다")
         );
         
         return Response.of(HttpStatus.OK,
@@ -61,25 +59,25 @@ public class MemberService {
     }
     @Transactional
     public Response<MemberResponse> searchMyPage(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-            return new ResourceNotFoundException("회원을 찾을 수 없습니다");
-        });
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+            new NotFoundEntityException("회원을 찾을 수 없습니다")
+        );
        
         return Response.of(HttpStatus.OK,
                 MemberMapper.instance.memberToMyPageResponse(member), "회원 정보 조회 성공");
     }
     @Transactional
     public Response<MemberResponse> setPassword(PasswordRequest passwordRequest, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> {
-            return new ResourceNotFoundException("회원을 찾을 수 없습니다");
-        });
+        Member member = memberRepository.findById(memberId).orElseThrow(()->
+            new NotModifyEmptyEntityException("회원이 존재하지 않아 비밀번호를 바꿀 수 없습니다")
+        );
         member.changePassword(passwordEncoder.encode(passwordRequest.getPassword()));
         return Response.of(HttpStatus.OK,null, "비밀번호 변경 성공");
     }
     @Transactional
     public Response<MemberResponse> deleteMember(Long memberId) {
         if (!memberRepository.existsById(memberId)) {
-            throw new ResourceConflictException("삭제 할 수 없습니다");
+            throw new NotDeleteEmptyEntityException("삭제 할 수 없습니다");
         }
         memberRepository.deleteById(memberId);
         return Response.of(HttpStatus.OK, null, "삭제 성공");
@@ -97,13 +95,13 @@ public class MemberService {
 
     private void validNicknameDuplication(String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
-            throw new ResourceConflictException("이미 중복되는 닉네임이 있습니다");
+            throw new NotAddDuplicateEntityException("이미 중복되는 닉네임이 있습니다");
         }
     }
     
     private void validEmailDuplication(String email) {
         if (memberRepository.existsByEmail(email)) {
-            throw new ResourceConflictException("이미 중복되는 이메일이 있습니다");
+            throw new NotAddDuplicateEntityException("이미 중복되는 이메일이 있습니다");
         }
     }
     

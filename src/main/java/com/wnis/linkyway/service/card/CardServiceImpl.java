@@ -7,13 +7,13 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wnis.linkyway.exception.common.*;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
@@ -59,8 +59,8 @@ public class CardServiceImpl implements CardService {
     public CardResponse findCardByCardId(Long cardId) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(
-                                          () -> new ResourceNotFoundException(
-                                                  "해당 카드가 존재하지 않습니다."));
+                                          () -> new NotFoundEntityException(
+                                                  "해당 카드가 존재하지 않습니다"));
         List<CardTag> cardTagList = card.getCardTags();
         List<Tag> tagList = new ArrayList<Tag>();
         for (CardTag cardTag : cardTagList) {
@@ -82,14 +82,14 @@ public class CardServiceImpl implements CardService {
     public Card updateCard(Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(
-                                          () -> new ResourceConflictException(
-                                                  "해당 카드가 존재하지 않아 수정이 불가능합니다."));
+                                          () -> new NotModifyEmptyEntityException(
+                                                  "해당 카드가 존재하지 않아 수정이 불가능합니다"));
         card.updateLink(cardRequest.getLink());
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateShareable(cardRequest.getShareable());
         updateCardTagByCard(card, cardRequest);
-        
+
         return card;
     }
 
@@ -121,8 +121,8 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public void deleteCard(Long cardId) {
         cardRepository.findById(cardId)
-                      .orElseThrow(() -> new ResourceConflictException(
-                              "해당 카드가 존재하지 않아 삭제가 불가능합니다."));
+                      .orElseThrow(() -> new NotDeleteEmptyEntityException(
+                              "해당 카드가 존재하지 않아 삭제가 불가능합니다"));
         cardRepository.deleteById(cardId);
     }
 }

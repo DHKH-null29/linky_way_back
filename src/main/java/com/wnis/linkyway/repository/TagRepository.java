@@ -11,18 +11,18 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
-    @Query("select t from Tag t join fetch t.member")
-    public List<Tag> findAllIncludesTag();
     
     @Query("select new com.wnis.linkyway.dto.tag.TagResponse(t) " +
             "from Tag t join t.member where t.member.id = :memberId")
     public List<TagResponse> findAllTagList(@Param("memberId") Long memberId);
     
-    @Query("select t from Tag t join fetch t.member " +
-            "where t.name = :name and t.member.id = :id")
-    public Tag findByTagNameAndMemberId(@Param(value = "name") String name,
-                                        @Param(value = "id") Long id);
     
+    @Query("select case when count(t) > 0 then true else false end from Tag t join t.member m " +
+            "where t.name = :name and m.id = :memberId")
+    public boolean existsByTagNameAndMemberId(@Param(value = "name") String name,
+                                              @Param(value = "memberId") Long memberId);
+    
+    // 코드 변경에 따라 사용되지 않는 코드가 되어서 추후에 삭제 예정
     @Modifying
     @Query(value = "insert into tag (name, shareable, views, member_member_id)" +
             "values (:name, :shareable, 0, :member_id)", nativeQuery = true)
