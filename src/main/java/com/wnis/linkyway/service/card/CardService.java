@@ -7,11 +7,11 @@ import com.wnis.linkyway.entity.Card;
 
 public interface CardService {
 
-    public AddCardResponse addCard(CardRequest cardRequest);
+    public AddCardResponse addCard(Long memberId, CardRequest cardRequest);
 
     public CardResponse findCardByCardId(Long cardId);
     
-    public Card updateCard(Long cardId, CardRequest cardRequest);
+    public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest);
     
     public void deleteCard(Long cardId);
 }

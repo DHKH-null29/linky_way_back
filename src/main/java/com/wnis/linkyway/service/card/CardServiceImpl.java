@@ -32,7 +32,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public AddCardResponse addCard(CardRequest cardRequest) {
+    public AddCardResponse addCard(Long memberId, CardRequest cardRequest) {
         Card savedCard = cardRepository.save(cardRequest.toEntity());
         addCardTagByCard(savedCard, cardRequest.getTagIdSet());
 
@@ -64,7 +64,8 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public Card updateCard(Long cardId, CardRequest cardRequest) {
+    public Card updateCard(Long memberId, Long cardId,
+            CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(
                                           () -> new NotModifyEmptyEntityException(
