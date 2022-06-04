@@ -142,4 +142,27 @@ public class CardServiceImpl implements CardService {
                               "해당 카드가 존재하지 않아 삭제가 불가능합니다"));
         cardRepository.deleteById(cardId);
     }
+    
+    @Override
+    public List<CardResponse> personalSearchCardByContent(String keyword, Long memberId) {
+        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
+        List<CardResponse> result = new ArrayList<>();
+        
+        for (Card card : cardsList) {
+            List<Tag> tags = new ArrayList<>();
+            card.getCardTags().forEach(t -> tags.add(t.getTag()));
+            CardResponse cardResponse = CardResponse.builder()
+                    .cardId(card.getId())
+                    .link(card.getLink())
+                    .content(card.getContent())
+                    .shareable(true)
+                    .title(card.getTitle())
+                    .tags(tags)
+                    .build();
+            
+            result.add(cardResponse);
+            
+        }
+        return result;
+    }
 }
