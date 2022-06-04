@@ -5,7 +5,6 @@ import com.wnis.linkyway.validation.ValidationGroup;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
@@ -15,7 +14,6 @@ import javax.validation.constraints.Positive;
 @Builder
 public class AddFolderRequest {
     
-    @NotNull(message = "부모 폴더 id를 입력해주세요", groups = ValidationGroup.NotBlankGroup.class)
     @Positive(message = "parentFolderId는 0 이상의 id를 입력하셔야 합니다.")
     private Long parentFolderId;
     
