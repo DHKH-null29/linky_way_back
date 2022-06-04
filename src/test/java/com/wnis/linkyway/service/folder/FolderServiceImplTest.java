@@ -9,11 +9,11 @@ import com.wnis.linkyway.dto.folder.SetFolderNameRequest;
 import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.exception.common.LimitDepthException;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,20 +61,20 @@ class FolderServiceImplTest {
         Folder folder1 = Folder.builder()
                 .member(member1)
                 .name("f1")
-                .depth(1L)
+                .depth(0L)
                 .build();
         
         Folder folder2 = Folder.builder()
                 .member(member1)
                 .name("f2")
-                .depth(2L)
-                .parent(folder1)
+                .depth(1L)
+                .parent(null)
                 .build();
         
         Folder folder3 = Folder.builder()
                 .member(member1)
                 .name("f3")
-                .depth(3L)
+                .depth(2L)
                 .parent(folder2)
                 .build();
         
@@ -102,17 +103,17 @@ class FolderServiceImplTest {
         @Test
         @DisplayName("응답 테스트")
         void responseTest() throws JsonProcessingException {
-            Response<FolderResponse> response = folderService.findFolderSuper(1L);
+            Response<List<FolderResponse>> response = folderService.findAllFolderSuper(1L);
             String s = objectMapper.writeValueAsString(response.getData());
             logger.info(s);
             assertThat(response.getCode()).isEqualTo(200);
         }
         
         @Test
-        @DisplayName("핸들러 테스트")
+        @DisplayName("없은 회원에 대해서 최상우 ㅣ폴더를 조회한 경우")
         void shouldThrowNotFoundException() {
             assertThatThrownBy(() -> {
-                folderService.findFolderSuper(100L);
+                folderService.findAllFolderSuper(100L);
             }).isInstanceOf(ResourceNotFoundException.class);
         }
     }
@@ -148,7 +149,7 @@ class FolderServiceImplTest {
         @DisplayName("응답 테스트")
         void responseTest() throws JsonProcessingException {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
-                    .parentFolderId(1L)
+                    .parentFolderId(2L)
                     .name("뻐꾸기")
                     .build();
             
@@ -158,7 +159,7 @@ class FolderServiceImplTest {
         }
         
         @Test
-        @DisplayName("예외 테스트1")
+        @DisplayName("예외 테스트: 존재하지 않느 폴더를 입력한 경우")
         void exceptionTest1() {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
                     .parentFolderId(100L)
@@ -166,11 +167,11 @@ class FolderServiceImplTest {
                     .build();
             
             assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 1L))
-                    .isInstanceOf(ResourceConflictException.class).hasMessage("존재 하지 않는 상위 폴더에 새로운 폴더를 추가 할 수 없습니다");
+                    .isInstanceOf(ResourceNotFoundException.class);
         }
         
         @Test
-        @DisplayName("예외 테스트2")
+        @DisplayName("예외 테스트: 회원이 존재하지 않는 경우")
         void exceptionTest2() {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
                     .parentFolderId(1L)
@@ -179,6 +180,30 @@ class FolderServiceImplTest {
             
             assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 100L))
                     .isInstanceOf(ResourceNotFoundException.class).hasMessage("회원이 존재하지 않습니다");
+        }
+        
+        @Test
+        @DisplayName("예외 테스트: 폴더 깊이가 2를 초과하는 경우")
+        void exceptionTest3() {
+            AddFolderRequest addFolderRequest = AddFolderRequest.builder()
+                    .parentFolderId(3L)
+                    .name("뻐꾸기")
+                    .build();
+            
+            assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 1L))
+                    .isInstanceOf(LimitDepthException.class);
+        }
+        
+        @Test
+        @DisplayName("예외 테스트: default 폴더 아래에 임의로 생성하는 경우")
+        void exceptionTest4() {
+            AddFolderRequest addFolderRequest = AddFolderRequest.builder()
+                    .parentFolderId(1L)
+                    .name("뻐꾸기")
+                    .build();
+            
+            assertThatThrownBy(() -> folderService.addFolder(addFolderRequest, 1L))
+                    .isInstanceOf(ResourceConflictException.class);
         }
     }
     

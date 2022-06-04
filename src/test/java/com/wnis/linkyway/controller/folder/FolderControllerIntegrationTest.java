@@ -69,21 +69,21 @@ public class FolderControllerIntegrationTest {
         
         Folder folder1 = Folder.builder()
                 .member(member1)
-                .depth(1L)
+                .depth(0L)
                 .name("f1")
                 .build();
         
         Folder folder2 = Folder.builder()
                 .member(member1)
                 .name("f2")
-                .depth(2L)
-                .parent(folder1)
+                .depth(1L)
+                .parent(null)
                 .build();
         
         Folder folder3 = Folder.builder()
                 .member(member1)
                 .name("f3")
-                .depth(3L)
+                .depth(2L)
                 .parent(folder2)
                 .build();
         
@@ -150,7 +150,7 @@ public class FolderControllerIntegrationTest {
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void responseTest() throws Exception {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
-                    .parentFolderId(1L)
+                    .parentFolderId(2L)
                     .name("f10")
                     .build();
             
@@ -162,6 +162,24 @@ public class FolderControllerIntegrationTest {
             
             logger.info(mvcResult.getResponse().getContentAsString());
             
+        }
+    
+        @Test
+        @DisplayName("부모 폴더에 null 을 기입한 경우")
+        @WithMockMember(id = 1L, email = "marrin1101@naver.com")
+        void RequestParentIdNull() throws Exception {
+            AddFolderRequest addFolderRequest = AddFolderRequest.builder()
+                    .parentFolderId(null)
+                    .name("f10")
+                    .build();
+        
+            MvcResult mvcResult = mockMvc.perform(post("/api/folders")
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsBytes(addFolderRequest)))
+                    .andExpect(status().is(200))
+                    .andReturn();
+            
+        
         }
         
         @Test
@@ -192,7 +210,7 @@ public class FolderControllerIntegrationTest {
             MvcResult mvcResult = mockMvc.perform(post("/api/folders")
                             .contentType("application/json")
                             .content(objectMapper.writeValueAsBytes(addFolderRequest)))
-                    .andExpect(status().is(409))
+                    .andExpect(status().is(404))
                     .andReturn();
             
             logger.info(mvcResult.getResponse().getContentAsString());
@@ -241,11 +259,27 @@ public class FolderControllerIntegrationTest {
     @Nested
     @DisplayName("폴더 경로 수정")
     class SetFolderPathTest {
-        
+    
+    
         @Test
         @DisplayName("응답 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void responseTest() throws Exception {
+            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+                    .targetFolderId(2L)
+                    .build();
+        
+            MvcResult mvcResult = mockMvc.perform(put("/api/folders/3/path")
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(setFolderPathRequest)))
+                    .andExpect(status().is(200))
+                    .andReturn();
+        }
+        
+        @Test
+        @DisplayName("수정하려는 폴더의 깊이가 깊은 경우 테스트")
+        @WithMockMember(id = 1L, email = "marrin1101@naver.com")
+        void LimitFolderDepthTest() throws Exception {
             SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
                     .targetFolderId(5L)
                     .build();
@@ -253,10 +287,8 @@ public class FolderControllerIntegrationTest {
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/3/path")
                             .contentType("application/json")
                             .content(objectMapper.writeValueAsString(setFolderPathRequest)))
-                    .andExpect(status().is(200))
+                    .andExpect(status().is(409))
                     .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
         }
         
         @Test
