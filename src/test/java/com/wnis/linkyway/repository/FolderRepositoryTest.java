@@ -81,15 +81,6 @@ class FolderRepositoryTest {
     }
     
     @Test
-    @DisplayName("findFolderByMemberId 테스트")
-    void findFolderByMemberIdTest() {
-        Folder folder = folderRepository.findFolderByMemberId(1L).orElse(null);
-        logger.info(String.valueOf(folder));
-        assertThat(folder.getId()).isEqualTo(1L);
-        assertThat(folder.getName()).isEqualTo("f1");
-    }
-    
-    @Test
     @DisplayName("findFolderByFolderId 테스트")
     void findFolderByIdTest() {
         Folder folder = folderRepository.findFolderById(2L).get();
