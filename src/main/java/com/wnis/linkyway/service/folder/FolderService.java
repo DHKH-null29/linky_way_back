@@ -7,9 +7,11 @@ import com.wnis.linkyway.dto.folder.FolderResponse;
 import com.wnis.linkyway.dto.folder.SetFolderNameRequest;
 import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
 
+import java.util.List;
+
 public interface FolderService {
     
-    Response<FolderResponse> findFolderSuper(Long memberId);
+    Response<List<FolderResponse>>  findAllFolderSuper(Long memberId);
     
     Response<FolderResponse> findFolder(Long folderId);
     
