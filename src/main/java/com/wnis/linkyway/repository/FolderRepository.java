@@ -2,6 +2,8 @@ package com.wnis.linkyway.repository;
 
 
 import com.wnis.linkyway.entity.Folder;
+import com.wnis.linkyway.entity.Member;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +25,5 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
             "values ('default', 1, null, :memberId)", nativeQuery = true)
     public void addSuperFolder(@Param("memberId") Long memberId);
     
+    public Optional<Folder> findByIdAndMember(Long id, Member member);
 }

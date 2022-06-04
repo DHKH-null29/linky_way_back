@@ -1,6 +1,8 @@
 package com.wnis.linkyway.dto.card;
 
 import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.entity.Folder;
+
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -31,12 +33,13 @@ public class CardRequest {
     @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
     private Long folderId;
 
-    public Card toEntity() {
+    public Card toEntity(Folder folder) {
         return Card.builder()
                    .link(link)
                    .title(title)
                    .content(content)
                    .shareable(shareable)
+                   .folder(folder)
                    .build();
     }
 }

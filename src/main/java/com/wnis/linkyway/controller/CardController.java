@@ -18,6 +18,8 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.security.annotation.Authenticated;
+import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.validation.ValidationSequence;
 
@@ -31,10 +33,11 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
-    public ResponseEntity<Response> addCard(
+    @Authenticated
+    public ResponseEntity<Response> addCard(@CurrentMember Long memberId,
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
-        AddCardResponse addCardResponse = cardService.addCard(cardRequest);
+        AddCardResponse addCardResponse = cardService.addCard(memberId, cardRequest);
 
         return ResponseEntity.created(URI.create("/card/" + addCardResponse))
                              .body(Response.builder()
@@ -45,6 +48,7 @@ public class CardController {
     }
 
     @GetMapping("/{cardId}")
+    @Authenticated
     public ResponseEntity<Response> findCardByCardId(Long cardId) {
 
         CardResponse cardResponse = cardService.findCardByCardId(cardId);
@@ -58,10 +62,12 @@ public class CardController {
     }
 
     @PutMapping("/{cardId}")
-    public ResponseEntity<Response> updateCard(@PathVariable Long cardId,
+    @Authenticated
+    public ResponseEntity<Response> updateCard(@CurrentMember Long memberId,
+            @PathVariable Long cardId,
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
-        cardService.updateCard(cardId, cardRequest);
+        cardService.updateCard(memberId, cardId, cardRequest);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
@@ -71,6 +77,7 @@ public class CardController {
     }
 
     @DeleteMapping("/{cardId}")
+    @Authenticated
     public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
 
         cardService.deleteCard(cardId);
