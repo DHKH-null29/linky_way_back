@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/folders")
@@ -25,7 +27,7 @@ public class FolderController {
     @GetMapping("/super")
     @Authenticated
     public ResponseEntity<Response> searchFolderSuper(@CurrentMember Long memberId) {
-        Response<FolderResponse> response = folderService.findFolderSuper(memberId);
+        Response<List<FolderResponse>> response = folderService.findAllFolderSuper(memberId);
         return ResponseEntity.status(response.getCode()).body(response);
     }
     
