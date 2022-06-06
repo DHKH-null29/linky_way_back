@@ -144,7 +144,7 @@ public class CardServiceImpl implements CardService {
     }
     
     @Override
-    public List<CardResponse> personalSearchCardByContent(String keyword, Long memberId) {
+    public List<CardResponse> personalSearchCardByKeyword(String keyword, Long memberId) {
         List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
         List<CardResponse> result = new ArrayList<>();
         
