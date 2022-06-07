@@ -89,7 +89,7 @@ public class CardController {
     @Authenticated
     public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
                                                        @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.personalSearchCardByContent(keyword, memberId);
+        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
         return ResponseEntity.ok()
                 .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }

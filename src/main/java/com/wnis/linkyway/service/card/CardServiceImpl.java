@@ -2,6 +2,7 @@ package com.wnis.linkyway.service.card;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -144,13 +145,20 @@ public class CardServiceImpl implements CardService {
     }
     
     @Override
-    public List<CardResponse> personalSearchCardByContent(String keyword, Long memberId) {
+    public List<CardResponse> personalSearchCardByKeyword(String keyword, Long memberId) {
         List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
         List<CardResponse> result = new ArrayList<>();
-        
+
         for (Card card : cardsList) {
             List<Tag> tags = new ArrayList<>();
-            card.getCardTags().forEach(t -> tags.add(t.getTag()));
+            
+            card.getCardTags().forEach(t -> {
+                Tag tag = t.getTag();
+                if (tag != null) {
+                    tags.add(tag);
+                }
+            });
+            
             CardResponse cardResponse = CardResponse.builder()
                     .cardId(card.getId())
                     .link(card.getLink())

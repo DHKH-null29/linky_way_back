@@ -17,5 +17,5 @@ public interface CardService {
     
     public void deleteCard(Long cardId);
     
-    public List<CardResponse> personalSearchCardByContent(String keyword, Long memberId);
+    public List<CardResponse> personalSearchCardByKeyword(String keyword, Long memberId);
 }
