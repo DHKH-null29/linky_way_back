@@ -131,7 +131,7 @@ public class CardController {
                                            .build());
     }
 
-    @GetMapping("/member")
+    @GetMapping("/all")
     public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
 
         List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId);
