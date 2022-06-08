@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
     
@@ -29,4 +30,10 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     public void addTag(@Param("name") String name,
                        @Param("shareable") boolean shareable,
                        @Param("member_id") Long memberId);
+
+    @Query("select t from Tag t join t.member m "
+            + "where t.id = :tagId and m.id = :memberId")
+    public Optional<Tag> findByIdAndMemberId(
+            @Param(value = "memberId") Long memberId,
+            @Param(value = "tagId") Long tagId);
 }
