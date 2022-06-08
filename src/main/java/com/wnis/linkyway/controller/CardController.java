@@ -132,4 +132,16 @@ public class CardController {
                                            .data(cardResponses)
                                            .build());
     }
+
+    @GetMapping("/member")
+    public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
 }

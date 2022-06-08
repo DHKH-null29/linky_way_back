@@ -202,6 +202,18 @@ public class CardServiceImpl implements CardService {
         }
         return toEntityList(cardList);
     }
+
+    @Override
+    @Transactional
+    public List<CardResponse> findCardsByMemberId(Long memberId) {
+        List<Card> cardList = cardRepository.findCardsByMemberId(memberId);
+
+        if (cardList.isEmpty()) {
+            throw new NotFoundEntityException("사용자의 카드가 존재하지 않습니다.");
+        }
+        return toEntityList(cardList);
+    }
+
     public List<CardResponse> toEntityList(List<Card> cardList) {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
