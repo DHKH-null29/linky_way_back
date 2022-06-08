@@ -106,4 +106,17 @@ public class CardController {
                                            .data(cardResponses)
                                            .build());
     }
+
+    @GetMapping("/folder/{folderId}")
+    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
+            @PathVariable Long folderId) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
 }

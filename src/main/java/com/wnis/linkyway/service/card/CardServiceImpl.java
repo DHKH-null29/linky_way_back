@@ -173,6 +173,20 @@ public class CardServiceImpl implements CardService {
         return toEntityList(cardList);
     }
 
+    @Override
+    @Transactional
+    public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId) {
+        folderRepository.findByIdAndMemberId(memberId, folderId)
+                        .orElseThrow(() -> new ResourceConflictException(
+                                "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+
+        List<Card> cardList = cardRepository.findCardsByMemberIdAndFolderId(memberId, folderId);
+
+        if (cardList.isEmpty()) {
+            throw new NotFoundEntityException("해당 폴더에 카드가 존재하지 않습니다.");
+        }
+        return toEntityList(cardList);
+    }
     public List<CardResponse> toEntityList(List<Card> cardList) {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
