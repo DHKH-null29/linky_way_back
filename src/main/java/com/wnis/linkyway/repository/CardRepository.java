@@ -25,4 +25,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             + "where c.folder.member.id = :memberId and c.folder.id = :folderId")
     public List<Card> findCardsByMemberIdAndFolderId(@Param(value = "memberId") Long memberId,
             @Param(value = "folderId") Long folderId);
+
+    @Query("select distinct c from Card c join fetch c.cardTags join c.folder "
+            + "where (c.folder.parent.id = :folderId or c.folder.id = :folderId) and c.folder.member.id = :memberId")
+    public List<Card> findLowLevelFoldersCardsByMemberIdAndFolderId(
+            @Param(value = "memberId") Long memberId, @Param(value = "folderId") Long folderId);
 }

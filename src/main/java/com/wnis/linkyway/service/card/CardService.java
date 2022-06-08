@@ -22,4 +22,6 @@ public interface CardService {
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId);
 
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId);
+
+    public List<CardResponse> findLowLevelFoldersCards(Long memberId, Long folderId);
 }
