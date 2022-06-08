@@ -1,14 +1,8 @@
 package com.wnis.linkyway.controller.tag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.tag.TagRequest;
-import com.wnis.linkyway.entity.Member;
-import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.repository.MemberRepository;
-import com.wnis.linkyway.repository.TagRepository;
 import com.wnis.linkyway.security.testutils.WithMockMember;
-import com.wnis.linkyway.service.tag.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -28,28 +21,23 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@Sql("/sqltest/initialize-test.sql")
+@Sql("/sqltest/tag-test.sql")
 public class TagControllerIntegrationTest {
     
-    private final Logger logger = LoggerFactory.getLogger(TagControllerIntegrationTest.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     WebApplicationContext ctx;
-    @Autowired
-    MemberRepository memberRepository;
-    @Autowired
-    TagRepository tagRepository;
-    @Autowired
-    TagService tagService;
+    
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -64,28 +52,6 @@ public class TagControllerIntegrationTest {
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
                 .alwaysDo(print())
                 .build();
-        
-        Member member = Member.builder()
-                .email("marrin1101@naver.com")
-                .nickname("Hyeon")
-                .password("A1!a1234")
-                .build();
-        
-        Tag tag1 = Tag.builder()
-                .name("Spring")
-                .shareable(true)
-                .views(0)
-                .build();
-        
-        Tag tag2 = Tag.builder()
-                .name("food1")
-                .shareable(false)
-                .views(10)
-                .build();
-        
-        member.addTag(tag1).addTag(tag2);
-        tagRepository.saveAll(Arrays.asList(tag1, tag2));
-        memberRepository.save(member);
     }
     
     @Nested
@@ -93,19 +59,16 @@ public class TagControllerIntegrationTest {
     class SearchTagsTest {
         
         @Test
-        @DisplayName("태그 조회 Response")
-        @WithMockMember(id = 1, email = "marrin1101@naver.com")
-        void responseTest() throws Exception {
-            Response response = tagService.searchTags(1L);
-            ResponseEntity<Response> expected = ResponseEntity.ok(response);
-            
-            MvcResult mvcResult = mockMvc.perform(get("/api/tags/table"))
-                    .andExpect(status().is(200))
-                    .andReturn();
-            
-            String s = mvcResult.getResponse().getContentAsString();
-            logger.info(s);
-            
+        @DisplayName("반드시 응답해야 할 프로퍼티 존재 검증")
+        @WithMockMember
+        void mustReturnResponseFormatExistTest() throws Exception {
+            mockMvc.perform(get("/api/tags/table"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isArray())
+                    .andExpect(jsonPath("$..tagId").exists())
+                    .andExpect(jsonPath("$..tagName").exists())
+                    .andExpect(jsonPath("$..shareable").exists())
+                    .andExpect(jsonPath("$..views").exists());
         }
     }
     
@@ -114,21 +77,21 @@ public class TagControllerIntegrationTest {
     class AddTagTest {
         
         @Test
-        @DisplayName("태그 추가 Response")
-        @WithMockMember(id = 1, email = "marrin1101@naver.com")
-        void ResponseTest() throws Exception {
+        @DisplayName("반드시 응답해야 할 프로퍼티 존재 검증")
+        @WithMockMember
+        void mustReturnResponseFormatExistTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
-                    .tagName("hello")
-                    .shareable("true")
-                    .build();
-            MvcResult mvcResult = mockMvc.perform(post("/api/tags")
+                    .tagName("dance").shareable("false").build();
+            
+            mockMvc.perform(post("/api/tags")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(tagRequest)))
                     .andExpect(status().isOk())
-                    .andReturn();
-            String res = mvcResult.getResponse().getContentAsString();
-            logger.info(res);
-            
+                    .andExpect(jsonPath("$.data").isMap())
+                    .andExpect(jsonPath("$..tagId").exists())
+                    .andExpect(jsonPath("$..tagName").doesNotExist())
+                    .andExpect(jsonPath("$..shareable").doesNotExist())
+                    .andExpect(jsonPath("$..views").doesNotExist());
         }
         
         @Test
@@ -136,7 +99,7 @@ public class TagControllerIntegrationTest {
         @WithMockMember(id = 1, email = "marrin1101@naver.com")
         void ResponseExceptionTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
-                    .tagName("Spring")
+                    .tagName("spring")
                     .shareable("true")
                     .build();
             
@@ -152,25 +115,24 @@ public class TagControllerIntegrationTest {
     
     @Nested
     @DisplayName("태그 수정")
-    
     class SetTag {
         
         @Test
-        @DisplayName("수정 Response")
-        @WithMockMember(id = 1, email = "marrin1101@naver.com")
-        void responseTest() throws Exception {
+        @DisplayName("반드시 응답해야 할 프로퍼티 존재 검증")
+        @WithMockMember
+        void mustReturnResponseFormatExistTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
-                    .tagName("Summer")
-                    .shareable("false")
-                    .build();
+                    .tagName("dance").shareable("false").build();
             
-            MvcResult mvcResult = mockMvc.perform(put("/api/tags/1")
+            mockMvc.perform(put("/api/tags/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(tagRequest)))
-                    .andExpect(status().is(200))
-                    .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isMap())
+                    .andExpect(jsonPath("$..tagId").exists())
+                    .andExpect(jsonPath("$..tagName").exists())
+                    .andExpect(jsonPath("$..shareable").exists())
+                    .andExpect(jsonPath("$..views").doesNotExist());
         }
         
         @Test
@@ -182,7 +144,7 @@ public class TagControllerIntegrationTest {
                     .shareable("false")
                     .build();
             
-            MvcResult mvcResult = mockMvc.perform(put("/api/tags/4")
+            MvcResult mvcResult = mockMvc.perform(put("/api/tags/4000")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(tagRequest)))
                     .andExpect(status().is(409))
@@ -196,28 +158,25 @@ public class TagControllerIntegrationTest {
     @DisplayName("태그 삭제")
     class DeleteTag {
         
-        @DisplayName("삭제 Response")
         @Test
-        @WithMockMember(id = 1, email = "marrin1101@naver.com")
-        void responseTest() throws Exception {
-            MvcResult mvcResult = mockMvc.perform(delete("/api/tags/1")
-                    )
-                    .andExpect(status().is(200))
-                    .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
+        @DisplayName("반드시 응답해야 할 프로퍼티 존재 검증")
+        @WithMockMember
+        void mustReturnResponseFormatExistTest() throws Exception {
+            mockMvc.perform(delete("/api/tags/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data").isMap())
+                    .andExpect(jsonPath("$..tagId").exists())
+                    .andExpect(jsonPath("$..tagName").doesNotExist())
+                    .andExpect(jsonPath("$..shareable").doesNotExist())
+                    .andExpect(jsonPath("$..views").doesNotExist());
         }
         
         @DisplayName("없는데 삭제 예외 핸들러")
         @Test
         @WithMockMember(id = 1, email = "marrin1101@naver.com")
         void responseExceptionTest() throws Exception {
-            MvcResult mvcResult = mockMvc.perform(delete("/api/tags/5")
-                    )
-                    .andExpect(status().is(409))
-                    .andReturn();
-            
-            logger.info(mvcResult.getResponse().getContentAsString());
+            mockMvc.perform(delete("/api/tags/1000"))
+                    .andExpect(status().is(409));
         }
     }
 }

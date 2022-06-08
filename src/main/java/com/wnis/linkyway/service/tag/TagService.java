@@ -1,16 +1,18 @@
 package com.wnis.linkyway.service.tag;
 
-import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.tag.TagRequest;
+import com.wnis.linkyway.dto.tag.TagResponse;
+
+import java.util.List;
 
 public interface TagService {
     
-    Response searchTags(Long memberId);
+    List<TagResponse> searchTags(Long memberId);
     
-    Response addTag(TagRequest tagRequest, Long memberId);
+    TagResponse addTag(TagRequest tagRequest, Long memberId);
     
-    Response setTag(TagRequest tagRequest, Long tagId);
+    TagResponse setTag(TagRequest tagRequest, Long tagId);
     
-    Response deleteTag(Long tagId);
+    TagResponse deleteTag(Long tagId);
     
 }
