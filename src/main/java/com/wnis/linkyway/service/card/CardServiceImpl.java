@@ -2,8 +2,8 @@ package com.wnis.linkyway.service.card;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -157,5 +157,38 @@ public class CardServiceImpl implements CardService {
             
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public List<CardResponse> findCardsByTagId(Long memberId, Long tagId) {
+        tagRepository.findByIdAndMemberId(memberId, tagId)
+                     .orElseThrow(() -> new ResourceConflictException(
+                             "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
+
+        List<Card> cardList = cardRepository.findCardsByTagId(tagId);
+        if (cardList.isEmpty()) {
+            throw new NotFoundEntityException("태그에 해당하는 카드가 존재하지 않습니다.");
+        }
+        return toEntityList(cardList);
+    }
+
+    public List<CardResponse> toEntityList(List<Card> cardList) {
+        List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
+        for (Card card : cardList) {
+            List<Tag> tag = card.getCardTags()
+                                .stream()
+                                .map(CardTag::getTag)
+                                .collect(Collectors.toList());
+            cardResponseList.add(CardResponse.builder()
+                                             .cardId(card.getId())
+                                             .title(card.getTitle())
+                                             .content(card.getContent())
+                                             .link(card.getLink())
+                                             .tags(tag)
+                                             .shareable(card.getShareable())
+                                             .build());
+        }
+        return cardResponseList;
     }
 }

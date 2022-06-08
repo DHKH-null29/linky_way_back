@@ -93,4 +93,17 @@ public class CardController {
         return ResponseEntity.ok()
                 .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }
+
+    @GetMapping("/tag/{tagId}")
+    public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId,
+            @PathVariable Long tagId) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
 }

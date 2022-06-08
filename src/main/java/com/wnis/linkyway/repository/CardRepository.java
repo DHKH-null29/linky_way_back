@@ -17,4 +17,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "or c.link like %:keyword%)")
     List<Card> findAllCardByKeyword(@Param(value = "keyword") String keyword,
                                     @Param(value = "memberId") Long memberId);
+
+    @Query("select ct.card from CardTag ct join ct.card join ct.tag where ct.tag.id = :tagId")
+    public List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId);
 }
