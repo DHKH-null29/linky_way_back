@@ -3,8 +3,6 @@ package com.wnis.linkyway.controller;
 import java.net.URI;
 import java.util.List;
 
-import com.wnis.linkyway.security.annotation.Authenticated;
-import com.wnis.linkyway.security.annotation.CurrentMember;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -84,14 +82,14 @@ public class CardController {
                                            .message("카드 삭제 완료")
                                            .build());
     }
-    
+
     @GetMapping("/personal/keyword")
     @Authenticated
-    public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
-                                                       @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
-        return ResponseEntity.ok()
-                .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
+    public ResponseEntity<Response> personalSearchCard(
+            @RequestParam(value = "keyword") String keyword, @CurrentMember Long memberId) {
+        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword,
+                memberId);
+        return ResponseEntity.ok().body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }
 
     @GetMapping("/tag/{tagId}")

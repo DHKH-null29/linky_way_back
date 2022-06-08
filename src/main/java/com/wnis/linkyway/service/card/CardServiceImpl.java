@@ -136,25 +136,25 @@ public class CardServiceImpl implements CardService {
 
         for (Card card : cardsList) {
             List<Tag> tags = new ArrayList<>();
-            
+
             card.getCardTags().forEach(t -> {
                 Tag tag = t.getTag();
                 if (tag != null) {
                     tags.add(tag);
                 }
             });
-            
+
             CardResponse cardResponse = CardResponse.builder()
-                    .cardId(card.getId())
-                    .link(card.getLink())
-                    .content(card.getContent())
-                    .shareable(true)
-                    .title(card.getTitle())
-                    .tags(tags)
-                    .build();
-            
+                                                    .cardId(card.getId())
+                                                    .link(card.getLink())
+                                                    .content(card.getContent())
+                                                    .shareable(true)
+                                                    .title(card.getTitle())
+                                                    .tags(tags)
+                                                    .build();
+
             result.add(cardResponse);
-            
+
         }
         return result;
     }
