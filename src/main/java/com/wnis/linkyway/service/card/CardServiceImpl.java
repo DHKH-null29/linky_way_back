@@ -186,9 +186,9 @@ public class CardServiceImpl implements CardService {
 
         List<Card> cardList;
         if (!findDeep) {
-            cardList = cardRepository.findCardsByMemberIdAndFolderId(memberId, folderId);
+            cardList = cardRepository.findCardsByFolderId(folderId);
         } else {
-            cardList = cardRepository.findLowLevelFoldersCardsByMemberIdAndFolderId(memberId, folderId);
+            cardList = cardRepository.findDeepFoldersCardsByFolderId(folderId);
         }
 
         if (cardList.isEmpty()) {

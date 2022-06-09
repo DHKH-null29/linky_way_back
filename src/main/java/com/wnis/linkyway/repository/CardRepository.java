@@ -20,14 +20,11 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select ct.card from CardTag ct join ct.card join ct.tag where ct.tag.id = :tagId")
     public List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId);
 
-    @Query("select c from Card c join c.folder f where f.member.id = :memberId and f.id = :folderId")
-    public List<Card> findCardsByMemberIdAndFolderId(@Param(value = "memberId") Long memberId,
-            @Param(value = "folderId") Long folderId);
+    @Query("select c from Card c join c.folder f where f.id = :folderId")
+    public List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId);
 
-    @Query("select c from Card c join c.folder f "
-            + "where (f.parent.id = :folderId or f.id = :folderId) and f.member.id = :memberId")
-    public List<Card> findLowLevelFoldersCardsByMemberIdAndFolderId(@Param(value = "memberId") Long memberId,
-            @Param(value = "folderId") Long folderId);
+    @Query("select c from Card c join c.folder f where f.parent.id = :folderId or f.id = :folderId")
+    public List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
 
     @Query("select c from Card c join c.folder f where f.member.id = :memberId")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId);
