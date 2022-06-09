@@ -106,12 +106,12 @@ public class CardController {
                                            .build());
     }
 
-    @GetMapping("/folder/{folderId}")
+    @GetMapping("/folder/shallow/{folderId}")
     @Authenticated
-    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
-            @PathVariable Long folderId) {
+    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId, @PathVariable Long folderId) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId);
+        boolean findDeep = false;
+        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
@@ -120,12 +120,13 @@ public class CardController {
                                            .build());
     }
 
-    @GetMapping("/folder/all/{folderId}")
+    @GetMapping("/folder/deep/{folderId}")
     @Authenticated
     public ResponseEntity<Response> findLowLevelFoldersCards(@CurrentMember Long memberId,
-            @PathVariable Long folderId) {
+        @PathVariable Long folderId) {
 
-        List<CardResponse> cardResponses = cardService.findLowLevelFoldersCards(memberId, folderId);
+        boolean findDeep = true;
+        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())

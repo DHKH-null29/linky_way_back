@@ -175,30 +175,19 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId) {
+    public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
         folderRepository.findByIdAndMemberId(memberId, folderId)
-                        .orElseThrow(() -> new ResourceConflictException(
-                                "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
 
-        List<Card> cardList = cardRepository.findCardsByMemberIdAndFolderId(memberId, folderId);
-
+        List<Card> cardList;
+        if (!findDeep) {
+            cardList = cardRepository.findCardsByMemberIdAndFolderId(memberId, folderId);
+        } else {
+            cardList = cardRepository.findLowLevelFoldersCardsByMemberIdAndFolderId(memberId, folderId);
+        }
+        
         if (cardList.isEmpty()) {
             throw new NotFoundEntityException("해당 폴더에 카드가 존재하지 않습니다.");
-        }
-        return toEntityList(cardList);
-    }
-
-    @Override
-    @Transactional
-    public List<CardResponse> findLowLevelFoldersCards(Long memberId, Long folderId) {
-        folderRepository.findByIdAndMemberId(memberId, folderId)
-                        .orElseThrow(() -> new ResourceConflictException(
-                                "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
-        List<Card> cardList = cardRepository.findLowLevelFoldersCardsByMemberIdAndFolderId(memberId,
-                folderId);
-
-        if (cardList.isEmpty()) {
-            throw new NotFoundEntityException("해당 폴더와 하위 폴더에 카드가 존재하지 않습니다.");
         }
         return toEntityList(cardList);
     }
