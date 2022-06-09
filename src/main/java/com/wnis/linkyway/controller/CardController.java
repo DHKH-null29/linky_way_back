@@ -85,17 +85,16 @@ public class CardController {
 
     @GetMapping("/personal/keyword")
     @Authenticated
-    public ResponseEntity<Response> personalSearchCard(
-            @RequestParam(value = "keyword") String keyword, @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword,
-                memberId);
-        return ResponseEntity.ok().body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
+    public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
+            @CurrentMember Long memberId) {
+        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
+        return ResponseEntity.ok()
+                             .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }
 
     @GetMapping("/tag/{tagId}")
     @Authenticated
-    public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId,
-            @PathVariable Long tagId) {
+    public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId, @PathVariable Long tagId) {
 
         List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId);
         return ResponseEntity.ok()
@@ -123,7 +122,7 @@ public class CardController {
     @GetMapping("/folder/deep/{folderId}")
     @Authenticated
     public ResponseEntity<Response> findLowLevelFoldersCards(@CurrentMember Long memberId,
-        @PathVariable Long folderId) {
+            @PathVariable Long folderId) {
 
         boolean findDeep = true;
         List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);

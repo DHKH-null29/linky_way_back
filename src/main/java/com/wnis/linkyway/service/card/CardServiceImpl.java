@@ -45,15 +45,16 @@ public class CardServiceImpl implements CardService {
 
         addCardTagByCard(memberId, savedCard, cardRequest.getTagIdSet());
 
-        return AddCardResponse.builder().cardId(savedCard.getId()).build();
+        return AddCardResponse.builder()
+                              .cardId(savedCard.getId())
+                              .build();
     }
 
     @Override
     @Transactional
     public CardResponse findCardByCardId(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(
-                                          () -> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
+                                  .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
         List<CardTag> cardTagList = card.getCardTags();
         List<Tag> tagList = new ArrayList<Tag>();
         for (CardTag cardTag : cardTagList) {
@@ -74,12 +75,12 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(() -> new NotModifyEmptyEntityException(
-                                          "해당 카드가 존재하지 않아 수정이 불가능합니다"));
+                                  .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다"));
         Folder oldFolder = card.getFolder();
         if (cardRequest.getFolderId() != oldFolder.getId()) {
-            Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember().getId(),
-                    cardRequest.getFolderId())
+            Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember()
+                                                                          .getId(),
+                                                                 cardRequest.getFolderId())
                                             .orElseThrow(() -> new NotFoundEntityException(
                                                     "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
             card.updateFolder(folder);
@@ -99,8 +100,12 @@ public class CardServiceImpl implements CardService {
             Tag tag = tagRepository.findByIdAndMemberId(memberId, tagId)
                                    .orElseThrow(() -> new NotFoundEntityException(
                                            "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
-            if (!cardTagRepository.findByCardAndTag(savedCard, tag).isPresent()) {
-                cardTagRepository.save(CardTag.builder().card(savedCard).tag(tag).build());
+            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
+                                  .isPresent()) {
+                cardTagRepository.save(CardTag.builder()
+                                              .card(savedCard)
+                                              .tag(tag)
+                                              .build());
             }
         }
     }
@@ -114,7 +119,8 @@ public class CardServiceImpl implements CardService {
 
         // 기존 태그가 선택되지 않음 -> 삭제
         for (CardTag oldCardTag : oldCardTagList) {
-            if (!newTagIdList.contains(oldCardTag.getTag().getId())) {
+            if (!newTagIdList.contains(oldCardTag.getTag()
+                                                 .getId())) {
                 cardTagRepository.deleteById(oldCardTag.getId());
             }
         }
@@ -124,8 +130,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public void deleteCard(Long cardId) {
         cardRepository.findById(cardId)
-                      .orElseThrow(
-                              () -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다"));
+                      .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다"));
         cardRepository.deleteById(cardId);
     }
 
@@ -137,12 +142,13 @@ public class CardServiceImpl implements CardService {
         for (Card card : cardsList) {
             List<Tag> tags = new ArrayList<>();
 
-            card.getCardTags().forEach(t -> {
-                Tag tag = t.getTag();
-                if (tag != null) {
-                    tags.add(tag);
-                }
-            });
+            card.getCardTags()
+                .forEach(t -> {
+                    Tag tag = t.getTag();
+                    if (tag != null) {
+                        tags.add(tag);
+                    }
+                });
 
             CardResponse cardResponse = CardResponse.builder()
                                                     .cardId(card.getId())
@@ -163,8 +169,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId) {
         tagRepository.findByIdAndMemberId(memberId, tagId)
-                     .orElseThrow(() -> new ResourceConflictException(
-                             "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
+                     .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<Card> cardList = cardRepository.findCardsByTagId(tagId);
         if (cardList.isEmpty()) {
@@ -185,7 +190,7 @@ public class CardServiceImpl implements CardService {
         } else {
             cardList = cardRepository.findLowLevelFoldersCardsByMemberIdAndFolderId(memberId, folderId);
         }
-        
+
         if (cardList.isEmpty()) {
             throw new NotFoundEntityException("해당 폴더에 카드가 존재하지 않습니다.");
         }

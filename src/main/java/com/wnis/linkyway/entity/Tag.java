@@ -71,7 +71,8 @@ public class Tag {
         this.views = views;
         this.member = member;
         if (member != null) {
-            member.getTags().add(this);
+            member.getTags()
+                  .add(this);
         }
 
     }

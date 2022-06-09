@@ -18,64 +18,64 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SetFolderNameRequestTest {
-    
+
     private static Validator validator;
     private static ValidatorFactory factory;
     private final Logger logger = LoggerFactory.getLogger(SetFolderNameRequestTest.class);
-    
+
     @BeforeAll
     static void setup() {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
-    
+
     @AfterAll
     static void close() {
         factory.close();
     }
-    
+
     @Test
     @DisplayName("Not Blank 테스트")
     void notBlankTest() {
         SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                .build();
-        
-        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator
-                .validate(setFolderNameRequest, ValidationGroup.NotBlankGroup.class);
-        
+                                                                        .build();
+
+        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
+                                                                                                 ValidationGroup.NotBlankGroup.class);
+
         constraintViolations.forEach((e) -> {
             logger.info(e.getMessage());
             assertThat(e).isInstanceOf(ConstraintViolationImpl.class);
         });
     }
-    
+
     @Test
     @DisplayName("Pattern 테스트")
     void patternTest() {
         SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                .name("가")
-                .build();
-        
-        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator
-                .validate(setFolderNameRequest, ValidationGroup.NotBlankGroup.class);
-        
+                                                                        .name("가")
+                                                                        .build();
+
+        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
+                                                                                                 ValidationGroup.NotBlankGroup.class);
+
         constraintViolations.forEach((e) -> {
             logger.info(e.getMessage());
             assertThat(e).isInstanceOf(ConstraintViolationImpl.class);
         });
     }
-    
+
     @Test
     @DisplayName("통과 테스트")
     void successTest() {
         AddFolderRequest addFolderRequest = AddFolderRequest.builder()
-                .parentFolderId(0L)
-                .name("가")
-                .build();
-        
-        Set<ConstraintViolation<AddFolderRequest>> constraintViolations = validator
-                .validate(addFolderRequest, ValidationGroup.PatternCheckGroup.class);
-        
+                                                            .parentFolderId(0L)
+                                                            .name("가")
+                                                            .build();
+
+        Set<ConstraintViolation<AddFolderRequest>> constraintViolations = validator.validate(addFolderRequest,
+                                                                                             ValidationGroup.PatternCheckGroup.class);
+
         assertThat(constraintViolations).isEmpty();
     }
 }

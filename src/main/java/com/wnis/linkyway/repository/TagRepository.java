@@ -25,7 +25,8 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     @Modifying
     @Query(value = "insert into tag (name, shareable, views, member_member_id)"
             + "values (:name, :shareable, 0, :member_id)", nativeQuery = true)
-    public void addTag(@Param("name") String name, @Param("shareable") boolean shareable,
+    public void addTag(@Param("name") String name,
+            @Param("shareable") boolean shareable,
             @Param("member_id") Long memberId);
 
     @Query("select t from Tag t join t.member m " + "where t.id = :tagId and m.id = :memberId")

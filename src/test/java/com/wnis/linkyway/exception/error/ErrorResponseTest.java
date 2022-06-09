@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @JsonTest
 class ErrorResponseTest {
     private static final Logger logger = LoggerFactory.getLogger(ErrorResponseTest.class);
@@ -22,8 +21,7 @@ class ErrorResponseTest {
 
     @Test
     void serializedTest() throws IOException {
-        ErrorResponse errorResponse =
-                ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE,"매우매우 나쁜 요청", "/login");
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, "매우매우 나쁜 요청", "/login");
 
         JsonContent<ErrorResponse> json = jacksonTester.write(errorResponse);
         logger.info(String.valueOf(json));

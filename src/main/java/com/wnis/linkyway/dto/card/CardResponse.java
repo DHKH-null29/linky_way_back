@@ -24,8 +24,7 @@ public class CardResponse {
     private List<TagResponse> tags = new ArrayList<>();
 
     @Builder
-    private CardResponse(Long cardId, String link, String title, String content,
-            boolean shareable, List<Tag> tags) {
+    private CardResponse(Long cardId, String link, String title, String content, boolean shareable, List<Tag> tags) {
         this.cardId = cardId;
         this.link = link;
         this.title = title;

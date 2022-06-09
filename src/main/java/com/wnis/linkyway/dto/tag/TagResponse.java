@@ -10,21 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class TagResponse {
-    
+
     private Long tagId;
     private String tagName;
     private Boolean shareable;
     private Integer views;
-    
+
     @Builder
-    private TagResponse(Long tagId, String tagName,
-                        Boolean shareable, Integer views) {
+    private TagResponse(Long tagId, String tagName, Boolean shareable, Integer views) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.shareable = shareable;
         this.views = views;
     }
-    
+
     public TagResponse(Tag tag) {
         this.tagId = tag.getId();
         this.tagName = tag.getName();

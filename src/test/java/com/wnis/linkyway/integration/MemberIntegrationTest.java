@@ -37,10 +37,10 @@ class MemberIntegrationTest {
     @BeforeAll
     void setup() {
         member = Member.builder()
-                .nickname("김갑환")
-                .email("ehd0309@naver.com")
-                .password(passwordEncoder.encode(rawPassword))
-                .build();
+                       .nickname("김갑환")
+                       .email("ehd0309@naver.com")
+                       .password(passwordEncoder.encode(rawPassword))
+                       .build();
         memberRepository.save(member);
         httpHeaders.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
     }
@@ -53,23 +53,19 @@ class MemberIntegrationTest {
         @DisplayName("존재하는 멤버에 대한 시도로 정상적으로 응답한다.")
         void shouldLoginSucceedAndReturnAccessToken() {
             LoginRequest loginRequest = new LoginRequest(member.getEmail(), rawPassword);
-            assertThat(testRestTemplate.exchange(
-                    "/api/members/login",
-                    HttpMethod.POST,
-                    new HttpEntity<>(loginRequest, httpHeaders),
-                    new ParameterizedTypeReference<Response<LoginResponse>>() {
-                    }))
-                    .isNotNull()
-                    .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
-                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-                        assertThat(responseEntity.getBody())
-                                .isNotNull()
-                                .isInstanceOfSatisfying(Response.class, response -> {
-                                    assertThat(response).isNotNull();
-                                    assertThat(response.getData())
-                                            .hasFieldOrProperty("accessToken");
-                                });
-                    });
+            assertThat(testRestTemplate.exchange("/api/members/login", HttpMethod.POST,
+                                                 new HttpEntity<>(loginRequest, httpHeaders),
+                                                 new ParameterizedTypeReference<Response<LoginResponse>>() {
+                                                 })).isNotNull()
+                                                    .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
+                                                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                                                        assertThat(responseEntity.getBody()).isNotNull()
+                                                                                            .isInstanceOfSatisfying(Response.class,
+                                                                                                                    response -> {
+                                                                                                                        assertThat(response).isNotNull();
+                                                                                                                        assertThat(response.getData()).hasFieldOrProperty("accessToken");
+                                                                                                                    });
+                                                    });
         }
 
         @Test
@@ -77,18 +73,13 @@ class MemberIntegrationTest {
         void shouldThrowsAuthorizationExceptionWithIncorrectPassword() {
 
             LoginRequest loginRequest = new LoginRequest(member.getEmail(), "!");
-            assertThat(testRestTemplate.exchange(
-                    "/api/members/login",
-                    HttpMethod.POST,
-                    new HttpEntity<>(loginRequest, httpHeaders),
-                    new ParameterizedTypeReference<Response<ErrorResponse>>() {
-                    }))
-                    .isNotNull()
-                    .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
-                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-                    });
+            assertThat(testRestTemplate.exchange("/api/members/login", HttpMethod.POST,
+                                                 new HttpEntity<>(loginRequest, httpHeaders),
+                                                 new ParameterizedTypeReference<Response<ErrorResponse>>() {
+                                                 })).isNotNull()
+                                                    .isInstanceOfSatisfying(ResponseEntity.class, responseEntity -> {
+                                                        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                                                    });
         }
-
     }
-
 }

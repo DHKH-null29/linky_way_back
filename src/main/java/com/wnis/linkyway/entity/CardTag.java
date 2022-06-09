@@ -30,9 +30,11 @@ public class CardTag {
     public CardTag(Card card, Tag tag) {
         this.card = card;
         if (card != null)
-            card.getCardTags().add(this);
+            card.getCardTags()
+                .add(this);
         this.tag = tag;
         if (tag != null)
-            tag.getCardTags().add(this);
+            tag.getCardTags()
+               .add(this);
     }
 }

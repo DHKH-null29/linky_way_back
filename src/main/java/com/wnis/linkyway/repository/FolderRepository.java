@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FolderRepository extends JpaRepository<Folder, Long> {
+
     @Query("select f from Folder f left outer join fetch f.parent " + "where f.id = :folderId")
     public Optional<Folder> findFolderById(@Param("folderId") Long folderId);
 
@@ -25,6 +26,5 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     @Query("select f from Folder f left outer join fetch f.parent "
             + "where f.id = :folderId and f.member.id = :memberId")
-    public Optional<Folder> findByIdAndMemberId(@Param("memberId") Long memberId,
-            @Param("folderId") Long folderId);
+    public Optional<Folder> findByIdAndMemberId(@Param("memberId") Long memberId, @Param("folderId") Long folderId);
 }

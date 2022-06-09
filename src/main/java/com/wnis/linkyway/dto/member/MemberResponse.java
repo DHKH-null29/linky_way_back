@@ -9,7 +9,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public class MemberResponse {
-    
+
     private Long memberId;
     private String email;
     private String nickname;

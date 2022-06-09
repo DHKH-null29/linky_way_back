@@ -1,7 +1,5 @@
 package com.wnis.linkyway.exception;
 
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.wnis.linkyway.exception.common.BusinessException;
 import com.wnis.linkyway.exception.error.ErrorCode;
@@ -20,9 +18,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.List;
-
-import static com.fasterxml.jackson.databind.JsonMappingException.*;
 
 @RestControllerAdvice
 @Slf4j

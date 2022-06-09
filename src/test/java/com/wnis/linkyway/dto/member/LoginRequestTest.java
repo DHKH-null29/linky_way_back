@@ -1,10 +1,5 @@
 package com.wnis.linkyway.dto.member;
 
-
-
-
-import com.wnis.linkyway.dto.member.LoginRequest;
-import com.wnis.linkyway.validation.ValidationGroup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +28,7 @@ public class LoginRequestTest {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
+
     @AfterAll
     static void close() {
         factory.close();
@@ -41,39 +37,31 @@ public class LoginRequestTest {
     @Nested
     class ValidationTest {
         @ParameterizedTest
-        @CsvSource(value = {
-                "'', '', 2",
-                "adg@naa, asdfa, 0",
-                "'', 'a', 1"
-        })
+        @CsvSource(value = { "'', '', 2", "adg@naa, asdfa, 0", "'', 'a', 1" })
         void notBlankTest(String email, String password, int result) {
             LoginRequest loginRequest = LoginRequest.builder()
-                    .email(email)
-                    .password(password)
-                    .build();
+                                                    .email(email)
+                                                    .password(password)
+                                                    .build();
 
-            Set<ConstraintViolation<LoginRequest>> constraintViolations = validator.validate(loginRequest, NotBlankGroup.class);
-            constraintViolations.forEach((error)->
-                    logger.debug(error.getMessage()));
+            Set<ConstraintViolation<LoginRequest>> constraintViolations = validator.validate(loginRequest,
+                                                                                             NotBlankGroup.class);
+            constraintViolations.forEach((error) -> logger.debug(error.getMessage()));
             assertThat(result).isEqualTo(result);
         }
 
         @ParameterizedTest
-        @CsvSource(value = {
-                "'', '', 2",
-                "adg@naa, asdfa, 2",
-                "'asd12@co.kr', 'aA1!aa121', 0"
-        })
+        @CsvSource(value = { "'', '', 2", "adg@naa, asdfa, 2", "'asd12@co.kr', 'aA1!aa121', 0" })
         void PatternTest(String email, String password, int result) {
             LoginRequest loginRequest = LoginRequest.builder()
-                    .email(email)
-                    .password(password)
-                    .build();
+                                                    .email(email)
+                                                    .password(password)
+                                                    .build();
 
-            Set<ConstraintViolation<LoginRequest>> constraintViolations = validator.validate(loginRequest, PatternCheckGroup.class);
+            Set<ConstraintViolation<LoginRequest>> constraintViolations = validator.validate(loginRequest,
+                                                                                             PatternCheckGroup.class);
             int errorSize = constraintViolations.size();
-            constraintViolations.forEach((error)->
-                    logger.debug(error.getMessage()));
+            constraintViolations.forEach((error) -> logger.debug(error.getMessage()));
             assertThat(errorSize).isEqualTo(result);
         }
     }

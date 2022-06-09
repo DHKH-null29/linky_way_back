@@ -41,9 +41,9 @@ public class LoginServiceTest {
         final String email = "ehd0309@naver.com";
         final String password = "AbcDeFG123!!";
         final Member member = Member.builder()
-                .email(email)
-                .password(password)
-                .build();
+                                    .email(email)
+                                    .password(password)
+                                    .build();
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         @Test
@@ -61,8 +61,7 @@ public class LoginServiceTest {
         void shouldThrowsInvalidInputExceptionDueToNotFoundEmail() {
             given(memberRepository.findByEmail(email)).willReturn(Optional.empty());
 
-            assertThatThrownBy(() -> memberService.login(loginRequest))
-                    .isInstanceOf(UsernameNotFoundException.class);
+            assertThatThrownBy(() -> memberService.login(loginRequest)).isInstanceOf(UsernameNotFoundException.class);
             verify(passwordEncoder, times(0)).encode(any());
         }
 
@@ -70,13 +69,11 @@ public class LoginServiceTest {
         @DisplayName("비밀번호가 일치하지 않아 예외를 반환한다.")
         void shouldThrowsConflictExceptionDueToNotCorrectPassword() {
             given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
-            given(passwordEncoder.matches(password,member.getPassword())).willReturn(false);
+            given(passwordEncoder.matches(password, member.getPassword())).willReturn(false);
 
-            assertThatThrownBy(() -> memberService.login(loginRequest))
-                    .isInstanceOf(BadCredentialsException.class);
+            assertThatThrownBy(() -> memberService.login(loginRequest)).isInstanceOf(BadCredentialsException.class);
         }
 
     }
-    
 
 }

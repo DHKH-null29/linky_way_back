@@ -29,62 +29,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Sql("/sqltest/initialize-test.sql")
 public class PersonalSearchIntegrationTest {
-    
+
     @Autowired
     MockMvc mockMvc;
-    
+
     @Autowired
     WebApplicationContext ctx;
-    
+
     @Autowired
     EntityManager entityManager;
-    
+
     @BeforeEach
     void setup() {
-        //MockMvc 설정
+        // MockMvc 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
-                .apply(springSecurity())
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
+                                 .apply(springSecurity())
+                                 .addFilters(new CharacterEncodingFilter("UTF-8", true)) // 필터 추가
+                                 .alwaysDo(print())
+                                 .build();
     }
-    
+
     @Nested
     @DisplayName("개인 검색 테스트")
     class personalSearchTest {
-        
+
         @BeforeEach
         void setUp() {
             Member member = Member.builder()
-                    .email("marrin1101@naver.com")
-                    .nickname("helloworld")
-                    .password("asda!!!12123A1").build();
-            
+                                  .email("marrin1101@naver.com")
+                                  .nickname("helloworld")
+                                  .password("asda!!!12123A1")
+                                  .build();
+
             Folder folder = Folder.builder()
-                    .member(member)
-                    .name("default")
-                    .depth(0L)
-                    .build();
-            
+                                  .member(member)
+                                  .name("default")
+                                  .depth(0L)
+                                  .build();
+
             Folder folder2 = Folder.builder()
-                    .member(member)
-                    .name("f1")
-                    .depth(1L)
-                    .build();
-    
+                                   .member(member)
+                                   .name("f1")
+                                   .depth(1L)
+                                   .build();
+
             Card card = Card.builder()
-                    .folder(folder2)
-                    .link("www.google.co.kr")
-                    .title("hello")
-                    .content("yeah")
-                    .shareable(false)
-                    .build();
-            Tag tag = Tag.builder()
+                            .folder(folder2)
+                            .link("www.google.co.kr")
+                            .title("hello")
+                            .content("yeah")
                             .shareable(false)
-                                    .name("spring")
-                                            .build();
-            CardTag cardTag = CardTag.builder().card(card).build();
-            
+                            .build();
+            Tag tag = Tag.builder()
+                         .shareable(false)
+                         .name("spring")
+                         .build();
+            CardTag cardTag = CardTag.builder()
+                                     .card(card)
+                                     .build();
+
             entityManager.persist(member);
             entityManager.persist(folder);
             entityManager.persist(folder2);
@@ -93,15 +96,15 @@ public class PersonalSearchIntegrationTest {
             entityManager.persist(cardTag);
             entityManager.flush();
         }
-        
+
         @Test
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void shouldOkAndDataFormatTest() throws Exception {
-    
+
             mockMvc.perform(get("/api/cards/personal/keyword").param("keyword", "hello"))
-                    .andExpect(status().is(200))
-                    .andExpect(jsonPath("$.data").isNotEmpty());
+                   .andExpect(status().is(200))
+                   .andExpect(jsonPath("$.data").isNotEmpty());
         }
-        
+
     }
 }

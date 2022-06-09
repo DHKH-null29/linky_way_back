@@ -16,11 +16,11 @@ import java.util.List;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql("/sqltest/tag-test.sql")
 class TagRepositoryTest {
-    
+
     @Autowired
     TagRepository tagRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     @ParameterizedTest
     @CsvFileSource(resources = "/input/tag/repository/findAllTagList-test.csv", delimiter = ',', numLinesToSkip = 1)
     void findAllTagListTest(Long memberId) {
@@ -28,9 +28,11 @@ class TagRepositoryTest {
         logger.info("size: {}", tagList.size());
         tagList.forEach((t) -> logger.info("tag id: {}, tag name: {}", t.getTagId(), t.getTagName()));
     }
-    
+
     @ParameterizedTest
-    @CsvFileSource(resources = "/input/tag/repository/existsByTagNameAndMemberId-test.csv", delimiter = ',', numLinesToSkip = 1)
+    @CsvFileSource(resources = "/input/tag/repository/existsByTagNameAndMemberId-test.csv",
+                   delimiter = ',',
+                   numLinesToSkip = 1)
     void existsByTagNameAndMemberIdTest(String name, Long memberId) {
         boolean bool = tagRepository.existsByTagNameAndMemberId(name, memberId);
         logger.info("result: {}", bool);

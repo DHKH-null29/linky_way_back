@@ -1,6 +1,5 @@
 package com.wnis.linkyway.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.http.HttpStatus;
