@@ -93,6 +93,7 @@ public class CardController {
     }
 
     @GetMapping("/tag/{tagId}")
+    @Authenticated
     public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId,
             @PathVariable Long tagId) {
 
@@ -106,6 +107,7 @@ public class CardController {
     }
 
     @GetMapping("/folder/{folderId}")
+    @Authenticated
     public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
             @PathVariable Long folderId) {
 
@@ -119,6 +121,7 @@ public class CardController {
     }
 
     @GetMapping("/folder/all/{folderId}")
+    @Authenticated
     public ResponseEntity<Response> findLowLevelFoldersCards(@CurrentMember Long memberId,
             @PathVariable Long folderId) {
 
@@ -132,6 +135,7 @@ public class CardController {
     }
 
     @GetMapping("/all")
+    @Authenticated
     public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
 
         List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId);
