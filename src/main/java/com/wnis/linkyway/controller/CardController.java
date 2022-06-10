@@ -3,8 +3,6 @@ package com.wnis.linkyway.controller;
 import java.net.URI;
 import java.util.List;
 
-import com.wnis.linkyway.security.annotation.Authenticated;
-import com.wnis.linkyway.security.annotation.CurrentMember;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -84,13 +82,54 @@ public class CardController {
                                            .message("카드 삭제 완료")
                                            .build());
     }
-    
+
     @GetMapping("/personal/keyword")
     @Authenticated
     public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
-                                                       @CurrentMember Long memberId) {
+            @CurrentMember Long memberId) {
         List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
         return ResponseEntity.ok()
-                .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
+                             .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
+    }
+
+    @GetMapping("/tag/{tagId}")
+    @Authenticated
+    public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId, @PathVariable Long tagId) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
+
+    @GetMapping("/folder/{folderId}")
+    @Authenticated
+    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
+            @PathVariable Long folderId,
+            @RequestParam boolean findDeep) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
+
+    @GetMapping("/all")
+    @Authenticated
+    public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
+
+        List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
     }
 }

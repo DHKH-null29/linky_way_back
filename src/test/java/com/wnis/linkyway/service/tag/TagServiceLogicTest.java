@@ -21,71 +21,64 @@ import java.util.List;
 @Sql("/sqltest/tag-test.sql")
 @Import(TagServiceImpl.class)
 public class TagServiceLogicTest {
-    
+
     @Autowired
     TagService tagService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     @Nested
     @DisplayName("태그 추가")
     class AddTagTest {
-        
+
         @ParameterizedTest
-        @CsvSource(value = {
-                "fire,false,1",
-                "hello21,true,1",
-                ",,1"
-        })
+        @CsvSource(value = { "fire,false,1", "hello21,true,1", ",,1" })
         void addTagSuccessTest(String tagName, String shareable, Long memberId) {
-            TagRequest tagRequest = TagRequest.builder().tagName(tagName).shareable(shareable).build();
+            TagRequest tagRequest = TagRequest.builder()
+                                              .tagName(tagName)
+                                              .shareable(shareable)
+                                              .build();
             TagResponse tagResponse = tagService.addTag(tagRequest, memberId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
         }
     }
-    
+
     @Nested
     @DisplayName("태그 수정")
     class SetTagTest {
-        
+
         @ParameterizedTest
-        @CsvSource(value = {
-                "source,true,1",
-                "hot,true,2"
-        })
+        @CsvSource(value = { "source,true,1", "hot,true,2" })
         void addTagSuccessTest(String tagName, String shareable, Long tagId) {
-            TagRequest tagRequest = TagRequest.builder().tagName(tagName).shareable(shareable).build();
+            TagRequest tagRequest = TagRequest.builder()
+                                              .tagName(tagName)
+                                              .shareable(shareable)
+                                              .build();
             TagResponse tagResponse = tagService.setTag(tagRequest, tagId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
         }
     }
-    
+
     @Nested
     @DisplayName("태그 삭제")
     class DeleteTagTest {
-        
+
         @ParameterizedTest
-        @CsvSource(value = {
-                "1",
-                "2",
-        }, delimiter = ',')
+        @CsvSource(value = { "1", "2", }, delimiter = ',')
         void addTagSuccessTest(Long tagId) {
             TagResponse tagResponse = tagService.deleteTag(tagId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
         }
     }
-    
+
     @Nested
     @DisplayName("태그 조회")
     class FindTagTest {
-        
+
         @ParameterizedTest
-        @CsvSource(value = {
-                "1",
-                "2",
-        })
+        @CsvSource(value = { "1", "2", })
         void findTagSuccessTest() {
             List<TagResponse> tagResponseList = tagService.searchTags(1L);
-            
+
         }
     }
 }

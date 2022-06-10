@@ -16,8 +16,7 @@ public class Ddabong {
     @Column(name = "ddabong_id", nullable = false)
     private Long id;
 
-
-    ////********************연관 관게  ***************************/////
+    //// ********************연관 관게 ***************************/////
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_member_id")
     private Member member;
@@ -30,11 +29,13 @@ public class Ddabong {
     public Ddabong(Member member, Tag tag) {
         this.member = member;
         if (member != null) {
-            member.getDdabongs().add(this);
+            member.getDdabongs()
+                  .add(this);
         }
         this.tag = tag;
         if (tag != null) {
-            tag.getDdabongs().add(this);
+            tag.getDdabongs()
+               .add(this);
         }
     }
 }

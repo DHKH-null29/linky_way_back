@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class AddCardResponse {
-    
+
     private final Long cardId;
 }

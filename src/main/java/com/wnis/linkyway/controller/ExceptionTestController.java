@@ -15,7 +15,8 @@ import javax.validation.constraints.PositiveOrZero;
 public class ExceptionTestController {
 
     @PostMapping("/cards")
-    public ResponseEntity<String> cardRequestTest(@Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
+    public ResponseEntity<String> cardRequestTest(
+            @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
         return ResponseEntity.ok(cardRequest.getContent());
     }
 
