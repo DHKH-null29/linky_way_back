@@ -105,26 +105,12 @@ public class CardController {
                                            .build());
     }
 
-    @GetMapping("/folder/shallow/{folderId}")
+    @GetMapping("/folder/{folderId}")
     @Authenticated
-    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId, @PathVariable Long folderId) {
+    public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
+            @PathVariable Long folderId,
+            @RequestParam boolean findDeep) {
 
-        boolean findDeep = false;
-        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
-        return ResponseEntity.ok()
-                             .body(Response.builder()
-                                           .code(HttpStatus.OK.value())
-                                           .message("태그에 해당하는 카드 조회 성공")
-                                           .data(cardResponses)
-                                           .build());
-    }
-
-    @GetMapping("/folder/deep/{folderId}")
-    @Authenticated
-    public ResponseEntity<Response> findLowLevelFoldersCards(@CurrentMember Long memberId,
-            @PathVariable Long folderId) {
-
-        boolean findDeep = true;
         List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
         return ResponseEntity.ok()
                              .body(Response.builder()
