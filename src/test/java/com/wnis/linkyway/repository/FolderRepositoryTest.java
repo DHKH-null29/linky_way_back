@@ -104,12 +104,19 @@ class FolderRepositoryTest {
         assertThat(parent.getChildren()
                          .size()).isEqualTo(2);
 
+        Member member = Member.builder()
+                .nickname("hello")
+                .email("heloo@naver.com")
+                .password("asda1!@!@")
+                .build();
         Folder newFolder = Folder.builder()
+                                 .member(member)
                                  .parent(parent)
                                  .name("f5")
                                  .depth(1L)
                                  .build();
 
+        entityManager.persist(member);
         folderRepository.save(newFolder);
 //        folderRepository.save(parent);
         folderRepository.flush();
