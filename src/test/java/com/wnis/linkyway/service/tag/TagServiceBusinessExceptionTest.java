@@ -41,7 +41,7 @@ public class TagServiceBusinessExceptionTest {
             doReturn(true).when(memberRepository)
                           .existsById(any()); // 회원 검증 통과
             doReturn(true).when(tagRepository)
-                          .existsByTagNameAndMemberId(any(), any()); // 중복 입력 예외
+                          .existsByMemberIdAndTagName(any(), any()); // 중복 입력 예외
 
             Assertions.assertThatThrownBy(() -> tagService.addTag(TagRequest.builder()
                                                                             .build(),
@@ -90,7 +90,7 @@ public class TagServiceBusinessExceptionTest {
                                               .findById(any());
             // 요청 tagName이랑 id로 탐색한 결과 이미 값이 존재한다면 중복 예외.
             doReturn(true).when(tagRepository)
-                          .existsByTagNameAndMemberId(any(), any());
+                          .existsByMemberIdAndTagName(any(), any());
 
             Assertions.assertThatThrownBy(() -> {
                 tagService.setTag(TagRequest.builder()

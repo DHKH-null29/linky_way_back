@@ -81,8 +81,9 @@ public class PersonalSearchIntegrationTest {
                             .shareable(false)
                             .build();
             Tag tag = Tag.builder()
-                         .shareable(false)
+                         .isPublic(false)
                          .name("spring")
+                         .member(member)
                          .build();
             CardTag cardTag = CardTag.builder()
                                      .card(card)

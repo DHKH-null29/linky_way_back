@@ -57,7 +57,7 @@ class TagControllerTest {
     void shouldReturn400_WhenBlankProperty(String tagName, String shareable) throws Exception {
         TagRequest tagRequest = TagRequest.builder()
                                           .tagName(tagName)
-                                          .shareable(shareable)
+                                          .isPublic(shareable)
                                           .build();
 
         mockMvc.perform(post("/api/tags/").contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +71,7 @@ class TagControllerTest {
     void shouldReturn400_WhenInvalidPattern(String tagName, String shareable) throws Exception {
         TagRequest tagRequest = TagRequest.builder()
                                           .tagName(tagName)
-                                          .shareable(shareable)
+                                          .isPublic(shareable)
                                           .build();
 
         mockMvc.perform(post("/api/tags/").contentType(MediaType.APPLICATION_JSON)

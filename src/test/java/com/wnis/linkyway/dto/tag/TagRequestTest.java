@@ -42,7 +42,7 @@ class TagRequestTest {
         void notBlankTest(String tagName, String shareable, int result) {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(shareable)
                                               .build();
 
             Set<ConstraintViolation<TagRequest>> constraintViolations = validator.validate(tagRequest,
@@ -57,7 +57,7 @@ class TagRequestTest {
         void patternTest(String tagName, String shareable, int result) {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(shareable)
                                               .build();
 
             Set<ConstraintViolation<TagRequest>> constraintViolations = validator.validate(tagRequest,

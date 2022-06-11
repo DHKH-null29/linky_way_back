@@ -20,14 +20,13 @@ class TagResponseTest {
         TagResponse tagResponse = TagResponse.builder()
                                              .tagName("hello")
                                              .tagId(1L)
-                                             .shareable(true)
+                                             .isPublic(true)
                                              .views(10)
                                              .build();
 
         assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.tagName");
         assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.tagId");
-        assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.shareable");
-        assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.views");
+        assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.isPublic");
     }
 
 }
