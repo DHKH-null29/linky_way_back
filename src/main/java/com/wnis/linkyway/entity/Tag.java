@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class Tag {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "tag")
-    private List<Ddabong> ddabongs = new ArrayList<>();
+    private List<Endorse> endorses = new ArrayList<>();
 
     // ******************* setter ******************************////
 
