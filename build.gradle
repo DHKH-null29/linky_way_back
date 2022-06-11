@@ -51,6 +51,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // my sql
+    runtimeOnly 'mysql:mysql-connector-java'
 }
 
 tasks.named('test') {
