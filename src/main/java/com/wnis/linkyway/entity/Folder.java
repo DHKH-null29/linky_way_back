@@ -11,17 +11,21 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "folder")
+@Table(name = "folder",
+indexes = {
+        @Index(name = "name", columnList = "name"),
+        @Index(name = "depth", columnList = "depth")
+})
 public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "folder_id", nullable = false)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 10)
     private String name;
 
-    @Column(name = "depth")
+    @Column(name = "depth", nullable = false)
     private Long depth;
 
     //// ********************연관 관게 ***************************/////
@@ -38,7 +42,7 @@ public class Folder {
     private Folder parent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_member_id")
+    @JoinColumn(name = "member_member_id", nullable = false)
     private Member member;
 
     // ********연관관계 메소드 *************************
