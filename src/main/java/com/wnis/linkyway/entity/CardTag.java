@@ -19,7 +19,7 @@ public class CardTag {
     //// ********************연관 관게 ***************************/////
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_card_id")
+    @JoinColumn(name = "card_card_id", nullable = false)
     private Card card;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -24,21 +24,24 @@ public class Card {
     @Setter
     private Long id;
 
-    @Column(name = "link")
+    @Column(name = "link", nullable = false)
     private String link;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false, length = 30)
     private String title;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "shareable")
+    @Column(name = "shareable", nullable = false)
     private Boolean shareable;
+    
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 
     //// ********************연관 관게 ***************************/////
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_folder_id")
+    @JoinColumn(name = "folder_folder_id", nullable = false)
     private Folder folder;
 
     // ***** 1 : N *****
@@ -46,13 +49,14 @@ public class Card {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
-    private Card(String link, String title, String content, Boolean shareable,
+    private Card(String link, String title, String content, Boolean shareable, Boolean isDeleted,
             Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
         this.shareable = shareable;
         this.folder = folder;
+        this.isDeleted = isDeleted;
         if (folder != null)
             folder.getCards().add(this);
     }
@@ -75,5 +79,9 @@ public class Card {
     
     public void updateFolder(Folder folder) {
         this.folder = folder;
+    }
+    
+    public void updateIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

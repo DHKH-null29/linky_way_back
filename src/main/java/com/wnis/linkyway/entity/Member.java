@@ -32,7 +32,7 @@ public class Member {
     private List<Folder> folders = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Ddabong> ddabongs = new ArrayList<>();
+    private List<Endorse> endorses = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Tag> tags = new ArrayList<>();
