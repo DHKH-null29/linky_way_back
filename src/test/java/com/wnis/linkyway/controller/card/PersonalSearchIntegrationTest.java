@@ -79,6 +79,7 @@ public class PersonalSearchIntegrationTest {
                             .title("hello")
                             .content("yeah")
                             .shareable(false)
+                            .isDeleted(false)
                             .build();
             Tag tag = Tag.builder()
                          .isPublic(false)
