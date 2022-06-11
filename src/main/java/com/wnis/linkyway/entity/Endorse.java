@@ -29,7 +29,7 @@ public class Endorse {
     public Endorse(Member member, Tag tag) {
         this.member = member;
         if (member != null) {
-            member.getDdabongs()
+            member.getEndorses()
                   .add(this);
         }
         this.tag = tag;
