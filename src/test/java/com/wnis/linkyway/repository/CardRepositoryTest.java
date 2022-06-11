@@ -156,6 +156,7 @@ public class CardRepositoryTest {
 
         Folder folder = Folder.builder()
                               .name("1")
+                              .depth(1L)
                               .member(member)
                               .build();
 

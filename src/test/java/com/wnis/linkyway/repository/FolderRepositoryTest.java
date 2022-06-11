@@ -107,6 +107,7 @@ class FolderRepositoryTest {
         Folder newFolder = Folder.builder()
                                  .parent(parent)
                                  .name("f5")
+                                 .depth(1L)
                                  .build();
 
         folderRepository.save(newFolder);
