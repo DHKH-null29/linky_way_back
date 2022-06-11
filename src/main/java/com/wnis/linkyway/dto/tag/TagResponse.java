@@ -13,21 +13,19 @@ public class TagResponse {
 
     private Long tagId;
     private String tagName;
-    private Boolean shareable;
-    private Integer views;
+    private Boolean isPublic;
+    
 
     @Builder
-    private TagResponse(Long tagId, String tagName, Boolean shareable, Integer views) {
+    private TagResponse(Long tagId, String tagName, Boolean isPublic, Integer views) {
         this.tagId = tagId;
         this.tagName = tagName;
-        this.shareable = shareable;
-        this.views = views;
+        this.isPublic = isPublic;
     }
 
     public TagResponse(Tag tag) {
         this.tagId = tag.getId();
         this.tagName = tag.getName();
-        this.shareable = tag.getShareable();
-        this.views = tag.getViews();
+        this.isPublic = tag.getIsPublic();
     }
 }
