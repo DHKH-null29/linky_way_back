@@ -9,11 +9,11 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "ddabong")
-public class Ddabong {
+@Table(name = "endorse")
+public class Endorse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ddabong_id", nullable = false)
+    @Column(name = "endorse_id", nullable = false)
     private Long id;
 
     //// ********************연관 관게 ***************************/////
@@ -26,15 +26,15 @@ public class Ddabong {
     private Tag tag;
 
     @Builder
-    public Ddabong(Member member, Tag tag) {
+    public Endorse(Member member, Tag tag) {
         this.member = member;
         if (member != null) {
-            member.getDdabongs()
+            member.getEndorses()
                   .add(this);
         }
         this.tag = tag;
         if (tag != null) {
-            tag.getDdabongs()
+            tag.getEndorses()
                .add(this);
         }
     }
