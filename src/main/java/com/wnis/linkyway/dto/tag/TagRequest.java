@@ -17,7 +17,7 @@ public class TagRequest {
 
     @NotBlank(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
     @Pattern(regexp = "(true|false)", groups = PatternCheckGroup.class)
-    String shareable;
+    String isPublic;
 
     @NotBlank(message = "tagName을 입력해주세요", groups = NotBlankGroup.class)
     @Size(max = 10, message = "10자 이하로 작성해주세요")

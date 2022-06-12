@@ -31,11 +31,11 @@ public class TagServiceLogicTest {
     class AddTagTest {
 
         @ParameterizedTest
-        @CsvSource(value = { "fire,false,1", "hello21,true,1", ",,1" })
+        @CsvSource(value = { "fire,false,1", "hello21,true,1", "hello32,false,1" })
         void addTagSuccessTest(String tagName, String shareable, Long memberId) {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(shareable)
                                               .build();
             TagResponse tagResponse = tagService.addTag(tagRequest, memberId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
@@ -51,7 +51,7 @@ public class TagServiceLogicTest {
         void addTagSuccessTest(String tagName, String shareable, Long tagId) {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(shareable)
                                               .build();
             TagResponse tagResponse = tagService.setTag(tagRequest, tagId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());

@@ -67,8 +67,7 @@ public class TagControllerIntegrationTest {
                    .andExpect(jsonPath("$.data").isArray())
                    .andExpect(jsonPath("$..tagId").exists())
                    .andExpect(jsonPath("$..tagName").exists())
-                   .andExpect(jsonPath("$..shareable").exists())
-                   .andExpect(jsonPath("$..views").exists());
+                   .andExpect(jsonPath("$..isPublic").exists());
         }
     }
 
@@ -82,7 +81,7 @@ public class TagControllerIntegrationTest {
         void mustReturnResponseFormatExistTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName("dance")
-                                              .shareable("false")
+                                              .isPublic("false")
                                               .build();
 
             mockMvc.perform(post("/api/tags").contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +100,7 @@ public class TagControllerIntegrationTest {
         void ResponseExceptionTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName("spring")
-                                              .shareable("true")
+                                              .isPublic("true")
                                               .build();
 
             MvcResult mvcResult = mockMvc.perform(post("/api/tags").contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +123,7 @@ public class TagControllerIntegrationTest {
         void mustReturnResponseFormatExistTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName("dance")
-                                              .shareable("false")
+                                              .isPublic("false")
                                               .build();
 
             mockMvc.perform(put("/api/tags/1").contentType(MediaType.APPLICATION_JSON)
@@ -133,7 +132,7 @@ public class TagControllerIntegrationTest {
                    .andExpect(jsonPath("$.data").isMap())
                    .andExpect(jsonPath("$..tagId").exists())
                    .andExpect(jsonPath("$..tagName").exists())
-                   .andExpect(jsonPath("$..shareable").exists())
+                   .andExpect(jsonPath("$..isPublic").exists())
                    .andExpect(jsonPath("$..views").doesNotExist());
         }
 
@@ -143,7 +142,7 @@ public class TagControllerIntegrationTest {
         void responseExceptionTest() throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName("Summer")
-                                              .shareable("false")
+                                              .isPublic("false")
                                               .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/tags/4000").contentType(MediaType.APPLICATION_JSON)

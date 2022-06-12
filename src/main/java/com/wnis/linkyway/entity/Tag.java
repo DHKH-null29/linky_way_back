@@ -11,26 +11,26 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "tag")
+@Table(name = "tag",
+indexes = {
+        @Index(name = "tag_ix_name", columnList = "name"),
+})
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id", nullable = false)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 10, nullable = false)
     private String name;
 
-    @Column(name = "shareable")
-    private Boolean shareable;
-
-    @Column(name = "views")
-    private Integer views;
-
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
+    
     //// ********************연관 관게 ***************************/////
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_member_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_member_id", nullable = false)
     private Member member;
 
     // ***** 1 : N *****
@@ -38,7 +38,7 @@ public class Tag {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "tag")
-    private List<Ddabong> ddabongs = new ArrayList<>();
+    private List<Endorse> endorses = new ArrayList<>();
 
     // ******************* setter ******************************////
 
@@ -47,15 +47,11 @@ public class Tag {
         return this;
     }
 
-    public Tag updateShareable(Boolean shareable) {
-        this.shareable = shareable;
+    public Tag updateIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
         return this;
     }
-
-    public Tag updateViews(Integer views) {
-        this.views = views;
-        return this;
-    }
+    
 
     public Tag updateMember(Member member) {
         this.member = member;
@@ -65,10 +61,9 @@ public class Tag {
     // **************** 생성자 *******************************///
 
     @Builder
-    private Tag(String name, Boolean shareable, Integer views, Member member) {
+    private Tag(String name, Boolean isPublic, Member member) {
         this.name = name;
-        this.shareable = shareable;
-        this.views = views;
+        this.isPublic = isPublic;
         this.member = member;
         if (member != null) {
             member.getTags()

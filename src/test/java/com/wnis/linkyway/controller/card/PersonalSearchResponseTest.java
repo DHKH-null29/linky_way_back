@@ -21,6 +21,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +61,7 @@ public class PersonalSearchResponseTest {
         @Test
         void shouldReturnCode200Test() throws Exception {
             Tag tag = Tag.builder()
-                         .shareable(false)
+                         .isPublic(false)
                          .name("site")
                          .build();
 
@@ -69,10 +70,10 @@ public class PersonalSearchResponseTest {
                                                     .title("hello")
                                                     .link("www.google.com")
                                                     .content("hello")
-                                                    .tags(Arrays.asList(tag))
+                                                    .tags(Collections.singletonList(tag))
                                                     .build();
 
-            List<CardResponse> list = new ArrayList<>(Arrays.asList(cardResponse));
+            List<CardResponse> list = new ArrayList<>(Collections.singletonList(cardResponse));
 
             doReturn(list).when(cardService)
                           .personalSearchCardByKeyword(any(), any());

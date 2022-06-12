@@ -35,14 +35,13 @@ public class TagServiceImpl implements TagService {
             throw new NotFoundEntityException("회원을 찾을 수 없습니다");
         }
 
-        if (tagRepository.existsByTagNameAndMemberId(tagRequest.getTagName(), memberId)) {
+        if (tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), memberId)) {
             throw new NotAddDuplicateEntityException("중복된 태그 이름을 추가 할 수 없습니다");
         }
 
         Tag tag = Tag.builder()
                      .name(tagRequest.getTagName())
-                     .shareable(Boolean.parseBoolean(tagRequest.getShareable()))
-                     .views(0)
+                     .isPublic(Boolean.parseBoolean(tagRequest.getIsPublic()))
                      .member(memberRepository.getById(memberId))
                      .build();
 
@@ -57,17 +56,17 @@ public class TagServiceImpl implements TagService {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new NotModifyEmptyEntityException("태그가 존재하지 않아 수정 할 수 없습니다."));
 
-        if (tagRepository.existsByTagNameAndMemberId(tagRequest.getTagName(), tagId)) {
+        if (tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), tagId)) {
             throw new NotModifyDuplicateException("이미 존재하는 태그의 이름으로 수정 할 수 없습니다");
         }
 
         tag.updateName(tagRequest.getTagName())
-           .updateShareable(Boolean.parseBoolean(tagRequest.getShareable()));
+           .updateIsPublic(Boolean.parseBoolean(tagRequest.getIsPublic()));
 
         return TagResponse.builder()
                           .tagId(tag.getId())
                           .tagName(tag.getName())
-                          .shareable(tag.getShareable())
+                          .isPublic(tag.getIsPublic())
                           .build();
     }
 

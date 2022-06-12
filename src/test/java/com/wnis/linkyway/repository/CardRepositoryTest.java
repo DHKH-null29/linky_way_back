@@ -132,28 +132,31 @@ public class CardRepositoryTest {
 
     @Test
     void countTheNumberOfSqlCalls_UsingFindAllCardByKeyword() {
-        Tag tag1 = Tag.builder()
-                      .name("hello")
-                      .shareable(true)
-                      .views(0)
-                      .build();
-        Tag tag2 = Tag.builder()
-                      .name("hello1")
-                      .shareable(false)
-                      .views(0)
-                      .build();
-        Tag tag3 = Tag.builder()
-                      .name("hello2")
-                      .shareable(false)
-                      .views(0)
-                      .build();
         Member member = Member.builder()
                               .nickname("h")
                               .password("1")
                               .email("as@naver.com")
                               .build();
+        
+        Tag tag1 = Tag.builder()
+                      .name("hello")
+                      .isPublic(true)
+                      .member(member)
+                      .build();
+        Tag tag2 = Tag.builder()
+                      .name("hello1")
+                      .isPublic(false)
+                      .member(member)
+                      .build();
+        Tag tag3 = Tag.builder()
+                      .name("hello2")
+                      .isPublic(false)
+                      .member(member)
+                      .build();
+
         Folder folder = Folder.builder()
                               .name("1")
+                              .depth(1L)
                               .member(member)
                               .build();
 

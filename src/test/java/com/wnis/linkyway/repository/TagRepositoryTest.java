@@ -34,7 +34,7 @@ class TagRepositoryTest {
                    delimiter = ',',
                    numLinesToSkip = 1)
     void existsByTagNameAndMemberIdTest(String name, Long memberId) {
-        boolean bool = tagRepository.existsByTagNameAndMemberId(name, memberId);
+        boolean bool = tagRepository.existsByMemberIdAndTagName(name, memberId);
         logger.info("result: {}", bool);
     }
 }

@@ -16,13 +16,13 @@ public class Member {
     @Column(name = "member_id", nullable = false)
     private Long id;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", nullable = false, length = 10)
     private String nickname;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false, length = 72)
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
 
     //// ********************연관 관게 ***************************/////
@@ -32,7 +32,7 @@ public class Member {
     private List<Folder> folders = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Ddabong> ddabongs = new ArrayList<>();
+    private List<Endorse> endorses = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Tag> tags = new ArrayList<>();

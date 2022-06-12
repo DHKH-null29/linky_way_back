@@ -17,19 +17,20 @@ VALUES ('pds0123@gmail.com', 'hello3', '$2a$10$BGENx/1mUjloPKZ311EGFe16UcWRM5NHy
 
 
 
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('spring', 0, 0, 1);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('spring', 0, 1);
 
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('food', 0, 0, 1);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('food', 0, 1);
 
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('spring', 0, 0, 2);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('spring', 0, 2);
 
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('spring', 0, 0, 3);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('spring', 0, 3);
 
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('firewall', 1, 0, 1);
-INSERT INTO tag (name, shareable, views, member_member_id)
-VALUES ('shopping', 1, 0, 1);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('firewall', 1, 1);
+INSERT INTO tag (name, is_public, member_member_id)
+VALUES ('shopping', 1, 1);
+
