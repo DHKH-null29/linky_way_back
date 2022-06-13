@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/linkyway?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    schema: classpath*:sql/schema.sql
+    initialization-mode: never   # 처음 사용시 always 그 이후는 never로 설정
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+    hibernate:
+      ddl-auto: validate   # none, create-drop, create, update, validate
+
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        highlight_sql: true
+    #        use_sql_comments: true
+    open-in-view: false
+
+  config:
+    import:
+      - classpath:jwt.yml
+      - classpath:folder.yml
+
+

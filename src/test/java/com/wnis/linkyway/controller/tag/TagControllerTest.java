@@ -53,6 +53,7 @@ class TagControllerTest {
                                  .build();
     }
 
+
     @Nested
     @DisplayName("태그 추가")
     class AddTag {
@@ -118,6 +119,7 @@ class TagControllerTest {
                                               .content(objectMapper.writeValueAsString(tagRequest)))
                    .andExpect(status().is(400));
         }
+
     }
     
     
