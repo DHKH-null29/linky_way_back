@@ -24,13 +24,17 @@ public class CardRequest {
     private String link;
 
     @Size(max = 15)
-    private String title;
-    private String content;
+    @Builder.Default
+    private String title = "";
+    
+    @Builder.Default
+    private String content = "";
 
     @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
-    private Boolean shareable;
+    private Boolean isPublic;
 
-    private Set<Long> tagIdSet = new HashSet<Long>();
+    @Builder.Default
+    private Set<Long> tagIdSet = new HashSet<>();
 
     @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
     private Long folderId;
@@ -40,8 +44,9 @@ public class CardRequest {
                    .link(link)
                    .title(title)
                    .content(content)
-                   .shareable(shareable)
+                   .isPublic(isPublic)
                    .folder(folder)
+                   .isDeleted(false)
                    .build();
     }
 }
