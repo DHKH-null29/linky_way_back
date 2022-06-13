@@ -105,6 +105,19 @@ public class CardController {
                                            .build());
     }
 
+    @GetMapping("/package/{tagId}")
+    @Authenticated
+    public ResponseEntity<Response> findShareableCardsByTagId(@PathVariable Long tagId) {
+
+        List<CardResponse> cardResponses = cardService.findShareableCardsByTagId(tagId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
+
     @GetMapping("/folder/{folderId}")
     @Authenticated
     public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
