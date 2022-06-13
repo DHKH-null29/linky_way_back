@@ -128,7 +128,7 @@ public class CardController {
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
-                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .message("폴더에 해당하는 카드 조회 성공")
                                            .data(cardResponses)
                                            .build());
     }
