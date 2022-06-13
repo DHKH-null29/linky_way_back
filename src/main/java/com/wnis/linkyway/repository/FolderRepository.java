@@ -24,7 +24,5 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
             + "values ('default', 0, null, :memberId)", nativeQuery = true)
     public void addSuperFolder(@Param("memberId") Long memberId);
 
-    @Query("select f from Folder f left outer join fetch f.parent "
-            + "where f.id = :folderId and f.member.id = :memberId")
-    public Optional<Folder> findByIdAndMemberId(@Param("memberId") Long memberId, @Param("folderId") Long folderId);
+    
 }
