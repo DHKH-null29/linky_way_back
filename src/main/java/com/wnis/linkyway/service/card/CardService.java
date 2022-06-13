@@ -21,6 +21,8 @@ public interface CardService {
 
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId);
 
+    public List<CardResponse> findShareableCardsByTagId(Long tagId);
+
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep);
 
     public List<CardResponse> findCardsByMemberId(Long memberId);

@@ -180,6 +180,19 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
+    public List<CardResponse> findShareableCardsByTagId(Long tagId) {
+        Tag tag = tagRepository.findById(tagId)
+                               .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
+        if (!tag.getShareable()) {
+            throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
+        }
+
+        List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
+        return toEntityList(cardList);
+    }
+
+    @Override
+    @Transactional
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
         folderRepository.findByIdAndMemberId(memberId, folderId)
                         .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
