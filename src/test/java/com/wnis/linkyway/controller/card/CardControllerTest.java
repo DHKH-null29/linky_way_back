@@ -1,4 +1,4 @@
-package com.wnis.linkyway.controller;
+package com.wnis.linkyway.controller.card;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Objects;
 
+import com.wnis.linkyway.controller.CardController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +64,7 @@ public class CardControllerTest {
                                                 .link("https://www.naver.com/")
                                                 .title("title1")
                                                 .content("content1")
-                                                .shareable(true)
+                                                .isPublic(true)
                                                 .folderId(1L)
                                                 .build();
         AddCardResponse addCardResponse = AddCardResponse.builder()
@@ -100,7 +101,7 @@ public class CardControllerTest {
                                        .link("https://www.naver.com/")
                                        .title("title1")
                                        .content("content1")
-                                       .shareable(true)
+                                       .isPublic(true)
                                        .build();
         }
 
@@ -155,13 +156,13 @@ public class CardControllerTest {
                                        .link("https://www.naver.com/")
                                        .title("title1")
                                        .content("content1")
-                                       .shareable(true)
+                                       .isPublic(true)
                                        .build();
             cardRequest = CardRequest.builder()
                                      .link("https://www.daum.net/")
                                      .title("title2")
                                      .content("content2")
-                                     .shareable(false)
+                                     .isPublic(false)
                                      .folderId(1L)
                                      .build();
         }
