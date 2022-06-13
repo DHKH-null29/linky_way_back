@@ -33,8 +33,8 @@ public class Card {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "shareable", nullable = false)
-    private Boolean shareable;
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
     
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
@@ -49,12 +49,12 @@ public class Card {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
-    private Card(String link, String title, String content, Boolean shareable, Boolean isDeleted,
+    private Card(String link, String title, String content, Boolean isPublic, Boolean isDeleted,
             Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
-        this.shareable = shareable;
+        this.isPublic = isPublic;
         this.folder = folder;
         this.isDeleted = isDeleted;
         if (folder != null)
@@ -73,8 +73,8 @@ public class Card {
         this.content = content;
     }
 
-    public void updateShareable(boolean shareable) {
-        this.shareable = shareable;
+    public void updateIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
     
     public void updateFolder(Folder folder) {
