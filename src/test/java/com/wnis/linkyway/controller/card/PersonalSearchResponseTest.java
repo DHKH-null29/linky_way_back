@@ -54,37 +54,37 @@ public class PersonalSearchResponseTest {
                                  .build();
     }
 
-    @Nested
-    @DisplayName("개인 검색")
-    class personalSearchTest {
-
-        @Test
-        void shouldReturnCode200Test() throws Exception {
-            Tag tag = Tag.builder()
-                         .isPublic(false)
-                         .name("site")
-                         .build();
-
-            CardResponse cardResponse = CardResponse.builder()
-                                                    .cardId(10L)
-                                                    .title("hello")
-                                                    .link("www.google.com")
-                                                    .content("hello")
-                                                    .tags(Collections.singletonList(tag))
-                                                    .build();
-
-            List<CardResponse> list = new ArrayList<>(Collections.singletonList(cardResponse));
-
-            doReturn(list).when(cardService)
-                          .personalSearchCardByKeyword(any(), any());
-            mockMvc.perform(get("/api/cards/personal/keyword").param("keyword", "hello"))
-                   .andExpect(status().is(200))
-                   .andExpect(jsonPath("$..title").exists())
-                   .andExpect(jsonPath("$..link").exists())
-                   .andExpect(jsonPath("$..content").exists())
-                   .andExpect(jsonPath("$..tags").exists());
-        }
-
-    }
+//    @Nested
+//    @DisplayName("개인 검색")
+//    class personalSearchTest {
+//
+//        @Test
+//        void shouldReturnCode200Test() throws Exception {
+//            Tag tag = Tag.builder()
+//                         .isPublic(false)
+//                         .name("site")
+//                         .build();
+//
+//            CardResponse cardResponse = CardResponse.builder()
+//                                                    .cardId(10L)
+//                                                    .title("hello")
+//                                                    .link("www.google.com")
+//                                                    .content("hello")
+//                                                    .tags(Collections.singletonList(tag))
+//                                                    .build();
+//
+//            List<CardResponse> list = new ArrayList<>(Collections.singletonList(cardResponse));
+//
+//            doReturn(list).when(cardService)
+//                          .personalSearchCardByKeyword(any(), any());
+//            mockMvc.perform(get("/api/cards/personal/keyword").param("keyword", "hello"))
+//                   .andExpect(status().is(200))
+//                   .andExpect(jsonPath("$..title").exists())
+//                   .andExpect(jsonPath("$..link").exists())
+//                   .andExpect(jsonPath("$..content").exists())
+//                   .andExpect(jsonPath("$..tags").exists());
+//        }
+//
+//    }
 
 }

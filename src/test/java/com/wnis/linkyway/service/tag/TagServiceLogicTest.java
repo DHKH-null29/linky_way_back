@@ -32,10 +32,10 @@ public class TagServiceLogicTest {
 
         @ParameterizedTest
         @CsvSource(value = { "fire,false,1", "hello21,true,1", "hello32,false,1" })
-        void addTagSuccessTest(String tagName, String shareable, Long memberId) {
+        void addTagSuccessTest(String tagName, String isPublic, Long memberId) {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .isPublic(shareable)
+                                              .isPublic(isPublic)
                                               .build();
             TagResponse tagResponse = tagService.addTag(tagRequest, memberId);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
