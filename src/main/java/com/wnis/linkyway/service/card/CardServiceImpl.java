@@ -12,6 +12,8 @@ import com.wnis.linkyway.exception.common.*;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
@@ -236,5 +238,34 @@ public class CardServiceImpl implements CardService {
                                              .build());
         }
         return cardResponseList;
+    }
+
+    @Override
+    @Transactional
+    public int copyCardsInPackage(CopyPackageCardsRequest copyPackageCardsRequest) {
+        Folder folder = folderRepository.findById(copyPackageCardsRequest.getFolderId())
+                                        .orElseThrow(() -> new NotFoundEntityException(
+                                                "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+        Tag tag = tagRepository.findById(copyPackageCardsRequest.getTagId())
+                               .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
+
+        List<CopyCardsRequest> cardRequestList = copyPackageCardsRequest.getCopyCardsRequestList();
+        List<Card> cardList = new ArrayList<Card>();
+        for (CopyCardsRequest card : cardRequestList) {
+            cardList.add(card.toEntity(folder, copyPackageCardsRequest.isShareable()));
+        }
+
+        List<Card> savedCardList = cardRepository.saveAll(cardList);
+
+        List<CardTag> cardTagList = new ArrayList<CardTag>();
+        for (Card savedCard : savedCardList) {
+            cardTagList.add(CardTag.builder()
+                                      .card(savedCard)
+                                      .tag(tag)
+                                      .build());
+        }
+        cardTagRepository.saveAll(cardTagList);
+        
+        return savedCardList.size();
     }
 }
