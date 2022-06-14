@@ -12,6 +12,7 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.security.annotation.Authenticated;
 import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
@@ -143,6 +144,20 @@ public class CardController {
                                            .code(HttpStatus.OK.value())
                                            .message("태그에 해당하는 카드 조회 성공")
                                            .data(cardResponses)
+                                           .build());
+    }
+
+    @PostMapping("/package/copy")
+    @Authenticated
+    public ResponseEntity<Response> copyCardsInPackage(
+            @Validated(ValidationSequence.class) @RequestBody CopyPackageCardsRequest copyPackageCardsRequest) {
+
+        int numOfSavedCards = cardService.copyCardsInPackage(copyPackageCardsRequest);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message(numOfSavedCards + "개 카드 복사 성공")
+                                           .data(numOfSavedCards)
                                            .build());
     }
 }
