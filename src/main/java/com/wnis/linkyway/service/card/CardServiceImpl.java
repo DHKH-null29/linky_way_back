@@ -158,9 +158,7 @@ public class CardServiceImpl implements CardService {
                                                     .title(card.getTitle())
                                                     .tags(tags)
                                                     .build();
-
             result.add(cardResponse);
-
         }
         return result;
     }
@@ -175,7 +173,7 @@ public class CardServiceImpl implements CardService {
         if (cardList.isEmpty()) {
             throw new NotFoundEntityException("태그에 해당하는 카드가 존재하지 않습니다.");
         }
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
@@ -188,7 +186,7 @@ public class CardServiceImpl implements CardService {
         }
 
         List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
@@ -207,7 +205,7 @@ public class CardServiceImpl implements CardService {
         if (cardList.isEmpty()) {
             throw new NotFoundEntityException("해당 폴더에 카드가 존재하지 않습니다.");
         }
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
@@ -218,10 +216,10 @@ public class CardServiceImpl implements CardService {
         if (cardList.isEmpty()) {
             throw new NotFoundEntityException("사용자의 카드가 존재하지 않습니다.");
         }
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
-    public List<CardResponse> toEntityList(List<Card> cardList) {
+    private List<CardResponse> toResponseList(List<Card> cardList) {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
             List<Tag> tag = card.getCardTags()
