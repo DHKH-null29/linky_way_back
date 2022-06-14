@@ -1,11 +1,10 @@
 package com.wnis.linkyway.service.card;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.wnis.linkyway.dto.tag.TagResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,14 +39,12 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public AddCardResponse addCard(Long memberId, CardRequest cardRequest) {
-        Boolean isExistFolder = folderRepository.existsById(cardRequest.getFolderId());
-        if (!isExistFolder) {
-            throw new NotFoundEntityException("해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요");
-        }
-        Folder folder = folderRepository.getById(cardRequest.getFolderId()); // 프록시 객체 외래키 적용 용도
-        
+        Folder folder = folderRepository.findByIdAndMemberId(memberId, cardRequest.getFolderId())
+                                        .orElseThrow(() -> new NotFoundEntityException(
+                                                "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
         Card savedCard = cardRepository.save(cardRequest.toEntity(folder));
-        addCardAndTagConnection(savedCard, cardRequest.getTagIdSet());
+
+        addCardTagByCard(memberId, savedCard, cardRequest.getTagIdSet());
 
         return AddCardResponse.builder()
                               .cardId(savedCard.getId())
@@ -59,16 +56,19 @@ public class CardServiceImpl implements CardService {
     public CardResponse findCardByCardId(Long cardId) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
-        
-        List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(cardId);
-        
+        List<CardTag> cardTagList = card.getCardTags();
+        List<Tag> tagList = new ArrayList<Tag>();
+        for (CardTag cardTag : cardTagList) {
+            tagList.add(cardTag.getTag());
+        }
+
         return CardResponse.builder()
                            .cardId(card.getId())
                            .link(card.getLink())
                            .title(card.getTitle())
                            .content(card.getContent())
                            .isPublic(card.getIsPublic())
-                           .tags(tags)
+                           .tags(tagList)
                            .build();
     }
 
@@ -77,61 +77,54 @@ public class CardServiceImpl implements CardService {
     public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다"));
-        
-        Long requestFolderId = cardRequest.getFolderId();
-        if (requestFolderId != null) {
-            Boolean isExistFolder = folderRepository.existsById(requestFolderId);
-            if (!isExistFolder) {
-                throw new NotFoundEntityException("해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요");
-            }
-            Folder folder = folderRepository.getById(requestFolderId); // folder 프록시 객체
-            card.updateFolder(folder); // 프록시 객체를 넣으면 CARD 는 folderId를 외래키로 등록함
+        Folder oldFolder = card.getFolder();
+        if (cardRequest.getFolderId() != oldFolder.getId()) {
+            Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember()
+                                                                          .getId(),
+                                                                 cardRequest.getFolderId())
+                                            .orElseThrow(() -> new NotFoundEntityException(
+                                                    "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
+            card.updateFolder(folder);
         }
         
         card.updateLink(cardRequest.getLink());
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateIsPublic(cardRequest.getIsPublic());
-        cardRepository.save(card);  // card and cardTag update
-        
-        Set<Long> beforeTagIdSet = cardTagRepository.findAllTagIdByCardId(cardId);
-        Set<Long> afterTagIdSet = cardRequest.getTagIdSet();
-        
-        // before, after 교집합
-        Set<Long> retainTagIdSet = new HashSet<>(afterTagIdSet);
-        retainTagIdSet.retainAll(beforeTagIdSet);
-        
-        // after - before
-        // 새로운 카드와 태그 관계 생성, 새로운 태그 생성 x
-        afterTagIdSet.removeAll(retainTagIdSet);
-        addCardAndTagConnection(card, afterTagIdSet);
-        
-        // before - after
-        // 카드와 태그의 연관관계는 삭제, 기존 태그 삭제 x
-        beforeTagIdSet.removeAll(retainTagIdSet);
-        deleteCardAndTagConnection(beforeTagIdSet);
-        
+        updateCardTagByCard(memberId, card, cardRequest);
+
         return card;
     }
 
-    private void addCardAndTagConnection(Card savedCard, Set<Long> tagIdList) {
-        // 카드 태그 테이블는 서로 연결이 되야만 관리한다.
-        List<Tag> tagList = tagRepository.findAllById(tagIdList);
-        tagList.forEach((tag -> {
-            CardTag cardTag = CardTag.builder()
-                    .card(savedCard)
-                    .tag(tag)
-                    .build();
-            cardTagRepository.save(cardTag);
-        }));
-        
-        
+    private void addCardTagByCard(Long memberId, Card savedCard, Set<Long> tagIdList) {
+        for (Long tagId : tagIdList) {
+            Tag tag = tagRepository.findByIdAndMemberId(memberId, tagId)
+                                   .orElseThrow(() -> new NotFoundEntityException(
+                                           "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
+            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
+                                  .isPresent()) {
+                cardTagRepository.save(CardTag.builder()
+                                              .card(savedCard)
+                                              .tag(tag)
+                                              .build());
+            }
+        }
     }
 
-    private void deleteCardAndTagConnection(Set<Long> tagIdSet) {
-        List<Long> ids = cardTagRepository.findAllCardTagIdInTagSet(tagIdSet);
-        cardTagRepository.deleteAllCardTagInIds(ids);
+    private void updateCardTagByCard(Long memberId, Card savedCard, CardRequest newCard) {
+        List<CardTag> oldCardTagList = savedCard.getCardTags();
+        Set<Long> newTagIdList = newCard.getTagIdSet();
 
+        // 새로운 태그가 선택됨 -> CardTag 추가
+        addCardTagByCard(memberId, savedCard, newTagIdList);
+
+        // 기존 태그가 선택되지 않음 -> 삭제
+        for (CardTag oldCardTag : oldCardTagList) {
+            if (!newTagIdList.contains(oldCardTag.getTag()
+                                                 .getId())) {
+                cardTagRepository.deleteById(oldCardTag.getId());
+            }
+        }
     }
 
     @Override
@@ -165,26 +158,11 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId) {
-        Boolean isExistTag = tagRepository.existsById(tagId);
-        if (!isExistTag) {
-            throw new NotFoundEntityException("존재하지 않는 태그입니다. 태그를 확인해주세요");
-        }
+        tagRepository.findByIdAndMemberId(memberId, tagId)
+                     .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<Card> cardList = cardRepository.findCardsByTagId(tagId);
-        return toEntityList(cardList);
-    }
-
-    @Override
-    @Transactional
-    public List<CardResponse> findShareableCardsByTagId(Long tagId) {
-        Tag tag = tagRepository.findById(tagId)
-                               .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
-        if (!tag.getIsPublic()) {
-            throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
-        }
-
-        List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
@@ -197,16 +175,14 @@ public class CardServiceImpl implements CardService {
         }
 
         List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
     @Transactional
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
-        Boolean isExistFolder = folderRepository.existsById(folderId);
-        if (!isExistFolder) {
-            throw new NotFoundEntityException("존재하지 않는 폴더입니다. 폴더를 확인해주세요");
-        }
+        folderRepository.findByIdAndMemberId(memberId, folderId)
+                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
 
         List<Card> cardList;
         if (!findDeep) {
@@ -214,28 +190,30 @@ public class CardServiceImpl implements CardService {
         } else {
             cardList = cardRepository.findDeepFoldersCardsByFolderId(folderId);
         }
-        
-        return toEntityList(cardList);
+        return toResponseList(cardList);
     }
 
     @Override
     @Transactional
     public List<CardResponse> findCardsByMemberId(Long memberId) {
         List<Card> cardList = cardRepository.findCardsByMemberId(memberId);
-        
-        return toEntityList(cardList);
+
+        return toResponseList(cardList);
     }
 
-    public List<CardResponse> toEntityList(List<Card> cardList) {
-        List<CardResponse> cardResponseList = new ArrayList<>();
+    private List<CardResponse> toResponseList(List<Card> cardList) {
+        List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
-            List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
+            List<Tag> tag = card.getCardTags()
+                                .stream()
+                                .map(CardTag::getTag)
+                                .collect(Collectors.toList());
             cardResponseList.add(CardResponse.builder()
                                              .cardId(card.getId())
                                              .title(card.getTitle())
                                              .content(card.getContent())
                                              .link(card.getLink())
-                                             .tags(tags)
+                                             .tags(tag)
                                              .isPublic(card.getIsPublic())
                                              .build());
         }
