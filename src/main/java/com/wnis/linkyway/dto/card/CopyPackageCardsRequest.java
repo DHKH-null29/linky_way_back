@@ -25,7 +25,7 @@ public class CopyPackageCardsRequest {
     private Long folderId;
     
     @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
-    private boolean shareable;
+    private boolean isPublic;
 
     @NotNull(message = "복사할 카드가 존재하지 않습니다.", groups = NotBlankGroup.class)
     private List<CopyCardsRequest> copyCardsRequestList;

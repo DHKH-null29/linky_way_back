@@ -139,7 +139,6 @@ public class CardServiceLogicTest {
             assertThat(cardResponse.getTitle()).isNotNull();
             assertThat(cardResponse.getContent()).isNotNull();
             assertThat(cardResponse.getIsPublic()).isNotNull();
-            assertThat(cardResponse.getIsDeleted()).isNotNull();
             assertThat(cardResponse.getTags()).isNotNull();
         }
     }

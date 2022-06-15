@@ -20,4 +20,8 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     public boolean existsByMemberIdAndTagName(@Param(value = "name") String name,
             @Param(value = "memberId") Long memberId);
     
+    @Query("select t from Tag t join t.member m " + "where t.id = :tagId and m.id = :memberId")
+    public Optional<Tag> findByIdAndMemberId(@Param(value = "memberId") Long memberId,
+            @Param(value = "tagId") Long tagId);
+    
 }
