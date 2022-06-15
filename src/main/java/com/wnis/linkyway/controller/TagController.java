@@ -49,7 +49,7 @@ public class TagController {
     @Authenticated
     public ResponseEntity<Response> setTag(@ApiIgnore @CurrentMember Long memberId,
             @PathVariable(value = "tagId") Long tagId,
-            @RequestBody TagRequest tagRequest) {
+            @Validated(ValidationSequence.class) @RequestBody TagRequest tagRequest) {
 
         TagResponse response = tagService.setTag(tagRequest, tagId);
         return ResponseEntity.status(200)
