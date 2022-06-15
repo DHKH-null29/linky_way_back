@@ -88,6 +88,7 @@ public class PersonalSearchIntegrationTest {
                          .build();
             CardTag cardTag = CardTag.builder()
                                      .card(card)
+                                     .tag(tag)
                                      .build();
 
             entityManager.persist(member);
