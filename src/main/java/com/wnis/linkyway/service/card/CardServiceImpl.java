@@ -56,7 +56,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public CardResponse findCardByCardId(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
+                                  .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다."));
         List<CardTag> cardTagList = card.getCardTags();
         List<Tag> tagList = new ArrayList<Tag>();
         for (CardTag cardTag : cardTagList) {
@@ -77,7 +77,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다"));
+                                  .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다."));
         Folder oldFolder = card.getFolder();
         if (cardRequest.getFolderId() != oldFolder.getId()) {
             Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember()
@@ -132,7 +132,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public void deleteCard(Long cardId) {
         cardRepository.findById(cardId)
-                      .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다"));
+                      .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다."));
         cardRepository.deleteById(cardId);
     }
 

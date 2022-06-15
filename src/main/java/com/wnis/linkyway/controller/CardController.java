@@ -38,7 +38,7 @@ public class CardController {
                              .body(Response.builder()
                                            .code(HttpStatus.CREATED.value())
                                            .data(addCardResponse)
-                                           .message("카드가 생성되었습니다.")
+                                           .message("카드가 생성 완료")
                                            .build());
     }
 
@@ -52,7 +52,7 @@ public class CardController {
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
                                            .data(cardResponse)
-                                           .message("카드를 찾았습니다.")
+                                           .message("카드 조회 성공")
                                            .build());
     }
 
