@@ -1,5 +1,6 @@
 package com.wnis.linkyway.repository;
 
+import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +15,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @DataJpaTest
@@ -133,11 +131,11 @@ class CardTagRepositoryTest {
     }
     
     @Nested
-    @DisplayName("findAllTagResponseByCardId 응답 테스트")
+    @DisplayName("findAllTagResponseByCardId 테스트")
     class findAllTagResponseByCardIdTest {
         
         @Test
-        @DisplayName("List<TagResponse> 리턴 테스트")
+        @DisplayName("List<TagResponse> 응답 테스트")
         void shouldReturnTagResponseTest() {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(1L);
             tags.forEach(tagResponse -> {
@@ -147,6 +145,20 @@ class CardTagRepositoryTest {
                             tagResponse.getIsPublic());
             });
             
+        }
+    }
+    
+    @Nested
+    @DisplayName("findAllPackageDtoByTagName 테스트")
+    class findAllPackageDtoByTagName {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void shouldReturnListPackageDtoTest() {
+            List<PackageDto> packageDtoList = cardTagRepository.findAllPackageDtoByTagName("t1");
+            assertThat(packageDtoList).isNotEmpty();
+            assertThat(packageDtoList.get(0)).extracting("tagName").isEqualTo("t1");
+            assertThat(packageDtoList.get(0)).extracting("nickname").isEqualTo("hello");
         }
     }
     
