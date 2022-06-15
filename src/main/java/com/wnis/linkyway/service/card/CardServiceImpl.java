@@ -88,7 +88,7 @@ public class CardServiceImpl implements CardService {
                                                     "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
             card.updateFolder(folder);
         }
-        
+
         card.updateLink(cardRequest.getLink());
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
@@ -153,7 +153,7 @@ public class CardServiceImpl implements CardService {
                     .build();
             cardResponseList.add(cardResponse);
         }
-        
+
         return cardResponseList;
     }
 
@@ -172,7 +172,7 @@ public class CardServiceImpl implements CardService {
     public List<CardResponse> findShareableCardsByTagId(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
-        if (!tag.getShareable()) {
+        if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
@@ -247,7 +247,7 @@ public class CardServiceImpl implements CardService {
                                       .build());
         }
         cardTagRepository.saveAll(cardTagList);
-        
+
         return savedCardList.size();
     }
 }
