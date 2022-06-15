@@ -14,5 +14,5 @@ public class PackageResponse {
     private String nickname;
     private Long tagId;
     private String tagName;
-    private Long numberOfCard;
+    private Integer numberOfCard;
 }

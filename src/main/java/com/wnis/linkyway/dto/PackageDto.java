@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class PackageDto {
     
     private Long memberId;
