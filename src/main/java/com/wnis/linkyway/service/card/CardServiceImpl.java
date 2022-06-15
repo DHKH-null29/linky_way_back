@@ -14,6 +14,7 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.dto.card.CopyCardsRequest;
 import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
@@ -59,9 +60,14 @@ public class CardServiceImpl implements CardService {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다."));
         List<CardTag> cardTagList = card.getCardTags();
-        List<Tag> tagList = new ArrayList<Tag>();
+        List<TagResponse> tagResponseList = new ArrayList<>();
         for (CardTag cardTag : cardTagList) {
-            tagList.add(cardTag.getTag());
+            Tag tag = cardTag.getTag();
+            tagResponseList.add(TagResponse.builder()
+                                           .tagId(tag.getId())
+                                           .tagName(tag.getName())
+                                           .isPublic(tag.getIsPublic())
+                                           .build());
         }
 
         return CardResponse.builder()
@@ -70,7 +76,7 @@ public class CardServiceImpl implements CardService {
                            .title(card.getTitle())
                            .content(card.getContent())
                            .isPublic(card.getIsPublic())
-                           .tags(tagList)
+                           .tags(tagResponseList)
                            .build();
     }
 
@@ -144,13 +150,13 @@ public class CardServiceImpl implements CardService {
         for (Card card : cardsList) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
             CardResponse cardResponse = CardResponse.builder()
-                    .cardId(card.getId())
-                    .link(card.getLink())
-                    .title(card.getTitle())
-                    .content(card.getContent())
-                    .isPublic(card.getIsPublic())
-                    .tags(tags)
-                    .build();
+                                                    .cardId(card.getId())
+                                                    .link(card.getLink())
+                                                    .title(card.getTitle())
+                                                    .content(card.getContent())
+                                                    .isPublic(card.getIsPublic())
+                                                    .tags(tags)
+                                                    .build();
             cardResponseList.add(cardResponse);
         }
 
@@ -206,16 +212,21 @@ public class CardServiceImpl implements CardService {
     private List<CardResponse> toResponseList(List<Card> cardList) {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
-            List<Tag> tag = card.getCardTags()
+            List<Tag> tagList = card.getCardTags()
                                 .stream()
                                 .map(CardTag::getTag)
                                 .collect(Collectors.toList());
+            
+            List<TagResponse> tagResponseList = tagList.stream()
+                                         .map((tag) -> new TagResponse(tag))
+                                         .collect(Collectors.toList());
+            
             cardResponseList.add(CardResponse.builder()
                                              .cardId(card.getId())
                                              .title(card.getTitle())
                                              .content(card.getContent())
                                              .link(card.getLink())
-                                             .tags(tag)
+                                             .tags(tagResponseList)
                                              .isPublic(card.getIsPublic())
                                              .build());
         }
@@ -234,7 +245,7 @@ public class CardServiceImpl implements CardService {
         List<CopyCardsRequest> cardRequestList = copyPackageCardsRequest.getCopyCardsRequestList();
         List<Card> cardList = new ArrayList<Card>();
         for (CopyCardsRequest card : cardRequestList) {
-            cardList.add(card.toEntity(folder, copyPackageCardsRequest.isShareable()));
+            cardList.add(card.toEntity(folder, copyPackageCardsRequest.isPublic()));
         }
 
         List<Card> savedCardList = cardRepository.saveAll(cardList);
@@ -242,9 +253,9 @@ public class CardServiceImpl implements CardService {
         List<CardTag> cardTagList = new ArrayList<CardTag>();
         for (Card savedCard : savedCardList) {
             cardTagList.add(CardTag.builder()
-                                      .card(savedCard)
-                                      .tag(tag)
-                                      .build());
+                                   .card(savedCard)
+                                   .tag(tag)
+                                   .build());
         }
         cardTagRepository.saveAll(cardTagList);
 

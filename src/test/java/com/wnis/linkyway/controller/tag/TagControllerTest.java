@@ -63,7 +63,7 @@ class TagControllerTest {
         void shouldReturn400_WhenBlankProperty(String tagName, String isPublic) throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(isPublic)
                                               .build();
         
             mockMvc.perform(post("/api/tags/").contentType(MediaType.APPLICATION_JSON)
@@ -74,10 +74,10 @@ class TagControllerTest {
         @ParameterizedTest
         @CsvSource(value = { "aaaaaaaaaaaaaaaaaaaaaaaa,true", "aa,faaaa", "aaaaaaaaaaaaaaaaaaaaaaaa,faaa" })
         @DisplayName("패턴 또는 태그 이름 길이를 초과한 경우")
-        void shouldReturn400_WhenInvalidPattern(String tagName, String shareable) throws Exception {
+        void shouldReturn400_WhenInvalidPattern(String tagName, String isPublic) throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(isPublic)
                                               .build();
         
             mockMvc.perform(post("/api/tags/").contentType(MediaType.APPLICATION_JSON)
@@ -94,10 +94,10 @@ class TagControllerTest {
         @ParameterizedTest
         @CsvSource(value = { "a,", ",", ",true" })
         @DisplayName("태그이름 또는 소셜 공유 여부를 입력하지 않는 경우")
-        void shouldReturn400_WhenBlankProperty(String tagName, String shareable) throws Exception {
+        void shouldReturn400_WhenBlankProperty(String tagName, String isPublic) throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(isPublic)
                                               .build();
             
             mockMvc.perform(put("/api/tags/1").contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +111,7 @@ class TagControllerTest {
         void shouldReturn400_WhenInvalidPattern(String tagName, String isPublic) throws Exception {
             TagRequest tagRequest = TagRequest.builder()
                                               .tagName(tagName)
-                                              .shareable(shareable)
+                                              .isPublic(isPublic)
                                               .build();
             
             mockMvc.perform(put("/api/tags/1").contentType(MediaType.APPLICATION_JSON)

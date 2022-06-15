@@ -25,14 +25,15 @@ public class CopyCardsRequest {
 
     @Size(max = 15)
     private String title;
+
     private String content;
 
-    public Card toEntity(Folder folder, boolean shareable) {
+    public Card toEntity(Folder folder, boolean isPublic) {
         return Card.builder()
                    .link(link)
                    .title(title)
                    .content(content)
-                   .shareable(shareable)
+                   .isPublic(isPublic)
                    .folder(folder)
                    .build();
     }

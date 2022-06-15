@@ -24,16 +24,16 @@ public class CardRequest {
     private String link;
 
     @Size(max = 15)
-    @Builder.Default
+    @NotNull
     private String title = "";
-    
-    @Builder.Default
+
+    @NotNull
     private String content = "";
 
     @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
     private Boolean isPublic;
 
-    @Builder.Default
+    @NotNull
     private Set<Long> tagIdSet = new HashSet<>();
 
     @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
