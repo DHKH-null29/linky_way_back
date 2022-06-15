@@ -2,14 +2,12 @@ package com.wnis.linkyway.dto.card;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wnis.linkyway.dto.tag.TagResponse;
-import com.wnis.linkyway.entity.Tag;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -20,20 +18,21 @@ public class CardResponse {
     private String link;
     private String title;
     private String content;
-    private Boolean shareable;
+    private Boolean isPublic;
+    
+    private Boolean isDeleted;
     private List<TagResponse> tags = new ArrayList<>();
 
     @Builder
-    private CardResponse(Long cardId, String link, String title, String content, boolean shareable, List<Tag> tags) {
+    private CardResponse(Long cardId, String link, String title, String content, boolean isPublic,boolean isDeleted, List<TagResponse> tags) {
         this.cardId = cardId;
         this.link = link;
         this.title = title;
         this.content = content;
-        this.shareable = shareable;
-        if (tags != null) {
-            this.tags = tags.stream()
-                            .map((tag) -> new TagResponse(tag))
-                            .collect(Collectors.toList());
-        }
+        this.isPublic = isPublic;
+        this.isDeleted = isDeleted;
+        if (tags != null)
+            this.tags = tags;
     }
+    
 }

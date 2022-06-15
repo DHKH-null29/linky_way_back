@@ -85,9 +85,9 @@ public class CardController {
 
     @GetMapping("/personal/keyword")
     @Authenticated
-    public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
+    public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
             @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
+        List<CardResponse> cardResponses = cardService.SearchCardByKeywordpersonalPage(keyword, memberId);
         return ResponseEntity.ok()
                              .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }

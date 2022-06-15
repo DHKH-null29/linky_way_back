@@ -23,7 +23,7 @@ public class CardTag {
     private Card card;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_tag_id")
+    @JoinColumn(name = "tag_tag_id", nullable = false)
     private Tag tag;
 
     @Builder
