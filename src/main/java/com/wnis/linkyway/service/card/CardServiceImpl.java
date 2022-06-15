@@ -68,7 +68,6 @@ public class CardServiceImpl implements CardService {
                            .title(card.getTitle())
                            .content(card.getContent())
                            .isPublic(card.getIsPublic())
-                           .isDeleted(card.getIsDeleted())
                            .tags(tags)
                            .build();
     }
@@ -180,7 +179,7 @@ public class CardServiceImpl implements CardService {
     public List<CardResponse> findShareableCardsByTagId(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
-        if (!tag.getShareable()) {
+        if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
