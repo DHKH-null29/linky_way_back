@@ -25,10 +25,10 @@ public class CardRequest {
 
     @Size(max = 15)
     @NotNull
-    private String title = "";
+    private String title;
 
     @NotNull
-    private String content = "";
+    private String content;
 
     @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
     private Boolean isPublic;
