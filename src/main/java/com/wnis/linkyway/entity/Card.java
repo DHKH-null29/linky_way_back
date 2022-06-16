@@ -9,15 +9,19 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
 @Getter
 @Table(name = "card")
-public class Card extends BaseEntity{
+public class Card extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "card_id", nullable = false)
@@ -35,8 +39,9 @@ public class Card extends BaseEntity{
 
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
-    
+
     @Column(name = "is_deleted", nullable = false)
+    @ColumnDefault("false")
     private Boolean isDeleted;
 
     //// ********************연관 관게 ***************************/////
@@ -49,16 +54,15 @@ public class Card extends BaseEntity{
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
-    private Card(String link, String title, String content, Boolean isPublic, Boolean isDeleted,
-            Folder folder) {
+    private Card(String link, String title, String content, Boolean isPublic, Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
         this.isPublic = isPublic;
         this.folder = folder;
-        this.isDeleted = isDeleted;
         if (folder != null)
-            folder.getCards().add(this);
+            folder.getCards()
+                  .add(this);
     }
 
     public void updateLink(String link) {
@@ -76,11 +80,11 @@ public class Card extends BaseEntity{
     public void updateIsPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
-    
+
     public void updateFolder(Folder folder) {
         this.folder = folder;
     }
-    
+
     public void updateIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }

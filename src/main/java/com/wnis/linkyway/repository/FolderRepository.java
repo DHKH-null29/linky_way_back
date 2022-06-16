@@ -21,8 +21,11 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     @Modifying
     @Query(value = "insert into folder (name, depth, parent_folder_id, member_member_id) "
-            + "values ('default', 0, null, :memberId)", nativeQuery = true)
+            + "values ('default', 0, null, :memberId)",
+           nativeQuery = true)
     public void addSuperFolder(@Param("memberId") Long memberId);
 
-    
+    @Query("select f from Folder f left outer join fetch f.parent "
+            + "where f.id = :folderId and f.member.id = :memberId")
+    public Optional<Folder> findByIdAndMemberId(@Param("memberId") Long memberId, @Param("folderId") Long folderId);
 }

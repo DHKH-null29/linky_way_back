@@ -63,7 +63,7 @@ class CardTagRepositoryTest {
                     .content("")
                     .link("asda")
                     .title("card")
-                    .isDeleted(false)
+//                    .isDeleted(false)
                     .build();
     
     CardTag cardTag1 = CardTag.builder()

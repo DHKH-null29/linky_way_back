@@ -62,7 +62,7 @@ public class CardServiceTest {
                            .title(title)
                            .content(content)
                            .isPublic(isPublic)
-                           .isDeleted(false)
+//                           .isDeleted(false)
                            .folder(folder)
                            .build();
         newCard.setId(cardId);

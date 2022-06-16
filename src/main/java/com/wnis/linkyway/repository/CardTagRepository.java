@@ -1,16 +1,22 @@
 package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.dto.tag.TagResponse;
+import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
+import com.wnis.linkyway.entity.Tag;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface CardTagRepository extends JpaRepository<CardTag, Long> {
+    
+    Optional<CardTag> findByCardAndTag(Card card, Tag tag);
     
     @Query("select t.id from CardTag ct join ct.card c join ct.tag t " +
             "where c.id = :cardId")
