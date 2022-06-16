@@ -40,6 +40,7 @@ public class FolderResponse {
                                   .getId();
         }
         this.level = folder.getDepth();
+        this.name = folder.getName();
         this.childFolderList = makeDirectoryTree(folder);
     }
 
