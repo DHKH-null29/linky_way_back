@@ -75,6 +75,7 @@ public class CardServiceImpl implements CardService {
                            .link(card.getLink())
                            .title(card.getTitle())
                            .content(card.getContent())
+                           .folderId(card.getFolder().getId())
                            .isPublic(card.getIsPublic())
                            .tags(tagResponseList)
                            .build();
@@ -227,6 +228,7 @@ public class CardServiceImpl implements CardService {
                                              .content(card.getContent())
                                              .link(card.getLink())
                                              .tags(tagResponseList)
+                                             .folderId(card.getFolder().getId())
                                              .isPublic(card.getIsPublic())
                                              .build());
         }

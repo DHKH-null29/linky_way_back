@@ -21,18 +21,21 @@ public class CardResponse {
     private String title;
 
     private String content;
+    
+    private Long folderId;
 
     private Boolean isPublic;
 
     private List<TagResponse> tags = new ArrayList<>();
 
     @Builder
-    private CardResponse(Long cardId, String link, String title, String content, boolean isPublic,
+    private CardResponse(Long cardId, String link, String title, String content, Long folderId, boolean isPublic,
             List<TagResponse> tags) {
         this.cardId = cardId;
         this.link = link;
         this.title = title;
         this.content = content;
+        this.folderId = folderId;
         this.isPublic = isPublic;
         if (tags != null)
             this.tags = tags;
