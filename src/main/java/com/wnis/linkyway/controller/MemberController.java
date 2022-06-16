@@ -7,6 +7,7 @@ import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.MemberService;
 import com.wnis.linkyway.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,8 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<Response> join(
             @Validated(ValidationSequence.class) @RequestBody JoinRequest joinRequest) {
-        Response<MemberResponse> response = memberService.join(joinRequest);
-        return ResponseEntity.status(response.getCode()).body(response);
+        MemberResponse response = memberService.join(joinRequest);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "회원가입 성공"));
     }
     
     @PostMapping("/login")
@@ -33,37 +34,44 @@ public class MemberController {
     
     @GetMapping("/email")
     public ResponseEntity<Response> searchEmail(@RequestParam String email) {
-        Response<MemberResponse> response = memberService.searchEmail(email);
-        return ResponseEntity.status(response.getCode()).body(response);
+        MemberResponse response = memberService.searchEmail(email);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "이메일 조회 성공"));
     }
 
     @GetMapping("/nickname")
     public ResponseEntity<Response<DuplicationResponse>> searchNicknameDuplicationInfo(@RequestParam String nickname) {
-        Response<DuplicationResponse> response = memberService.isValidNickname(nickname);
-        return  ResponseEntity.status(response.getCode()).body(response);
+        DuplicationResponse response = memberService.isValidNickname(nickname);
+        return  ResponseEntity.ok(Response.of(HttpStatus.OK, response, "닉네임 사용가능 여부 조회 성공"));
     }
     
-    @GetMapping("/mypage")
+    @GetMapping("/page/me")
     @Authenticated
     public ResponseEntity<Response> searchMyPage(@CurrentMember Long memberId) {
-        Response<MemberResponse> response = memberService.searchMyPage(memberId);
-        return ResponseEntity.status(response.getCode()).body(response);
+        MemberResponse response = memberService.searchMyPage(memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
+    }
+    
+    @PutMapping("/page/me")
+    @Authenticated
+    public ResponseEntity<Response> updateMyPage(@CurrentMember Long memberId) {
+        MemberResponse response = memberService.searchMyPage(memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
     }
     
     @PutMapping("/password")
     @Authenticated
-    public ResponseEntity<Response> setPassword(
+    public ResponseEntity<Response> updatePassword(
             @Validated(ValidationSequence.class) @RequestBody PasswordRequest passwordRequest,
             @CurrentMember Long memberId) {
-        Response<MemberResponse> response = memberService.setPassword(passwordRequest, memberId);
-        return ResponseEntity.status(response.getCode()).body(response);
+        MemberResponse response = memberService.updatePassword(passwordRequest, memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "패스워드 변경 성공"));
     }
     
     @DeleteMapping
     @Authenticated
     public ResponseEntity<Response> deleteMember(@CurrentMember Long memberId) {
-        Response<MemberResponse> response = memberService.deleteMember(memberId);
-        return ResponseEntity.status(response.getCode()).body(response);
+        MemberResponse response = memberService.deleteMember(memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "멤버 삭제 성공"));
     }
     
 }
