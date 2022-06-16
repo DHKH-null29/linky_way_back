@@ -2,14 +2,12 @@ package com.wnis.linkyway.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.MemberResponse;
 import com.wnis.linkyway.dto.member.PasswordRequest;
 import com.wnis.linkyway.exception.common.InvalidValueException;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
-import com.wnis.linkyway.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,9 +33,7 @@ class MemberServiceTest {
     private final Logger logger = LoggerFactory.getLogger(MemberServiceTest.class);
     @Autowired
     MemberService memberService;
-
-    @Autowired
-    MemberRepository memberRepository;
+    
 
     @Autowired
     ObjectMapper objectMapper;
@@ -55,8 +51,11 @@ class MemberServiceTest {
                                                  .email("masss2213@naver.com")
                                                  .build();
 
-            Response<MemberResponse> response = memberService.join(joinRequest);
-            logger.info(objectMapper.writeValueAsString(response));
+            MemberResponse response = memberService.join(joinRequest);
+            
+            assertThat(response.getEmail()).isNotNull();
+            assertThat(response.getMemberId()).isNotNull();
+            assertThat(response.getNickname()).isNotNull();
         }
 
         @Test
@@ -85,8 +84,10 @@ class MemberServiceTest {
         @DisplayName("응답 테스트")
         void responseTest() throws JsonProcessingException {
             String email = "marrin1101@naver.com";
-            Response<MemberResponse> response = memberService.searchEmail(email);
-            logger.info(objectMapper.writeValueAsString(response));
+            MemberResponse response = memberService.searchEmail(email);
+            assertThat(response).extracting("memberId").isNull();
+            assertThat(response).extracting("email").isNotNull();
+            assertThat(response).extracting("nickname").isNull();
         }
 
         @Test
@@ -108,8 +109,12 @@ class MemberServiceTest {
         @DisplayName("응답 테스트")
         void responseTest() throws JsonProcessingException {
             Long memberId = 1L;
-            Response<MemberResponse> response = memberService.searchMyPage(memberId);
+            MemberResponse response = memberService.searchMyPage(memberId);
             logger.info(objectMapper.writeValueAsString(response));
+    
+            assertThat(response).extracting("memberId").isNotNull();
+            assertThat(response).extracting("email").isNotNull();
+            assertThat(response).extracting("nickname").isNotNull();
         }
 
         @Test
@@ -135,9 +140,13 @@ class MemberServiceTest {
                                                              .password("aasd!@!asdA")
                                                              .build();
             Long memberId = 1L;
-            Response<MemberResponse> response = memberService.setPassword(passwordRequest, memberId);
+            MemberResponse response = memberService.updatePassword(passwordRequest, memberId);
 
             logger.info(objectMapper.writeValueAsString(response));
+    
+            assertThat(response).extracting("memberId").isNull();
+            assertThat(response).extracting("email").isNull();
+            assertThat(response).extracting("nickname").isNull();
         }
 
         @Test
@@ -149,7 +158,7 @@ class MemberServiceTest {
             Long memberId = 100L;
 
             assertThatThrownBy(() -> {
-                memberService.setPassword(passwordRequest, memberId);
+                memberService.updatePassword(passwordRequest, memberId);
             }).isInstanceOf(ResourceConflictException.class)
               .hasMessage("회원이 존재하지 않아 비밀번호를 바꿀 수 없습니다");
         }
@@ -163,7 +172,7 @@ class MemberServiceTest {
         @DisplayName("응답 테스트")
         void responseTest() throws JsonProcessingException {
             Long memberId = 1L;
-            Response<MemberResponse> response = memberService.deleteMember(memberId);
+            MemberResponse response = memberService.deleteMember(memberId);
 
             logger.info(objectMapper.writeValueAsString(response));
         }
@@ -188,7 +197,7 @@ class MemberServiceTest {
         @DisplayName("사용 가능한 닉네임 요청에 대한 응답: True")
         void shouldReturnTrue() {
             assertThat(memberService.isValidNickname("최번개")
-                                    .getData()).isNotNull()
+                                    ).isNotNull()
                                                .hasFieldOrPropertyWithValue("usable", true);
         }
 
@@ -196,7 +205,7 @@ class MemberServiceTest {
         @DisplayName("중복되는 닉네임 요청에 대한 응답: False")
         void shouldReturnFalse() {
             assertThat(memberService.isValidNickname("Zeratu1")
-                                    .getData()).isNotNull()
+                                    ).isNotNull()
                                                .hasFieldOrPropertyWithValue("usable", false);
         }
 
