@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.controller.tag.TagControllerIntegrationTest;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.PasswordRequest;
-import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.security.testutils.WithMockMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,8 +37,7 @@ class MemberControllerIntegrationTest {
     private final Logger logger = LoggerFactory.getLogger(TagControllerIntegrationTest.class);
     @Autowired
     WebApplicationContext ctx;
-    @Autowired
-    MemberRepository memberRepository;
+
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -140,7 +138,7 @@ class MemberControllerIntegrationTest {
         @WithMockMember(id = 1L, email = "marrin1101@hanmail.com")
         void responseTest() throws Exception {
 
-            MvcResult mvcResult = mockMvc.perform(get("/api/members/mypage"))
+            MvcResult mvcResult = mockMvc.perform(get("/api/members/page/me"))
                                          .andExpect(status().is(200))
                                          .andReturn();
 

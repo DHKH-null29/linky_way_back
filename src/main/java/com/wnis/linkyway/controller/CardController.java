@@ -12,6 +12,7 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.security.annotation.Authenticated;
 import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
@@ -37,7 +38,7 @@ public class CardController {
                              .body(Response.builder()
                                            .code(HttpStatus.CREATED.value())
                                            .data(addCardResponse)
-                                           .message("카드가 생성되었습니다.")
+                                           .message("카드가 생성 완료")
                                            .build());
     }
 
@@ -51,7 +52,7 @@ public class CardController {
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
                                            .data(cardResponse)
-                                           .message("카드를 찾았습니다.")
+                                           .message("카드 조회 성공")
                                            .build());
     }
 
@@ -85,9 +86,9 @@ public class CardController {
 
     @GetMapping("/personal/keyword")
     @Authenticated
-    public ResponseEntity<Response> personalSearchCard(@RequestParam(value = "keyword") String keyword,
+    public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
             @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.personalSearchCardByKeyword(keyword, memberId);
+        List<CardResponse> cardResponses = cardService.SearchCardByKeywordpersonalPage(keyword, memberId);
         return ResponseEntity.ok()
                              .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }
@@ -97,6 +98,19 @@ public class CardController {
     public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId, @PathVariable Long tagId) {
 
         List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .data(cardResponses)
+                                           .build());
+    }
+
+    @GetMapping("/package/{tagId}")
+    @Authenticated
+    public ResponseEntity<Response> findShareableCardsByTagId(@PathVariable Long tagId) {
+
+        List<CardResponse> cardResponses = cardService.findShareableCardsByTagId(tagId);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
@@ -115,7 +129,7 @@ public class CardController {
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
-                                           .message("태그에 해당하는 카드 조회 성공")
+                                           .message("폴더에 해당하는 카드 조회 성공")
                                            .data(cardResponses)
                                            .build());
     }
@@ -130,6 +144,20 @@ public class CardController {
                                            .code(HttpStatus.OK.value())
                                            .message("태그에 해당하는 카드 조회 성공")
                                            .data(cardResponses)
+                                           .build());
+    }
+
+    @PostMapping("/package/copy")
+    @Authenticated
+    public ResponseEntity<Response> copyCardsInPackage(
+            @Validated(ValidationSequence.class) @RequestBody CopyPackageCardsRequest copyPackageCardsRequest) {
+
+        int numOfSavedCards = cardService.copyCardsInPackage(copyPackageCardsRequest);
+        return ResponseEntity.ok()
+                             .body(Response.builder()
+                                           .code(HttpStatus.OK.value())
+                                           .message(numOfSavedCards + "개 카드 복사 성공")
+                                           .data(numOfSavedCards)
                                            .build());
     }
 }

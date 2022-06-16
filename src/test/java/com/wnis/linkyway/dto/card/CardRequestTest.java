@@ -38,11 +38,11 @@ class CardRequestTest {
         @ParameterizedTest
         @CsvSource(value = { "www.google.co.kr, '', '', 1, 0", "'', '', false, '1', 1", "'', '', '', '0', 1" },
                    delimiter = ',')
-        void notBlankTest(String link, String title, Boolean shareable, Long folderId, int result) {
+        void notBlankTest(String link, String title, Boolean isPublic, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
                                                  .link(link)
                                                  .title(title)
-                                                 .shareable(shareable)
+                                                 .isPublic(isPublic)
                                                  .folderId(folderId)
                                                  .build();
 
@@ -59,11 +59,11 @@ class CardRequestTest {
         @ParameterizedTest
         @CsvSource(value = { "www.google.co.kr, '', '', 1, 0", "'', '', false, '1', 0", "'', '', 'true', '1', 0",
                 "'', '', 'trye1', '1', 0" }, delimiter = ',')
-        void patternTest(String link, String title, Boolean shareable, Long folderId, int result) {
+        void patternTest(String link, String title, Boolean isPublic, Long folderId, int result) {
             CardRequest cardRequest = CardRequest.builder()
                                                  .link(link)
                                                  .title(title)
-                                                 .shareable(shareable)
+                                                 .isPublic(isPublic)
                                                  .folderId(folderId)
                                                  .build();
 

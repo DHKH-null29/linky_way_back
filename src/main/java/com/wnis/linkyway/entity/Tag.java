@@ -15,7 +15,7 @@ import java.util.List;
 indexes = {
         @Index(name = "tag_ix_name", columnList = "name"),
 })
-public class Tag {
+public class Tag extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id", nullable = false)

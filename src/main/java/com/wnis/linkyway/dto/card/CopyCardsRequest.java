@@ -18,28 +18,17 @@ import static com.wnis.linkyway.validation.ValidationGroup.*;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class CardRequest {
+public class CopyCardsRequest {
 
     @NotBlank(message = "링크를 입력해주세요", groups = NotBlankGroup.class)
     private String link;
 
     @Size(max = 15)
-    @NotNull
     private String title;
 
-    @NotNull
     private String content;
 
-    @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
-    private Boolean isPublic;
-
-    @NotNull
-    private Set<Long> tagIdSet = new HashSet<>();
-
-    @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
-    private Long folderId;
-
-    public Card toEntity(Folder folder) {
+    public Card toEntity(Folder folder, boolean isPublic) {
         return Card.builder()
                    .link(link)
                    .title(title)

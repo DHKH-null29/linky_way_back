@@ -78,8 +78,8 @@ public class PersonalSearchIntegrationTest {
                             .link("www.google.co.kr")
                             .title("hello")
                             .content("yeah")
-                            .shareable(false)
-                            .isDeleted(false)
+                            .isPublic(false)
+//                            .isDeleted(false)
                             .build();
             Tag tag = Tag.builder()
                          .isPublic(false)
@@ -88,6 +88,7 @@ public class PersonalSearchIntegrationTest {
                          .build();
             CardTag cardTag = CardTag.builder()
                                      .card(card)
+                                     .tag(tag)
                                      .build();
 
             entityManager.persist(member);

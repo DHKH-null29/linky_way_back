@@ -17,7 +17,7 @@ public class TagResponse {
     
 
     @Builder
-    private TagResponse(Long tagId, String tagName, Boolean isPublic, Integer views) {
+    private TagResponse(Long tagId, String tagName, Boolean isPublic) {
         this.tagId = tagId;
         this.tagName = tagName;
         this.isPublic = isPublic;

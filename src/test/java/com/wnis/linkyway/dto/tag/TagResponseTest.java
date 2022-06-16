@@ -21,7 +21,6 @@ class TagResponseTest {
                                              .tagName("hello")
                                              .tagId(1L)
                                              .isPublic(true)
-                                             .views(10)
                                              .build();
 
         assertThat(jacksonTester.write(tagResponse)).hasJsonPathValue("@.tagName");
