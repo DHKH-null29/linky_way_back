@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -23,6 +24,13 @@ import java.util.Arrays;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    private ResponseEntity<ErrorResponse> handleMethodMissingServletRequestParameterException(MissingServletRequestParameterException e, HttpServletRequest request) {
+        log.error(e.getClass().getSimpleName(), e.getMessage());
+        
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.getRequestURI());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     private ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         log.error(e.getClass().getSimpleName(), e.getMessage());
