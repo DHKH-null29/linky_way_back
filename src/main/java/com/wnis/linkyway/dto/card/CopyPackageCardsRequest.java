@@ -1,14 +1,10 @@
 package com.wnis.linkyway.dto.card;
 
-import com.wnis.linkyway.validation.ValidationSequence;
 import com.wnis.linkyway.validation.ValidationGroup.NotBlankGroup;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
@@ -18,7 +14,7 @@ import java.util.List;
 @Builder
 public class CopyPackageCardsRequest {
 
-    @NotNull(message = "복사할 카드가 존재하지 않습니다.", groups = NotBlankGroup.class)
+    @NotNull(message = "복사할 태그가 존재하지 않습니다.", groups = NotBlankGroup.class)
     private Long tagId;
 
     @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
