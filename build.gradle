@@ -54,6 +54,10 @@ dependencies {
 
     // my sql
     runtimeOnly 'mysql:mysql-connector-java'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.7'
+    implementation('it.ozimov:embedded-redis:0.7.3') { exclude group: "org.slf4j", module: "slf4j-simple" }
 }
 
 tasks.named('test') {
