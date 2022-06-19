@@ -5,7 +5,7 @@ spring:
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     schema: classpath*:sql/schema.sql
-    data: classpath*:sql/data.sql
+#    data: classpath*:sql/data.sql
     initialization-mode: always   # 처음 사용시 always 그 이후는 never로 설정
 
   jpa:
