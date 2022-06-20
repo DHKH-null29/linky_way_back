@@ -19,8 +19,8 @@ public class CookieUtil {
                 .findFirst().orElse(null);
     }
 
-    public Cookie createCookie(String cookieName, String value, int second){
-        Cookie token = new Cookie(cookieName,value);
+    public Cookie createCookie(String cookieName, String value, int second) {
+        Cookie token = new Cookie(cookieName, value);
         token.setHttpOnly(true);
         token.setMaxAge(second);
         token.setPath("/");
