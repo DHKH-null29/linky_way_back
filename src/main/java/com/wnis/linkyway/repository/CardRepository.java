@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
@@ -28,4 +29,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("select c from Card c join c.folder f where f.member.id = :memberId")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId);
+    
+    @Query("select c.id from Card c " +
+            "where c.isDeleted = true and c.modifiedBy <= :deletedDateAt")
+    public List<Long> findAllIdToDeletedCard(@Param(value = "deletedDateAt")LocalDateTime deletedDateAt);
 }
