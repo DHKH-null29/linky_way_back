@@ -24,6 +24,12 @@ public class EmailVerificationValue {
         this.code = code;
     }
 
+    public void checkSameCode(String code) {
+        if (!this.code.equals(code)) {
+            throw new EmailSendException("잘못된 인증 코드입니다.");
+        }
+    }
+
     private void checkRetryCount() {
         if (currentCount >= RETRY_COUNT) {
             throw new EmailSendException(

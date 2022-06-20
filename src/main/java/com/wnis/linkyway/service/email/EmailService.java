@@ -24,6 +24,15 @@ public class EmailService {
     private static final String VERIFICATION_SUBJECT = "LinkyWay 에서 이메일 인증코드 발송";
     private static final long EMAIL_VALIDATION_EXPIRATION_TIME = 1000 * 60 * 15;
 
+    public void confirmVerificationCode(String email, String code) {
+        EmailVerificationValue emailVerification = redisProvider.getData(email, EmailVerificationValue.class);
+        if (emailVerification == null) {
+            throw new EmailSendException("인증 코드 발송된 적 없음");
+        }
+        emailVerification.checkSameCode(code);
+        redisProvider.deleteData(email);
+    }
+
     public void sendVerificationCode(String email) {
         try {
             EmailVerificationValue emailVerification = getEmailVerification(email);

@@ -74,4 +74,42 @@ class EmailServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("이메일 인증 코드 검증 테스트")
+    class ConfirmVerificationCodeTest {
+
+        EmailVerificationValue emailVerificationValue;
+
+        @BeforeEach
+        void setup() {
+            emailVerificationValue = new EmailVerificationValue(1, "CODE");
+        }
+
+        @Test
+        @DisplayName("발급된 코드와 동일한 코드로의 요청으로 정상적으로 검증 동작을 모두 수행한다")
+        void sameCodeRequestShouldDoAll() {
+            given(redisProvider.getData(EMAIL, EmailVerificationValue.class))
+                    .willReturn(emailVerificationValue);
+            emailService.confirmVerificationCode(EMAIL, emailVerificationValue.getCode());
+            verify(redisProvider, times(1)).deleteData(EMAIL);
+        }
+
+        @Test
+        @DisplayName("발급된 코드와 다른 코드로의 요청으로 예외를 반환한다.")
+        void diffCodeRequestShouldThrowEmailException() {
+            given(redisProvider.getData(EMAIL, EmailVerificationValue.class))
+                    .willReturn(new EmailVerificationValue(1, "CODE2"));
+            assertThatThrownBy(() -> emailService.confirmVerificationCode(EMAIL, emailVerificationValue.getCode()))
+                    .isInstanceOf(EmailSendException.class);
+        }
+
+        @Test
+        @DisplayName("인증 코드 전송이 없었던 이메일에 대한 검증 요청으로 예외를 발환한다.")
+        void NoCodeRequestShouldThrowEmailException() {
+            assertThatThrownBy(() -> emailService.confirmVerificationCode(EMAIL, emailVerificationValue.getCode()))
+                    .isInstanceOf(EmailSendException.class);
+        }
+
+    }
+
 }
