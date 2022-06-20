@@ -58,6 +58,10 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.7'
     implementation('it.ozimov:embedded-redis:0.7.3') { exclude group: "org.slf4j", module: "slf4j-simple" }
+
+    // test with time-sleep
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.1'
+
 }
 
 tasks.named('test') {
