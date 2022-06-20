@@ -35,6 +35,13 @@ class RedisProviderTest {
     }
 
     @Test
+    @DisplayName("없는 객체 데이터에 대한 조회 요청에 대해 null 을 반환한다.")
+    void findObjectValueByKeyAndTypeNotExistsShouldReturnNull() {
+        SampleObj result = redisProvider.getData("hello", SampleObj.class);
+        assertThat(result).isNull();
+    }
+
+    @Test
     @DisplayName("저장된 객체 key-value 데이터를 조회할 수 있다.")
     void findObjectValueByKeyAndTypeShouldReturnObjectResult() {
         SampleObj result = redisProvider.getData(objectKey, SampleObj.class);
@@ -82,10 +89,6 @@ class RedisProviderTest {
 
         public String getName() {
             return name;
-        }
-
-        public int getAge() {
-            return age;
         }
 
     }

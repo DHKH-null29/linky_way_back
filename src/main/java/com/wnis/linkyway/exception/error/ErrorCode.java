@@ -8,6 +8,7 @@ public enum ErrorCode {
     // 4xx
     INVALID_INPUT_VALUE(400, "올바르지 않은 입력 요청"),
     INVALID_TYPE_VALUE(400, "올바르지 않은 타입 요청"),
+    EMAIL_SEND_ERROR(400, "메일 전송 오류"),
     RESOURCE_NOT_FOUND(404, "존재하지 않는 리소스 요청"),
     UNAUTHORIZED(401, "인증 자격 없음"),
     FORBIDDEN(403, "요청 거절됨"),
