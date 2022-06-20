@@ -75,8 +75,8 @@ VALUES ('https://www.xn--w39at6wpzax3i7sdctt.kr/html/index.html', '명륜진사�
 INSERT INTO card (link, title, content, is_public, is_deleted, folder_folder_id)
 VALUES ('https://tracecooking.tistory.com/84', '명륜진사갈비 블로그', '', 0, 0, 5);
 
-INSERT INTO card (link, title, content, is_public, is_deleted, folder_folder_id)
-VALUES ('https://namu.wiki/w/%EC%B1%84%EC%86%8C', '채소 나무위키', '채소에 대한 정보', 1, 0, 2);
+INSERT INTO card (link, title, content, is_public, is_deleted, folder_folder_id, modified_by)
+VALUES ('https://namu.wiki/w/%EC%B1%84%EC%86%8C', '채소 나무위키', '채소에 대한 정보', 1, 1, 2, '2002-02-02 00:00:00');
 
 
 
