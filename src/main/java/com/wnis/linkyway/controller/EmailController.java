@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.wnis.linkyway.util.cookie.CookieConstants.*;
+
 @RestController
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
@@ -26,9 +28,6 @@ public class EmailController {
 
     private final EmailService emailService;
     private final CookieUtil cookieUtil;
-
-    private static final int VERIFICATION_COOKIE_EXPIRATION_MINUTE = 10;
-    private static final String VERIFICATION_COOKIE_NAME = "evc";
 
     @PostMapping("/code")
     @ApiOperation(value = "이메일 인증 코드 전송")
