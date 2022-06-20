@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 
@@ -25,9 +26,8 @@ public class RedisProvider {
     public <T> T getData(String key, Class<T> classType) {
         try {
             ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-            return objectMapper.readValue(valueOperations.get(key), classType);
-        }
-        catch (JsonProcessingException e) {
+            return getObjectData(valueOperations.get(key), classType);
+        } catch (JsonProcessingException e) {
             log.error("", e);
             return null;
         }
@@ -51,6 +51,13 @@ public class RedisProvider {
 
     public void deleteData(String key) {
         redisTemplate.delete(key);
+    }
+
+    private <T> T getObjectData(String values, Class<T> classType) throws JsonProcessingException {
+        if (!StringUtils.hasText(values)) {
+            return null;
+        }
+        return objectMapper.readValue(values, classType);
     }
 
 }
