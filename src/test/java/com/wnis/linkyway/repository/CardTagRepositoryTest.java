@@ -15,6 +15,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +66,14 @@ class CardTagRepositoryTest {
 //                    .isDeleted(false)
                     .build();
     
+    Card card2 = Card.builder()
+            .folder(folder)
+            .isPublic(false)
+            .content("")
+            .link("2")
+            .title("card")
+            .build();
+    
     CardTag cardTag1 = CardTag.builder()
                               .card(card)
                               .tag(tag1)
@@ -74,6 +84,11 @@ class CardTagRepositoryTest {
                               .tag(tag2)
                               .build();
     
+    CardTag cardTag3 = CardTag.builder()
+            .card(card2)
+            .tag(tag2)
+            .build();
+    
     @BeforeEach
     void setUp() {
         em.persist(member);
@@ -81,8 +96,10 @@ class CardTagRepositoryTest {
         em.persist(tag1);
         em.persist(tag2);
         em.persist(card);
+        em.persist(card2);
         em.persist(cardTag1);
         em.persist(cardTag2);
+        em.persist(cardTag3);
         em.flush();
     }
     
@@ -96,21 +113,14 @@ class CardTagRepositoryTest {
         void resultCardTagWhenUpdateCard() {
             em.clear();
             Card card1 = cardRepository.findById(1L).orElse(null);
-            logger.info("{}", card1.getTitle());
             card1.updateTitle("updatedCard");
-            cardRepository.save(card1);
-
+            logger.info("{}", card1.getTitle());
+            cardRepository.saveAndFlush(card1);
+            em.clear();
     
             Card card2 = cardRepository.findById(1L).orElse(null);
             logger.info(card2.getTitle());
-            List<CardTag> cardTagList = cardTagRepository.findAll();
-            cardTagList.forEach((cardTag -> {
-                logger.info("{}", cardTag.getId());
-                logger.info("{}", cardTag.getCard().getId());
-                logger.info("{}", cardTag.getCard().getTitle());
-                assertThat(cardTag.getCard().getId()).isEqualTo(1);
-                assertThat(cardTag.getCard().getTitle()).isEqualTo("updatedCard");
-            }));
+            assertThat(card1.getTitle()).isEqualTo(card2.getTitle());
         
         }
         
@@ -159,6 +169,25 @@ class CardTagRepositoryTest {
             assertThat(packageDtoList).isNotEmpty();
             assertThat(packageDtoList.get(0)).extracting("tagName").isEqualTo("t1");
             assertThat(packageDtoList.get(0)).extracting("nickname").isEqualTo("hello");
+        }
+    }
+    
+    @Nested
+    @DisplayName("findAllCardTagIdInCardIds 테스트")
+    class findAllCardTagIdINCardIdsTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void shouldReturnCardIds() {
+            List<CardTag> all = cardTagRepository.findAll();
+            assertThat(all.size()).isEqualTo(3);
+            List<Long> ids = cardTagRepository.findAllCardTagIdInCardIds(
+                    new ArrayList<>(Arrays.asList(1L)));
+            logger.info("ids: {} ", ids);
+            assertThat(ids.size()).isEqualTo(2);
+            assertThat(ids.get(0)).isEqualTo(1L);
+    
+            
         }
     }
     
