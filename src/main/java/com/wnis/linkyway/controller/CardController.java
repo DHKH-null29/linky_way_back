@@ -44,7 +44,7 @@ public class CardController {
 
     @GetMapping("/{cardId}")
     @Authenticated
-    public ResponseEntity<Response> findCardByCardId(Long cardId) {
+    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId) {
 
         CardResponse cardResponse = cardService.findCardByCardId(cardId);
 
@@ -88,7 +88,7 @@ public class CardController {
     @Authenticated
     public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
             @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.SearchCardByKeywordpersonalPage(keyword, memberId);
+        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(keyword, memberId);
         return ResponseEntity.ok()
                              .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }

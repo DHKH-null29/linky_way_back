@@ -15,13 +15,19 @@ spring:
         format_sql: true
         generate-ddl: true
         highlight_sql: true
-
     #        use_sql_comments: true
     open-in-view: false
+
+  batch:
+    initialize-schema: always
+    job:
+      enabled: false
+      names: ${job.name:batchJob}
+
   config:
     import:
       - classpath:jwt.yml
-      - classpath:folder.yml
+
 
 
 logging:

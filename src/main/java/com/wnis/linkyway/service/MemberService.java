@@ -5,7 +5,6 @@ import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.exception.common.*;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
-import com.wnis.linkyway.util.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,9 +37,10 @@ public class MemberService {
         validEmailDuplication(joinRequest.getEmail());
         validNicknameDuplication(joinRequest.getNickname());
 
-        Member joinMember = Member.builder().nickname(joinRequest.getNickname())
-                .password(joinRequest.getPassword())
+        Member joinMember = Member.builder()
                 .nickname(joinRequest.getNickname())
+                .password(joinRequest.getPassword())
+                .email(joinRequest.getEmail())
                 .build();
         
         joinMember.changePassword(passwordEncoder.encode(joinMember.getPassword()));
