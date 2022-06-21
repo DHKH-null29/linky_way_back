@@ -3,6 +3,7 @@ package com.wnis.linkyway.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "folder_id", nullable = false)
+    @Setter
     private Long id;
 
     @Column(name = "name", nullable = false, length = 10)
