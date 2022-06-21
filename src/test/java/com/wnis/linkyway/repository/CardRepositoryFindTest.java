@@ -153,4 +153,32 @@ public class CardRepositoryFindTest {
         // then
         assertThat(cardList.size()).isEqualTo(1); // tag1에 카드 2개 But 1개는 공유 불가능한 카드
     }
+
+    @Test
+    @DisplayName("폴더 아이디로 해당 폴더 카드 목록 조회 성공")
+    public void findCardsByFolderIdSuccess() {
+        // given
+        Folder folder1 = savedFolders.get(0);
+        Folder folder2 = savedFolders.get(1);
+        // when
+        List<Card> cardList1 = cardRepository.findCardsByFolderId(folder1.getId());
+        List<Card> cardList2 = cardRepository.findCardsByFolderId(folder2.getId());
+        // then
+        assertThat(cardList1.size()).isEqualTo(3);
+        assertThat(cardList2.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("폴더 아이디로 하위 폴더까지의 카드 목록 조회 성공")
+    public void findDeepFoldersCardsByFolderIdSuccess() {
+        // given
+        Folder folder1 = savedFolders.get(0);
+        Folder folder2 = savedFolders.get(1);
+        // when
+        List<Card> cardList1 = cardRepository.findDeepFoldersCardsByFolderId(folder1.getId());
+        List<Card> cardList2 = cardRepository.findDeepFoldersCardsByFolderId(folder2.getId());
+        // then
+        assertThat(cardList1.size()).isEqualTo(4);
+        assertThat(cardList2.size()).isEqualTo(1);
+    }
 }

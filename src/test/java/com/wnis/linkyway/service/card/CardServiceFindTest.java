@@ -219,4 +219,89 @@ public class CardServiceFindTest {
             verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong());
         }
     }
+
+    @Nested
+    @DisplayName("카드 목록 조회 : 폴더 아이디로 조회")
+    class findCardsByFolderId {
+
+        @Test
+        @DisplayName("카드 목록 조회 성공: 해당 폴더만")
+        void FindingCardsSuccessWhenFindDeepIsFalse() throws Exception {
+            // given
+            Optional<Folder> folder = Optional.of(folder1);
+            lenient().doReturn(folder)
+                     .when(folderRepository)
+                     .findByIdAndMemberId(anyLong(), anyLong());
+            lenient().doReturn(cardList)
+                     .when(cardRepository)
+                     .findCardsByFolderId(anyLong());
+            // when
+            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), false);
+
+            // then
+            for (int index = 0; index < cardResponses.size(); index++) {
+                CardResponse cardResponse = cardResponses.get(index);
+                Card card = cardList.get(index);
+
+                assertThat(cardResponse.getCardId()).isEqualTo(card.getId());
+                assertThat(cardResponse.getTitle()).isEqualTo(card.getTitle());
+                assertThat(cardResponse.getContent()).isEqualTo(card.getContent());
+                assertThat(cardResponse.getIsPublic()).isEqualTo(card.getIsPublic());
+                assertThat(cardResponse.getFolderId()).isEqualTo(card.getFolder()
+                                                                     .getId());
+            }
+
+            // verify
+            verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
+            verify(cardRepository, times(1)).findCardsByFolderId(anyLong());
+            verify(cardRepository, times(0)).findDeepFoldersCardsByFolderId(anyLong());
+        }
+
+        @Test
+        @DisplayName("카드 목록 조회 성공: 하위 폴더까지")
+        void FindingCardsSuccessWhenFindDeepIsTrue() throws Exception {
+            // given
+            Optional<Folder> folder = Optional.of(folder1);
+            lenient().doReturn(folder)
+                     .when(folderRepository)
+                     .findByIdAndMemberId(anyLong(), anyLong());
+            lenient().doReturn(cardList)
+                     .when(cardRepository)
+                     .findDeepFoldersCardsByFolderId(anyLong());
+            // when
+            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), true);
+
+            // then
+            for (int index = 0; index < cardResponses.size(); index++) {
+                CardResponse cardResponse = cardResponses.get(index);
+                Card card = cardList.get(index);
+
+                assertThat(cardResponse.getCardId()).isEqualTo(card.getId());
+                assertThat(cardResponse.getTitle()).isEqualTo(card.getTitle());
+                assertThat(cardResponse.getContent()).isEqualTo(card.getContent());
+                assertThat(cardResponse.getIsPublic()).isEqualTo(card.getIsPublic());
+                assertThat(cardResponse.getFolderId()).isEqualTo(card.getFolder()
+                                                                     .getId());
+            }
+
+            // verify
+            verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
+            verify(cardRepository, times(0)).findCardsByFolderId(anyLong());
+            verify(cardRepository, times(1)).findDeepFoldersCardsByFolderId(anyLong());
+        }
+
+        @Test
+        @DisplayName("카드 목록 조회 실패: 존재하지 않는 폴더 또는 해당 사용자의 폴더가 아님")
+        void FindingCardsFailBecauseFolderDoesNotExistOrNotBelongsToUser() throws Exception {
+            // when
+            doReturn(Optional.empty()).when(folderRepository)
+                                      .findByIdAndMemberId(anyLong(), anyLong());
+            // then
+            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByFolderId(100L, 1L, true));
+            // verify
+            verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
+            verify(cardRepository, times(0)).findCardsByFolderId(anyLong());
+            verify(cardRepository, times(0)).findDeepFoldersCardsByFolderId(anyLong());
+        }
+    }
 }

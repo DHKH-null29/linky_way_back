@@ -305,5 +305,25 @@ public class CardControllerTest {
                                                                               .containsPropertiesAsJson(Response.class)) // method
                                                .andReturn();
         }
+
+        @Test
+        @DisplayName("폴더 아이디로 사용자의 카드 목록 조회 성공")
+        void findCardsByFolderIdSuccess() throws Exception {
+            // given
+            lenient().doReturn(cardResponses)
+                     .when(cardService)
+                     .findCardsByFolderId(anyLong(), anyLong(), any(Boolean.class));
+            // when
+            ResultActions resultActions = mockMvc.perform(get("/api/cards/folder/"
+                    + folderId).param("findDeep", String.valueOf(true))
+                               .contentType("application/json")
+                               .content(objectMapper.writeValueAsString(cardResponses)));
+            // then
+            MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                               .andExpect(ResponseBodyMatchers.responseBody() // create
+                                                                              // ResponseBodyMatcher
+                                                                              .containsPropertiesAsJson(Response.class)) // method
+                                               .andReturn();
+        }
     }
 }
