@@ -1,9 +1,11 @@
-package com.wnis.linkyway.controller;
+package com.wnis.linkyway.controller.member;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.controller.tag.TagControllerIntegrationTest;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.PasswordRequest;
+import com.wnis.linkyway.dto.member.UpdateMemberRequest;
 import com.wnis.linkyway.security.testutils.WithMockMember;
 import com.wnis.linkyway.util.cookie.CookieConstants;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -182,6 +185,24 @@ class MemberControllerIntegrationTest {
 
     }
 
+    @Nested
+    @DisplayName("회원 수정 테스트")
+    @WithMockMember(id = 1L, email = "marrin1101@hanmail.com")
+    class UpdateMemberTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void responseTest() throws Exception {
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                                                                         .nickname("hello").build();
+            
+            mockMvc.perform(put("/api/members/page/me")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(updateMemberRequest)))
+                   .andExpect(status().is(200));
+        }
+    }
+    
     @Nested
     @DisplayName("회원 삭제 테스트")
     @WithMockMember(id = 1L, email = "marrin1101@hanmail.com")
