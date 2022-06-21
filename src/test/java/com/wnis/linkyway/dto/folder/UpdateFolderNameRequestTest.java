@@ -17,11 +17,11 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SetFolderNameRequestTest {
+class UpdateFolderNameRequestTest {
 
     private static Validator validator;
     private static ValidatorFactory factory;
-    private final Logger logger = LoggerFactory.getLogger(SetFolderNameRequestTest.class);
+    private final Logger logger = LoggerFactory.getLogger(UpdateFolderNameRequestTest.class);
 
     @BeforeAll
     static void setup() {
@@ -37,11 +37,11 @@ class SetFolderNameRequestTest {
     @Test
     @DisplayName("Not Blank 테스트")
     void notBlankTest() {
-        SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                        .build();
+        UpdateFolderNameRequest setFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                              .build();
 
-        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
-                                                                                                 ValidationGroup.NotBlankGroup.class);
+        Set<ConstraintViolation<UpdateFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
+                                                                                                    ValidationGroup.NotBlankGroup.class);
 
         constraintViolations.forEach((e) -> {
             logger.info(e.getMessage());
@@ -52,12 +52,12 @@ class SetFolderNameRequestTest {
     @Test
     @DisplayName("Pattern 테스트")
     void patternTest() {
-        SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                        .name("가")
-                                                                        .build();
+        UpdateFolderNameRequest setFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                              .name("가")
+                                                                              .build();
 
-        Set<ConstraintViolation<SetFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
-                                                                                                 ValidationGroup.NotBlankGroup.class);
+        Set<ConstraintViolation<UpdateFolderNameRequest>> constraintViolations = validator.validate(setFolderNameRequest,
+                                                                                                    ValidationGroup.NotBlankGroup.class);
 
         constraintViolations.forEach((e) -> {
             logger.info(e.getMessage());

@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
-public class SetFolderNameRequest {
+public class UpdateFolderNameRequest {
 
     @NotBlank(message = "변경하실 폴더 이름을 입력해주세요", groups = NotBlankGroup.class)
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z\\d_]{1,10}$",

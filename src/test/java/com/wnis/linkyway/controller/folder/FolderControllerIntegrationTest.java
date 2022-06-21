@@ -3,8 +3,8 @@ package com.wnis.linkyway.controller.folder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.controller.tag.TagControllerIntegrationTest;
 import com.wnis.linkyway.dto.folder.AddFolderRequest;
-import com.wnis.linkyway.dto.folder.SetFolderNameRequest;
-import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderNameRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.repository.FolderRepository;
@@ -116,10 +116,7 @@ public class FolderControllerIntegrationTest {
             MvcResult mvcResult = mockMvc.perform(get("/api/folders/super"))
                                          .andExpect(status().is(200))
                                          .andReturn();
-
-            logger.info(mvcResult.getResponse()
-                                 .getContentAsString());
-
+            
         }
 
     }
@@ -164,22 +161,7 @@ public class FolderControllerIntegrationTest {
                                  .getContentAsString());
 
         }
-
-        @Test
-        @DisplayName("부모 폴더에 null 을 기입한 경우")
-        @WithMockMember(id = 1L, email = "marrin1101@naver.com")
-        void RequestParentIdNull() throws Exception {
-            AddFolderRequest addFolderRequest = AddFolderRequest.builder()
-                                                                .parentFolderId(null)
-                                                                .name("f10")
-                                                                .build();
-
-            MvcResult mvcResult = mockMvc.perform(post("/api/folders").contentType("application/json")
-                                                                      .content(objectMapper.writeValueAsBytes(addFolderRequest)))
-                                         .andExpect(status().is(200))
-                                         .andReturn();
-
-        }
+        
 
         @Test
         @DisplayName("멤버 없는 경우 응답 테스트")
@@ -224,9 +206,9 @@ public class FolderControllerIntegrationTest {
         @DisplayName("응답 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void responseTest() throws Exception {
-            SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                            .name("f_10L")
-                                                                            .build();
+            UpdateFolderNameRequest setFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                                  .name("f_10L")
+                                                                                  .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/1/name").contentType("application/json")
                                                                             .content(objectMapper.writeValueAsString(setFolderNameRequest)))
@@ -241,9 +223,9 @@ public class FolderControllerIntegrationTest {
         @DisplayName("폴더가 존재하지 않는 경우 응답 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void NotExistFolderResponseTest() throws Exception {
-            SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                            .name("f_10L")
-                                                                            .build();
+            UpdateFolderNameRequest setFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                                  .name("f_10L")
+                                                                                  .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/100/name").contentType("application/json")
                                                                               .content(objectMapper.writeValueAsString(setFolderNameRequest)))
@@ -264,12 +246,12 @@ public class FolderControllerIntegrationTest {
         @DisplayName("응답 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void responseTest() throws Exception {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
-                                                                            .targetFolderId(2L)
-                                                                            .build();
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
+                                                                               .targetFolderId(2L)
+                                                                               .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/3/path").contentType("application/json")
-                                                                            .content(objectMapper.writeValueAsString(setFolderPathRequest)))
+                                                                            .content(objectMapper.writeValueAsString(updateFolderPathRequest)))
                                          .andExpect(status().is(200))
                                          .andReturn();
         }
@@ -278,12 +260,12 @@ public class FolderControllerIntegrationTest {
         @DisplayName("수정하려는 폴더의 깊이가 깊은 경우 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void LimitFolderDepthTest() throws Exception {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(5L)
                                                                             .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/3/path").contentType("application/json")
-                                                                            .content(objectMapper.writeValueAsString(setFolderPathRequest)))
+                                                                            .content(objectMapper.writeValueAsString(updateFolderPathRequest)))
                                          .andExpect(status().is(409))
                                          .andReturn();
         }
@@ -292,12 +274,12 @@ public class FolderControllerIntegrationTest {
         @DisplayName("수정하려는 폴더가 없는 경우 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void NotExistOriginFolderTest() throws Exception {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(5L)
                                                                             .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/101/path").contentType("application/json")
-                                                                              .content(objectMapper.writeValueAsString(setFolderPathRequest)))
+                                                                              .content(objectMapper.writeValueAsString(updateFolderPathRequest)))
                                          .andExpect(status().is(409))
                                          .andReturn();
 
@@ -309,7 +291,7 @@ public class FolderControllerIntegrationTest {
         @DisplayName("목표 부모 폴더가 없는 경우 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void NotExistTargetFolderTest() throws Exception {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest setFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(100L)
                                                                             .build();
 
@@ -326,7 +308,7 @@ public class FolderControllerIntegrationTest {
         @DisplayName("목표부모가 직계후손인 경우 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void TargetFolderIsDirectDescendantFolderTest() throws Exception {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest setFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(3L)
                                                                             .build();
 
