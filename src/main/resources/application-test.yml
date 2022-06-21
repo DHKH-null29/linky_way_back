@@ -27,8 +27,8 @@ spring:
   config:
     import:
       - classpath:jwt.yml
-
-
+      - classpath:redis.yml
+      - classpath:email.yml
 
 logging:
   level:
