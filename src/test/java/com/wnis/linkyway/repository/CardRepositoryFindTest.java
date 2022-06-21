@@ -181,4 +181,13 @@ public class CardRepositoryFindTest {
         assertThat(cardList1.size()).isEqualTo(4);
         assertThat(cardList2.size()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("사용자의 모든 카드 목록 조회 성공")
+    public void findCardsByMemberIdSuccess() {
+        // when
+        List<Card> cardList = cardRepository.findCardsByMemberId(savedMember.getId());
+        // then
+        assertThat(cardList.size()).isEqualTo(4);
+    }
 }

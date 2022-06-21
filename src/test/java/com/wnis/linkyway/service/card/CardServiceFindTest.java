@@ -304,4 +304,35 @@ public class CardServiceFindTest {
             verify(cardRepository, times(0)).findDeepFoldersCardsByFolderId(anyLong());
         }
     }
+
+    @Nested
+    @DisplayName("카드 목록 조회 : 사용자의 모든 카드 조회")
+    class findCardsByMemberId {
+        @Test
+        @DisplayName("카드 목록 조회 성공")
+        void FindingCardsSuccess() throws Exception {
+            // given
+            lenient().doReturn(cardList)
+                     .when(cardRepository)
+                     .findCardsByMemberId(anyLong());
+            // when
+            List<CardResponse> cardResponses = cardService.findCardsByMemberId(member.getId());
+
+            // then
+            for (int index = 0; index < cardResponses.size(); index++) {
+                CardResponse cardResponse = cardResponses.get(index);
+                Card card = cardList.get(index);
+
+                assertThat(cardResponse.getCardId()).isEqualTo(card.getId());
+                assertThat(cardResponse.getTitle()).isEqualTo(card.getTitle());
+                assertThat(cardResponse.getContent()).isEqualTo(card.getContent());
+                assertThat(cardResponse.getIsPublic()).isEqualTo(card.getIsPublic());
+                assertThat(cardResponse.getFolderId()).isEqualTo(card.getFolder()
+                                                                     .getId());
+            }
+
+            // verify
+            verify(cardRepository, times(1)).findCardsByMemberId(anyLong());
+        }
+    }
 }
