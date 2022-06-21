@@ -14,6 +14,7 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.dto.card.CopyCardsRequest;
 import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.card.SocialCardResponse;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
@@ -176,15 +177,17 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findIsPublicCardsByTagId(Long tagId) {
+    public List<SocialCardResponse> findIsPublicCardsByTagId(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
         if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        return toResponseList(cardList);
         List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId);
+        return toResponseList(cardList).stream()
+                                       .map((cardResponse) -> new SocialCardResponse(cardResponse))
+                                       .collect(Collectors.toList());
     }
 
     @Override
