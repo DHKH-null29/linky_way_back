@@ -285,5 +285,25 @@ public class CardControllerTest {
                                                                               .containsPropertiesAsJson(Response.class)) // method
                                                .andReturn();
         }
+
+        @Test
+        @DisplayName("태그 아이디로 isPublic인 카드 목록 조회 성공")
+        void findIsPublicCardsByTagIdSuccess() throws Exception {
+            // given
+            lenient().doReturn(cardResponses)
+                     .when(cardService)
+                     .findIsPublicCardsByTagId(anyLong());
+            // when
+            ResultActions resultActions = mockMvc.perform(get("/api/cards/package/"
+                    + tagId1).contentType("application/json")
+                             .content(objectMapper.writeValueAsString(cardResponses)));
+
+            // then
+            MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                               .andExpect(ResponseBodyMatchers.responseBody() // create
+                                                                              // ResponseBodyMatcher
+                                                                              .containsPropertiesAsJson(Response.class)) // method
+                                               .andReturn();
+        }
     }
 }

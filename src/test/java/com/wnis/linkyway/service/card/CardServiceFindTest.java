@@ -155,4 +155,68 @@ public class CardServiceFindTest {
             verify(tagRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
         }
     }
+
+    @Nested
+    @DisplayName("카드 목록 조회 : 태그 아이디로 isPublic=true인 카드 조회")
+    class findIsPublicCardsByTagId {
+        @Test
+        @DisplayName("카드 목록 조회 성공")
+        void FindingCardsSuccess() throws Exception {
+            // given
+            Optional<Tag> tag = Optional.of(tag1);
+            lenient().doReturn(tag)
+                     .when(tagRepository)
+                     .findById(anyLong());
+            lenient().doReturn(cardList)
+                     .when(cardRepository)
+                     .findIsPublicCardsByTagId(anyLong());
+            // when
+            List<SocialCardResponse> socialCardResponses = cardService.findIsPublicCardsByTagId(tag1.getId());
+
+            // then
+            for (int index = 0; index < socialCardResponses.size(); index++) {
+                SocialCardResponse response = socialCardResponses.get(index);
+                Card card = cardList.get(index);
+
+                assertThat(response.getCardId()).isEqualTo(card.getId());
+                assertThat(response.getLink()).isEqualTo(card.getLink());
+                assertThat(response.getTitle()).isEqualTo(card.getTitle());
+                assertThat(response.getContent()).isEqualTo(card.getContent());
+                assertThat(response.getIsPublic()).isEqualTo(card.getIsPublic());
+            }
+
+            // verify
+            verify(tagRepository, times(1)).findById(anyLong());
+            verify(cardRepository, times(1)).findIsPublicCardsByTagId(anyLong());
+        }
+
+        @Test
+        @DisplayName("카드 목록 조회 실패: 존재하지 않는 태그")
+        void FindingCardsFailBecauseTagDoesNotExist() throws Exception {
+            // when
+            doReturn(Optional.empty()).when(tagRepository)
+                                      .findById(anyLong());
+            // then
+            assertThrows(ResourceConflictException.class, () -> cardService.findIsPublicCardsByTagId(10000L));
+
+            // verify
+            verify(tagRepository, times(1)).findById(anyLong());
+            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong());
+        }
+
+        @Test
+        @DisplayName("카드 목록 조회 실패: 소셜 공유가 허용되지 않은 태그")
+        void FindingCardsFailBecauseTagIsNotPublic() throws Exception {
+            // when
+            Optional<Tag> tag = Optional.of(tag2);
+            doReturn(tag).when(tagRepository)
+                         .findById(anyLong());
+            // then
+            assertThrows(NotAccessableException.class, () -> cardService.findIsPublicCardsByTagId(tag2.getId()));
+
+            // verify
+            verify(tagRepository, times(1)).findById(anyLong());
+            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong());
+        }
+    }
 }

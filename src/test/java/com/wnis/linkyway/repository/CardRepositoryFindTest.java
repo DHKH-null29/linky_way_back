@@ -142,4 +142,15 @@ public class CardRepositoryFindTest {
         // then
         assertThat(cardList.size()).isEqualTo(2);
     }
+
+    @Test
+    @DisplayName("태그 아이디로 소셜 공유 가능한 카드 목록 조회 성공")
+    public void findIsPublicCardsByTagIdSuccess() {
+        // given
+        Tag tag1 = savedTags.get(0);
+        // when
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tag1.getId());
+        // then
+        assertThat(cardList.size()).isEqualTo(1); // tag1에 카드 2개 But 1개는 공유 불가능한 카드
+    }
 }
