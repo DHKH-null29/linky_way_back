@@ -132,32 +132,16 @@ public class CardControllerTest {
     @DisplayName("단일 북마크(카드) 상세 조회")
     class findCardByCardId {
 
-        Long cardId;
-        CardResponse cardResponse;
-
-        @BeforeEach
-        void setCard() {
-            cardId = 3L;
-            cardResponse = CardResponse.builder()
-                                       .cardId(cardId)
-                                       .link("https://www.naver.com/")
-                                       .title("title1")
-                                       .content("content1")
-                                       .isPublic(true)
-                                       .build();
-        }
-
         @Test
         @DisplayName("상세 조회 성공: 올바른 URL")
         void CardExistFindingSuccess() throws Exception {
             // given
+            CardResponse cardResponse = makeCardResponse();
             doReturn(cardResponse).when(cardService)
                                   .findCardByCardId(any());
-
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/" + cardId).contentType("application/json")
                                                                                      .content(objectMapper.writeValueAsString(cardResponse)));
-
             // then
             MvcResult mvcResult = resultActions.andExpect(status().isOk())
                                                .andExpect(ResponseBodyMatchers.responseBody()
@@ -169,10 +153,11 @@ public class CardControllerTest {
         @Test
         @DisplayName("상세 조회 실패: 잘못된 URL")
         void CardNotExistFindingFail() throws Exception {
+            // given
+            CardResponse cardResponse = makeCardResponse();
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/").contentType("application/json")
                                                                             .content(objectMapper.writeValueAsString(cardResponse)));
-
             // then
             resultActions.andExpect(status().isMethodNotAllowed())
                          .andExpect(result -> Assertions.assertThat(Objects.requireNonNull(result.getResolvedException())

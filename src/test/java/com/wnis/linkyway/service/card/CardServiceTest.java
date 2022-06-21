@@ -3,30 +3,28 @@ package com.wnis.linkyway.service.card;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
-import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
+import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.exception.common.NotModifyEmptyEntityException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
 import com.wnis.linkyway.repository.FolderRepository;
+import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -39,44 +37,54 @@ public class CardServiceTest {
 
     @Mock
     private CardRepository cardRepository;
-    
+
     @Mock
     private FolderRepository folderRepository;
-    
+
     @Mock
     private TagRepository tagRepository;
-    
+
+    @Mock
+    private MemberRepository memberRepository;
+
     @Mock
     private CardTagRepository cardTagRepository;
 
-    private final Long cardId = 3L;
+    private final Long cardId = 1L;
     private final String link = "https://github.com/DHKH-null29/linky_way_back/issues/12";
     private final String title = "카드 조회";
     private final String content = "카드 조회 issue";
     private final boolean isPublic = true;
-    private final Folder folder = null;
+    private Optional<Folder> folder;
+    private final Set<Long> tagSet = new HashSet<Long>();
 
-    private Card card() {
-        Card newCard = Card.builder()
-                           .link(link)
-                           .title(title)
-                           .content(content)
-                           .isPublic(isPublic)
-//                           .isDeleted(false)
-                           .folder(folder)
-                           .build();
-        newCard.setId(cardId);
-        return newCard;
+    @BeforeEach
+    void setUp() {
+        Member member = Member.builder()
+                              .email("maee@naver.com")
+                              .nickname("sssee")
+                              .password("a!aA212341")
+                              .build();
+
+        folder = Optional.of(Folder.builder()
+                                   .member(member)
+                                   .depth(1L)
+                                   .name("f")
+                                   .build());
+
+        tagSet.add(1L);
     }
 
-    private CardRequest makeCardRequest() {
-        return CardRequest.builder()
-                          .link(link)
-                          .title(title)
-                          .content(content)
-                          .isPublic(isPublic)
-                          .folderId(1L)
-                          .build();
+    private Card makeCard() {
+        Card card = Card.builder()
+                        .link(link)
+                        .title(title)
+                        .content(content)
+                        .isPublic(isPublic)
+                        .folder(folder.get())
+                        .build();
+        card.setId(cardId);
+        return card;
     }
 
     @Test
@@ -107,26 +115,16 @@ public class CardServiceTest {
     @DisplayName("단일 북마크(카드) 상세 조회")
     class findCardByCardId {
 
-        private Card savedCard;
-
-        @BeforeEach
-        void setCard() {
-            Card card = card();
-            BDDMockito.given(cardRepository.save(Mockito.any(Card.class)))
-                      .willReturn(card);
-            savedCard = cardRepository.save(card);
-        }
-
         @Test
         @DisplayName("상세 조회 성공: 카드가 존재함")
         void CardExistFindingSuccess() throws Exception {
             // given
-            Optional<Card> resultCard = Optional.of(savedCard);
-            doReturn(resultCard).when(cardRepository)
-                                .findById(any());
-            doReturn(new ArrayList<CardResponse>()).when(cardTagRepository).findAllTagResponseByCardId(any());
+            Optional<Card> savedCard = Optional.of(makeCard());
+            doReturn(savedCard).when(cardRepository)
+                               .findById(any());
             // when
-            CardResponse cardResponse = cardService.findCardByCardId(savedCard.getId());
+            CardResponse cardResponse = cardService.findCardByCardId(savedCard.get()
+                                                                              .getId());
 
             // then
             assertThat(cardResponse).isNotNull();
