@@ -66,6 +66,23 @@ public class MemberService {
 
         return MemberResponse.from(member);
     }
+    
+    @Transactional
+    public MemberResponse updateMyPage(UpdateMemberRequest updateMemberRequest, Long memberId) {
+        if (memberRepository.existsByNickname(updateMemberRequest.getNickname())) {
+            throw new NotAddDuplicateEntityException("중복된 닉네임을 입력 할 수 없습니다");
+        }
+        
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundEntityException("회원을 찾을 수 없습니다"));
+        
+        member.updateNickname(updateMemberRequest.getNickname());
+        
+        return MemberResponse.builder()
+                .memberId(memberId)
+                .nickname(member.getNickname())
+                .build();
+    }
 
     @Transactional
     public MemberResponse updatePassword(PasswordRequest passwordRequest, Long memberId) {
