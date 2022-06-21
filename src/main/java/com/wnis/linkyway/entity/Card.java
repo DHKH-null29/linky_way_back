@@ -40,9 +40,9 @@ public class Card extends BaseEntity {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
-    @Column(name = "is_deleted", nullable = false)
     @ColumnDefault("false")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
     //// ********************연관 관게 ***************************/////
     @ManyToOne(fetch = FetchType.LAZY)
