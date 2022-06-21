@@ -132,4 +132,14 @@ public class CardRepositoryFindTest {
         cardTagRepository.saveAll(Arrays.asList(cardtag1, cardtag2, cardtag3, cardtag4));
     }
 
+    @Test
+    @DisplayName("태그 아이디로 카드 목록 조회 성공")
+    public void findCardsByTagIdSuccess() {
+        // given
+        Tag tag = savedTags.get(0);
+        // when
+        List<Card> cardList = cardRepository.findCardsByTagId(tag.getId());
+        // then
+        assertThat(cardList.size()).isEqualTo(2);
+    }
 }

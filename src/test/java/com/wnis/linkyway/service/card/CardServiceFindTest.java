@@ -104,4 +104,55 @@ public class CardServiceFindTest {
         cardList = new ArrayList<Card>(Arrays.asList(card1, card2));
     }
 
+    @Nested
+    @DisplayName("카드 목록 조회 : 태그 아이디로 조회")
+    class findCardsByTagId {
+
+        @Test
+        @DisplayName("카드 목록 조회 성공")
+        void FindingCardsSuccess() throws Exception {
+            // given
+            Optional<Tag> tag = Optional.of(tag1);
+            lenient().doReturn(tag)
+                     .when(tagRepository)
+                     .findByIdAndMemberId(anyLong(), anyLong());
+            lenient().doReturn(cardList)
+                     .when(cardRepository)
+                     .findCardsByTagId(anyLong());
+
+            // when
+            List<CardResponse> cardResponses = cardService.findCardsByTagId(member.getId(), tag1.getId());
+            // then
+            assertThat(cardResponses).size()
+                                     .isEqualTo(cardList.size());
+            for (int index = 0; index < cardResponses.size(); index++) {
+                CardResponse cardResponse = cardResponses.get(index);
+                Card card = cardList.get(index);
+
+                assertThat(cardResponse.getCardId()).isEqualTo(card.getId());
+                assertThat(cardResponse.getTitle()).isEqualTo(card.getTitle());
+                assertThat(cardResponse.getContent()).isEqualTo(card.getContent());
+                assertThat(cardResponse.getIsPublic()).isEqualTo(card.getIsPublic());
+                assertThat(cardResponse.getFolderId()).isEqualTo(card.getFolder()
+                                                                     .getId());
+            }
+
+            // verify
+            verify(tagRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
+            verify(cardRepository, times(1)).findCardsByTagId(anyLong());
+        }
+
+        @Test
+        @DisplayName("카드 목록 조회 실패: 존재하지 않는 태그 또는 해당 사용자의 태그가 아님")
+        void FindingCardsFailBecauseTagDoesNotExistOrNotBelongsToUser() throws Exception {
+            // when
+            doReturn(Optional.empty()).when(tagRepository)
+                                      .findByIdAndMemberId(anyLong(), anyLong());
+            // then
+            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByTagId(2L, 10000L));
+
+            // verify
+            verify(tagRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
+        }
+    }
 }

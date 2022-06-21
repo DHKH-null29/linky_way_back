@@ -226,4 +226,64 @@ public class CardControllerTest {
                          .andReturn();
         }
     }
+    @Nested
+    @DisplayName("카드 목록 조회")
+    class findCards {
+
+        private List<CardResponse> cardResponses = new ArrayList<CardResponse>();
+        private Long tagId1 = 1L;
+        private Long tagId2 = 2L;
+        private Long folderId = 10L;
+
+        @BeforeEach
+        void initCardList() {
+            TagResponse tagResponse1 = TagResponse.builder()
+                                                  .tagId(tagId1)
+                                                  .tagName("t1")
+                                                  .isPublic(true)
+                                                  .build();
+            TagResponse tagResponse2 = TagResponse.builder()
+                                                  .tagId(tagId2)
+                                                  .tagName("t2")
+                                                  .isPublic(false)
+                                                  .build();
+            cardResponses = Arrays.asList(CardResponse.builder()
+                                                      .cardId(cardId)
+                                                      .link("https://www.naver.com/")
+                                                      .title("title1")
+                                                      .content("content1")
+                                                      .isPublic(true)
+                                                      .folderId(folderId)
+                                                      .tags(Arrays.asList(tagResponse1, tagResponse2))
+                                                      .build(),
+                                          CardResponse.builder()
+                                                      .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
+                                                      .title("카드 조회")
+                                                      .content("카드 조회 issue")
+                                                      .isPublic(true)
+                                                      .folderId(folderId)
+                                                      .tags(Arrays.asList(tagResponse1))
+                                                      .build());
+        }
+
+        @Test
+        @DisplayName("태그 아이디로 사용자의 카드 목록 조회 성공")
+        void findCardsByTagIdSuccess() throws Exception {
+            // given
+            lenient().doReturn(cardResponses)
+                     .when(cardService)
+                     .findCardsByTagId(any(), anyLong());
+            // when
+            ResultActions resultActions = mockMvc.perform(get("/api/cards/tag/"
+                    + tagId1).contentType("application/json")
+                             .content(objectMapper.writeValueAsString(cardResponses)));
+
+            // then
+            MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                               .andExpect(ResponseBodyMatchers.responseBody() // create
+                                                                              // ResponseBodyMatcher
+                                                                              .containsPropertiesAsJson(Response.class)) // method
+                                               .andReturn();
+        }
+    }
 }
