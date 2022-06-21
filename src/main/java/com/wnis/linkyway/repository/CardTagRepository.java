@@ -42,4 +42,8 @@ public interface CardTagRepository extends JpaRepository<CardTag, Long> {
             "join t.member m " +
             "where t.name like %:tagName%")
     List<PackageDto> findAllPackageDtoByTagName(@Param(value = "tagName") String tagName);
+
+    @Query("select ct.id from CardTag ct join ct.card c " +
+            "where c.id in :ids")
+    List<Long> findAllCardTagIdInCardIds(@Param(value = "ids") List<Long> cardIds);
 }

@@ -45,6 +45,7 @@ public class CardRequest {
                    .title(title)
                    .content(content)
                    .isPublic(isPublic)
+                   .isDeleted(false)
                    .folder(folder)
                    .build();
     }
