@@ -5,12 +5,10 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.LoginRequest;
 import com.wnis.linkyway.dto.member.LoginResponse;
 import com.wnis.linkyway.exception.common.InvalidValueException;
+import com.wnis.linkyway.redis.RedisProvider;
 import com.wnis.linkyway.security.jwt.JwtAuthenticationToken;
 import com.wnis.linkyway.security.jwt.JwtProvider;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
@@ -19,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -27,15 +26,15 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JwtAuthenticationFilterTest {
 
     private final JwtProvider jwtProvider = mock(JwtProvider.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RedisProvider redisProvider = mock(RedisProvider.class);
 
     @InjectMocks
     private final JwtAuthenticationFilter jwtAuthenticationFilter
-            = new JwtAuthenticationFilter(objectMapper, jwtProvider);
+            = new JwtAuthenticationFilter(objectMapper, jwtProvider, redisProvider);
 
     private MockHttpServletRequest httpServletRequest;
     private MockHttpServletResponse httpServletResponse;
@@ -44,8 +43,18 @@ class JwtAuthenticationFilterTest {
     private final Authentication authentication = new JwtAuthenticationToken(
             loginRequest.getEmail(), loginRequest.getPassword(), null);
 
+    static Stream<String> wrongJsons() {
+        return Stream.of("", " ", "{}");
+    }
 
-    @BeforeAll
+    static Stream<LoginRequest> wrongLogins() {
+        return Stream.of(
+                new LoginRequest("", "AbcdeVx123!!"),
+                new LoginRequest("ehd0309@naver.com", "   ")
+        );
+    }
+
+    @BeforeEach
     void setup() {
         String LOGIN_URL = "/members/login";
         httpServletRequest = new MockHttpServletRequest("POST", LOGIN_URL);
@@ -68,9 +77,16 @@ class JwtAuthenticationFilterTest {
         verify(authenticationManager, times(1)).authenticate(authentication);
     }
 
+    @Test
+    @DisplayName("적절한 로그인 요청이나 이미 N회 이상 시도하여 로그인이 제한되어있을 경우의 테스트")
+    void failAttemptAuthenticationWithRestriction() throws Exception {
+        AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
+        httpServletRequest.setContent(objectMapper.writeValueAsBytes(loginRequest));
+        given(redisProvider.getData(any())).willReturn("999");
+        jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
 
-    Stream<String> wrongJsons() {
-        return Stream.of("", " ", "{}");
+        assertThatThrownBy(() -> jwtAuthenticationFilter.attemptAuthentication(httpServletRequest, httpServletResponse))
+                .isInstanceOf(LockedException.class);
     }
 
     @ParameterizedTest
@@ -86,13 +102,6 @@ class JwtAuthenticationFilterTest {
                     assertThat(e.getMessage()).isEqualTo(errorMsg);
                 })
                 .hasCause(new InvalidValueException(""));
-    }
-
-    Stream<LoginRequest> wrongLogins() {
-        return Stream.of(
-                new LoginRequest("", "AbcdeVx123!!"),
-                new LoginRequest("ehd0309@naver.com", "   ")
-        );
     }
 
     @ParameterizedTest
@@ -121,10 +130,18 @@ class JwtAuthenticationFilterTest {
 
         Response<LoginResponse> response =
                 objectMapper.readValue(httpServletResponse.getContentAsString(), Response.class);
-        LoginResponse loginResponse = objectMapper.convertValue(response.getData(),LoginResponse.class);
+        LoginResponse loginResponse = objectMapper.convertValue(response.getData(), LoginResponse.class);
 
         assertThat(httpServletResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(loginResponse.getAccessToken()).isEqualTo(tokenName);
+    }
+
+    @Test
+    @DisplayName("인증 실패 핸들러 동작 테스트")
+    void unSuccessFulAuthenticationTest() throws Exception {
+        jwtAuthenticationFilter.unsuccessfulAuthentication(httpServletRequest, httpServletResponse, new LockedException("hi"));
+        verify(redisProvider)
+                .setDataWithExpiration(anyString(), anyString(), anyLong());
     }
 
 }
