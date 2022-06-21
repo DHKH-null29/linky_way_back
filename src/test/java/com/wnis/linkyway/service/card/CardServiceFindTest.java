@@ -182,7 +182,6 @@ public class CardServiceFindTest {
                 assertThat(response.getLink()).isEqualTo(card.getLink());
                 assertThat(response.getTitle()).isEqualTo(card.getTitle());
                 assertThat(response.getContent()).isEqualTo(card.getContent());
-                assertThat(response.getIsPublic()).isEqualTo(card.getIsPublic());
             }
 
             // verify

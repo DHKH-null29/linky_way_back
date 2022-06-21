@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,8 +39,6 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
-import com.wnis.linkyway.dto.card.CopyCardsRequest;
-import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
@@ -343,6 +340,5 @@ public class CardControllerTest {
                                                                               .containsPropertiesAsJson(Response.class)) // method
                                                .andReturn();
         }
-    }
     }
 }
