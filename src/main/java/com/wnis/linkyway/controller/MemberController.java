@@ -1,5 +1,6 @@
 package com.wnis.linkyway.controller;
 
+import com.wnis.linkyway.aop.WithEmailVerification;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.*;
 import com.wnis.linkyway.security.annotation.Authenticated;
@@ -20,6 +21,7 @@ public class MemberController {
     private final MemberService memberService;
     
     @PostMapping
+    @WithEmailVerification
     public ResponseEntity<Response> join(
             @Validated(ValidationSequence.class) @RequestBody JoinRequest joinRequest) {
         MemberResponse response = memberService.join(joinRequest);
