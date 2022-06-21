@@ -26,7 +26,7 @@ public class JoinRequest {
     private String password;
 
     @NotBlank(message = "닉네임을 입력해주세요", groups = NotBlankGroup.class)
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z\\d_]{2,10}$",
+    @Pattern(regexp = "^[가-힣a-zA-Z\\d_]{2,10}$",
              message = "문자/숫자로만 2~10 글자 사이로 입력해주세요",
              groups = PatternCheckGroup.class)
     private String nickname;
