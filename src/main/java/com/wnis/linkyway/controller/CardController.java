@@ -108,9 +108,9 @@ public class CardController {
 
     @GetMapping("/package/{tagId}")
     @Authenticated
-    public ResponseEntity<Response> findShareableCardsByTagId(@PathVariable Long tagId) {
+    public ResponseEntity<Response> findIsPublicCardsByTagId(@PathVariable Long tagId) {
 
-        List<CardResponse> cardResponses = cardService.findShareableCardsByTagId(tagId);
+        List<CardResponse> cardResponses = cardService.findIsPublicCardsByTagId(tagId);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())

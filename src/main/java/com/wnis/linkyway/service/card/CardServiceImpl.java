@@ -176,15 +176,15 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findShareableCardsByTagId(Long tagId) {
+    public List<CardResponse> findIsPublicCardsByTagId(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
         if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
         return toResponseList(cardList);
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId);
     }
 
     @Override
