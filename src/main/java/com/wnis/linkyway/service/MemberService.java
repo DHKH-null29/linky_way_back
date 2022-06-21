@@ -69,9 +69,7 @@ public class MemberService {
     
     @Transactional
     public MemberResponse updateMyPage(UpdateMemberRequest updateMemberRequest, Long memberId) {
-        if (memberRepository.existsByNickname(updateMemberRequest.getNickname())) {
-            throw new NotAddDuplicateEntityException("중복된 닉네임을 입력 할 수 없습니다");
-        }
+        validNicknameDuplication(updateMemberRequest.getNickname())
         
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundEntityException("회원을 찾을 수 없습니다"));
