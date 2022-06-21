@@ -1,6 +1,5 @@
 spring:
   profiles:
-    active: local
+    active: test
   config:
     import: classpath:folder.yml
-
