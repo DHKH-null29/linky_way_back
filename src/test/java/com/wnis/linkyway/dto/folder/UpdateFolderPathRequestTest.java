@@ -17,10 +17,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SetFolderPathRequestTest {
+class UpdateFolderPathRequestTest {
     private static Validator validator;
     private static ValidatorFactory factory;
-    private final Logger logger = LoggerFactory.getLogger(SetFolderPathRequestTest.class);
+    private final Logger logger = LoggerFactory.getLogger(UpdateFolderPathRequestTest.class);
 
     @BeforeAll
     static void setup() {
@@ -36,10 +36,10 @@ class SetFolderPathRequestTest {
     @Test
     @DisplayName("Not Blank 테스트")
     void notBlankTest() {
-        SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+        UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                         .build();
 
-        Set<ConstraintViolation<SetFolderPathRequest>> constraintViolations = validator.validate(setFolderPathRequest,
+        Set<ConstraintViolation<UpdateFolderPathRequest>> constraintViolations = validator.validate(updateFolderPathRequest,
                                                                                                  ValidationGroup.NotBlankGroup.class);
 
         constraintViolations.forEach((e) -> {
@@ -51,11 +51,11 @@ class SetFolderPathRequestTest {
     @Test
     @DisplayName("positive 테스트")
     void positiveTest() {
-        SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+        UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                         .targetFolderId(-1L)
                                                                         .build();
 
-        Set<ConstraintViolation<SetFolderPathRequest>> constraintViolations = validator.validate(setFolderPathRequest);
+        Set<ConstraintViolation<UpdateFolderPathRequest>> constraintViolations = validator.validate(updateFolderPathRequest);
 
         constraintViolations.forEach((e) -> {
             logger.info(e.getMessage());
@@ -66,11 +66,11 @@ class SetFolderPathRequestTest {
     @Test
     @DisplayName("통과 테스트")
     void successTest() {
-        SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+        UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                         .targetFolderId(1L)
                                                                         .build();
 
-        Set<ConstraintViolation<SetFolderPathRequest>> constraintViolations = validator.validate(setFolderPathRequest);
+        Set<ConstraintViolation<UpdateFolderPathRequest>> constraintViolations = validator.validate(updateFolderPathRequest);
         assertThat(constraintViolations).isEmpty();
     }
 }
