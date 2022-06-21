@@ -76,7 +76,8 @@ public class CardServiceImpl implements CardService {
                            .link(card.getLink())
                            .title(card.getTitle())
                            .content(card.getContent())
-                           .folderId(card.getFolder().getId())
+                           .folderId(card.getFolder()
+                                         .getId())
                            .isPublic(card.getIsPublic())
                            .tags(tagResponseList)
                            .build();
@@ -217,21 +218,22 @@ public class CardServiceImpl implements CardService {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
             List<Tag> tagList = card.getCardTags()
-                                .stream()
-                                .map(CardTag::getTag)
-                                .collect(Collectors.toList());
-            
+                                    .stream()
+                                    .map(CardTag::getTag)
+                                    .collect(Collectors.toList());
+
             List<TagResponse> tagResponseList = tagList.stream()
-                                         .map((tag) -> new TagResponse(tag))
-                                         .collect(Collectors.toList());
-            
+                                                       .map((tag) -> new TagResponse(tag))
+                                                       .collect(Collectors.toList());
+
             cardResponseList.add(CardResponse.builder()
                                              .cardId(card.getId())
                                              .title(card.getTitle())
                                              .content(card.getContent())
                                              .link(card.getLink())
                                              .tags(tagResponseList)
-                                             .folderId(card.getFolder().getId())
+                                             .folderId(card.getFolder()
+                                                           .getId())
                                              .isPublic(card.getIsPublic())
                                              .build());
         }
