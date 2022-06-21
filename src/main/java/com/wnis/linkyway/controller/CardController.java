@@ -3,6 +3,7 @@ package com.wnis.linkyway.controller;
 import java.net.URI;
 import java.util.List;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +29,7 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
+    @ApiOperation(value = "카드 생성", notes = "카드 요청 정보를 입력 받아 카드 하나를 생성한다")
     @Authenticated
     public ResponseEntity<Response> addCard(@CurrentMember Long memberId,
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
@@ -43,6 +45,7 @@ public class CardController {
     }
 
     @GetMapping("/{cardId}")
+    @ApiOperation(value = "ID를 통해 카드 조회", notes = "Card ID를 활용해 하나의 카드를 조회한다")
     @Authenticated
     public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId) {
 
@@ -57,6 +60,7 @@ public class CardController {
     }
 
     @PutMapping("/{cardId}")
+    @ApiOperation(value = "카드 수정", notes = "카드 수정 정보를 이용해 카드를 수정한다")
     @Authenticated
     public ResponseEntity<Response> updateCard(@CurrentMember Long memberId,
             @PathVariable Long cardId,
@@ -72,6 +76,7 @@ public class CardController {
     }
 
     @DeleteMapping("/{cardId}")
+    @ApiOperation(value = "카드 완전 삭제", notes = "DB에서 카드를 완전히 삭제한다")
     @Authenticated
     public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
 
@@ -85,6 +90,7 @@ public class CardController {
     }
 
     @GetMapping("/personal/keyword")
+    @ApiOperation(value = "키워드를 통한 카드 조회", notes = "키워드를 활용해 여러 카드를 조회한다")
     @Authenticated
     public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
             @CurrentMember Long memberId) {
@@ -94,6 +100,7 @@ public class CardController {
     }
 
     @GetMapping("/tag/{tagId}")
+    @ApiOperation(value = "태그아이디를 통해 카드 조회", notes = "TAG ID를 가지고 있는 여러 카드를 조회")
     @Authenticated
     public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId, @PathVariable Long tagId) {
 
@@ -107,6 +114,7 @@ public class CardController {
     }
 
     @GetMapping("/package/{tagId}")
+    @ApiOperation(value = "태그아이디를 통해 패키지 조회", notes = "태그 아이디를 활용해 여러 태그 아이디 조회")
     @Authenticated
     public ResponseEntity<Response> findShareableCardsByTagId(@PathVariable Long tagId) {
 
@@ -120,6 +128,7 @@ public class CardController {
     }
 
     @GetMapping("/folder/{folderId}")
+    @ApiOperation(value = "폴더 아이디를 활용한 카드 조회", notes = "FOLDER ID에 속해있는 카드들 모두 조회")
     @Authenticated
     public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
             @PathVariable Long folderId,
@@ -135,6 +144,7 @@ public class CardController {
     }
 
     @GetMapping("/all")
+    @ApiOperation(value = "회원 카드 조회", notes = "회원이 가지고 있는 모든 카드 조회")
     @Authenticated
     public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
 
@@ -148,6 +158,7 @@ public class CardController {
     }
 
     @PostMapping("/package/copy")
+    @ApiOperation(value = "패키지 카드 복사", notes = "패키지에 있는 카드 모두 복사")
     @Authenticated
     public ResponseEntity<Response> copyCardsInPackage(
             @Validated(ValidationSequence.class) @RequestBody CopyPackageCardsRequest copyPackageCardsRequest) {
