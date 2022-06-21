@@ -79,7 +79,7 @@ public class MemberControllerTest {
             mockMvc.perform(put("/api/members/page/me")
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(updateMemberRequest)))
-                   .andExpect(status().is(409));
+                   .andExpect(status().isConflict());
         }
     
         @Test
