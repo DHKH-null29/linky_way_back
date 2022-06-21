@@ -21,8 +21,6 @@ public class SocialCardResponse {
 
     private String content;
 
-    private Boolean isPublic;
-
     private List<TagResponse> tags = new ArrayList<>();
 
     public SocialCardResponse(CardResponse cardResponse) {
@@ -30,7 +28,6 @@ public class SocialCardResponse {
         this.link = cardResponse.getLink();
         this.title = cardResponse.getTitle();
         this.content = cardResponse.getContent();
-        this.isPublic = cardResponse.getIsPublic();
         this.tags = cardResponse.getTags();
     }
 
