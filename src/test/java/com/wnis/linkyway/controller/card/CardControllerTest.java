@@ -1,16 +1,23 @@
 package com.wnis.linkyway.controller.card;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import com.wnis.linkyway.controller.CardController;
 import org.assertj.core.api.Assertions;
@@ -21,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -34,6 +40,9 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
 
@@ -57,6 +66,39 @@ public class CardControllerTest {
     }
 
     @DisplayName("카드(북마크) 추가 성공")
+    private CardRequest makeCardRequest() {
+        Set<Long> tagIdSet = new HashSet<>(Arrays.asList(1L, 2L));
+        return CardRequest.builder()
+                          .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
+                          .title("카드 조회")
+                          .content("카드 조회 issue")
+                          .isPublic(true)
+                          .folderId(1L)
+                          .tagIdSet(tagIdSet)
+                          .build();
+    }
+
+    private Long cardId = 100L;
+
+    private CardResponse makeCardResponse() {
+        TagResponse tagResponse1 = TagResponse.builder()
+                                              .tagName("t1")
+                                              .isPublic(true)
+                                              .build();
+        TagResponse tagResponse2 = TagResponse.builder()
+                                              .tagName("t2")
+                                              .isPublic(false)
+                                              .build();
+        return CardResponse.builder()
+                           .cardId(cardId)
+                           .link("https://www.naver.com/")
+                           .title("title1")
+                           .content("content1")
+                           .isPublic(true)
+                           .tags(Arrays.asList(tagResponse1, tagResponse2))
+                           .build();
+    }
+
     @Test
     void addCardSuccess() throws Exception {
         // given
