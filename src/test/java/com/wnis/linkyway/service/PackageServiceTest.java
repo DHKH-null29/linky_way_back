@@ -37,7 +37,7 @@ public class PackageServiceTest {
         });
     
         // 조회시는 대소문자 구분 없이 모두 조회
-        List<PackageResponse> food = packageService.findAllPackageByTagName("FoOd");
+        List<PackageResponse> food = packageService.findAllPackageByTagName("food");
         logger.info("{}", food.get(0).getNumberOfCard());
         assertThat(food.get(0).getNumberOfCard()).isEqualTo(4);
         food.forEach(packageResponse -> {

@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -175,5 +176,16 @@ public class CardRepositoryTest {
             logger.info("{}", id);
         });
     
+    }
+    
+    @Test
+    @DisplayName("findAllIdToDeletedCard 테스트")
+    void findAllIdToDeletedCardTest() {
+        
+        List<Long> ids = cardRepository.findAllIdToDeletedCard(LocalDateTime.now().minusDays(7));
+        assertThat(ids.size()).isEqualTo(1);
+        Card c = cardRepository.findById(ids.get(0)).orElse(null);
+        logger.info("{}",c.getModifiedBy());
+        assertThat(c.getIsDeleted()).isEqualTo(true);
     }
 }

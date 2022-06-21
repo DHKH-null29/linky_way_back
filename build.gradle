@@ -54,6 +54,14 @@ dependencies {
 
     // my sql
     runtimeOnly 'mysql:mysql-connector-java'
+
+    // batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+
+    // scheduler
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
 }
 
 tasks.named('test') {

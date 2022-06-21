@@ -18,7 +18,7 @@ public interface CardService {
 
     public void deleteCard(Long cardId);
 
-    public List<CardResponse> SearchCardByKeywordpersonalPage(String keyword, Long memberId);
+    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId);
 
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId);
 
