@@ -1,6 +1,7 @@
 package com.wnis.linkyway.service.email;
 
 import com.wnis.linkyway.exception.common.EmailSendException;
+import com.wnis.linkyway.redis.RedisConstants;
 import com.wnis.linkyway.redis.RedisProvider;
 import com.wnis.linkyway.redis.values.EmailVerificationValue;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.wnis.linkyway.redis.RedisConstants.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,6 @@ public class EmailService {
     private final RedisProvider redisProvider;
 
     private static final String VERIFICATION_SUBJECT = "LinkyWay 에서 이메일 인증코드 발송";
-    private static final long EMAIL_VALIDATION_EXPIRATION_TIME = 1000 * 60 * 15;
 
     public void confirmVerificationCode(String email, String code) {
         EmailVerificationValue emailVerification = redisProvider.getData(email, EmailVerificationValue.class);
