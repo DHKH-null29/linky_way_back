@@ -21,7 +21,7 @@ spring:
   config:
     import:
       - classpath:jwt.yml
-      - classpath:folder.yml
+
 
 
 logging:

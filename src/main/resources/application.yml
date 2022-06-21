@@ -1,3 +1,5 @@
 spring:
   profiles:
-    active: mysql
+    active: local
+  config:
+    import: classpath:folder.yml
