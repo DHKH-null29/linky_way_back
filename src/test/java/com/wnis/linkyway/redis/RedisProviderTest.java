@@ -91,6 +91,10 @@ class RedisProviderTest {
             return name;
         }
 
+        public int getAge() {
+            return age;
+        }
+
     }
 
     static class SampleWrongObj {
