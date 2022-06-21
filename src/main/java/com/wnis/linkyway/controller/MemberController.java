@@ -50,14 +50,16 @@ public class MemberController {
     @Authenticated
     public ResponseEntity<Response> searchMyPage(@CurrentMember Long memberId) {
         MemberResponse response = memberService.searchMyPage(memberId);
-        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회 성공"));
     }
     
     @PutMapping("/page/me")
     @Authenticated
-    public ResponseEntity<Response> updateMyPage(@CurrentMember Long memberId) {
-        MemberResponse response = memberService.searchMyPage(memberId);
-        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
+    public ResponseEntity<Response> updateMyPage(
+            @Validated(ValidationSequence.class) @RequestBody UpdateMemberRequest updateMemberRequest,
+            @CurrentMember Long memberId) {
+        MemberResponse response = memberService.updateMyPage(updateMemberRequest, memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 수정 성공"));
     }
     
     @PutMapping("/password")
