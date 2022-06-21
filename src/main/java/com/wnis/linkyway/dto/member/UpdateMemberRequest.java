@@ -14,7 +14,7 @@ import javax.validation.constraints.Pattern;
 public class UpdateMemberRequest {
     
     @NotBlank(message = "닉네임을 입력해주세요", groups = ValidationGroup.NotBlankGroup.class)
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z\\d_]{2,10}$",
+    @Pattern(regexp = "^[가-힣a-zA-Z\\d_]{2,10}$",
             message = "문자/숫자로만 2~10 글자 사이로 입력해주세요",
             groups = ValidationGroup.PatternCheckGroup.class)
     private String nickname;
