@@ -92,9 +92,10 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
+    public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findById(cardId)
                                   .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다."));
+
         Folder oldFolder = card.getFolder();
         if (cardRequest.getFolderId() != oldFolder.getId()) {
             Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember()
@@ -109,40 +110,31 @@ public class CardServiceImpl implements CardService {
         card.updateTitle(cardRequest.getTitle());
         card.updateContent(cardRequest.getContent());
         card.updateIsPublic(cardRequest.getIsPublic());
+
         updateCardTagByCard(memberId, card, cardRequest);
 
-        return card;
-    }
-
-    private void addCardTagByCard(Long memberId, Card savedCard, Set<Long> tagIdList) {
-        for (Long tagId : tagIdList) {
-            Tag tag = tagRepository.findByIdAndMemberId(memberId, tagId)
-                                   .orElseThrow(() -> new NotFoundEntityException(
-                                           "존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요."));
-            if (!cardTagRepository.findByCardAndTag(savedCard, tag)
-                                  .isPresent()) {
-                cardTagRepository.save(CardTag.builder()
-                                              .card(savedCard)
-                                              .tag(tag)
-                                              .build());
-            }
-        }
+        return card.getId();
     }
 
     private void updateCardTagByCard(Long memberId, Card savedCard, CardRequest newCard) {
         List<CardTag> oldCardTagList = savedCard.getCardTags();
         Set<Long> newTagIdList = newCard.getTagIdSet();
-
-        // 새로운 태그가 선택됨 -> CardTag 추가
-        addCardTagByCard(memberId, savedCard, newTagIdList);
-
-        // 기존 태그가 선택되지 않음 -> 삭제
+        
+        List<CardTag> delCardTagList = new ArrayList<>();
         for (CardTag oldCardTag : oldCardTagList) {
-            if (!newTagIdList.contains(oldCardTag.getTag()
-                                                 .getId())) {
-                cardTagRepository.deleteById(oldCardTag.getId());
+            Long tagId = oldCardTag.getTag()
+                                   .getId();
+            // 기존 태그가 선택되지 않음 -> 삭제
+            if (!newTagIdList.contains(tagId)) {
+                delCardTagList.add(oldCardTag);
+            } else {    // 새로운 태그가 선택됨 -> CardTag 추가
+                newTagIdList.remove(tagId);
             }
         }
+        cardTagRepository.deleteAll(delCardTagList);
+        
+        List<Tag> newTagList = tagRepository.findAllById(newTagIdList);
+        addCardTag(savedCard, newTagList);
     }
     
     private void addCardTag(Card card, List<Tag> tagList) {
