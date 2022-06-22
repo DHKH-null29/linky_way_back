@@ -1,10 +1,12 @@
 package com.wnis.linkyway.controller;
 
 import com.wnis.linkyway.dto.Response;
+import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.TrashService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +27,12 @@ public class TrashController {
         List<Long> response = trashService.updateDeleteCardTrueOrFalse(ids, memberId, isDeleted);
         String message = isDeleted ? "삭제 성공" : "복원 성공";
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, message));
+    }
+    
+    @GetMapping
+    @ApiOperation(value = "삭제된 카드 조회", notes = "isDeleted가 true인 카드들을 조회한다")
+    ResponseEntity<Response<List<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId, Pageable pageable) {
+        List<CardResponse> response = trashService.findAllDeletedCard(memberId, pageable);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "삭제된 카드 조회 성공"));
     }
 }
