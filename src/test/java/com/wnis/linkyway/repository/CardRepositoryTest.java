@@ -97,16 +97,14 @@ public class CardRepositoryTest {
         // when
         cardRepository.findById(savedCard.getId())
                       // then
-                      .ifPresent(selectCard -> { // 카드 존재 시 출력
-                          System.out.println("card:" + selectCard.getId() + selectCard.getTitle());
+                      .ifPresent(selectCard -> {
+                          assertThat(selectCard.getLink()).isEqualTo(savedCard.getLink());
+                          assertThat(selectCard.getTitle()).isEqualTo(savedCard.getTitle());
+                          assertThat(selectCard.getContent()).isEqualTo(savedCard.getContent());
+                          assertThat(selectCard.getIsPublic()).isEqualTo(savedCard.getIsPublic());
+                          assertThat(selectCard.getFolder()).isEqualTo(savedCard.getFolder());
+//                          assertThat(selectCard.getIsDeleted()).isEqualTo(false);
                       });
-
-        assertThat(savedCard.getLink()).isEqualTo("https://github.com/DHKH-null29/linky_way_back/issues/12");
-        assertThat(savedCard.getTitle()).isEqualTo("카드 조회");
-        assertThat(savedCard.getContent()).isEqualTo("카드 조회 issue");
-        assertThat(savedCard.getIsPublic()).isEqualTo(true);
-        assertThat(savedCard.getFolder()).isEqualTo(folder);
-        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
     }
 
     
