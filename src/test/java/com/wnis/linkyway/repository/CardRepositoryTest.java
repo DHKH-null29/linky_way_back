@@ -16,10 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -254,5 +251,16 @@ public class CardRepositoryTest {
         Card c = cardRepository.findById(ids.get(0)).orElse(null);
         logger.info("{}",c.getModifiedBy());
         assertThat(c.getIsDeleted()).isEqualTo(true);
+    }
+    
+    @Test
+    void test() {
+        final Long INVALID_MEMBER_ID = 100L;
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L, INVALID_MEMBER_ID));
+        List<Card> result = cardRepository.findAllInIdsAndMemberId(ids, 1L);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0)).extracting("id").isEqualTo(1L);
+        assertThat(result.get(1)).extracting("id").isEqualTo(2L);
+        assertThat(result.get(2)).extracting("id").isEqualTo(3L);
     }
 }
