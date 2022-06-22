@@ -3,6 +3,7 @@ package com.wnis.linkyway.service.tag;
 import com.wnis.linkyway.dto.tag.TagRequest;
 import com.wnis.linkyway.entity.Tag;
 import com.wnis.linkyway.exception.common.*;
+
 import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
 import org.assertj.core.api.Assertions;
@@ -24,6 +25,7 @@ public class TagServiceBusinessExceptionTest {
 
     @Mock
     TagRepository tagRepository;
+    
 
     @Mock
     MemberRepository memberRepository;
@@ -34,20 +36,6 @@ public class TagServiceBusinessExceptionTest {
     @Nested
     @DisplayName("태그 추가")
     class AddTagTest {
-
-        @Test
-        @DisplayName("중복 입력시 예외")
-        void shouldThrowDuplicateExceptionWhenTagNameDuplicated() {
-            doReturn(true).when(memberRepository)
-                          .existsById(any()); // 회원 검증 통과
-            doReturn(true).when(tagRepository)
-                          .existsByMemberIdAndTagName(any(), any()); // 중복 입력 예외
-
-            Assertions.assertThatThrownBy(() -> tagService.addTag(TagRequest.builder()
-                                                                            .build(),
-                                                                  1L))
-                      .isInstanceOf(NotAddDuplicateEntityException.class);
-        }
 
         @Test
         @DisplayName("엉뚱한 회원 입력시 예외")
@@ -61,6 +49,20 @@ public class TagServiceBusinessExceptionTest {
                                   1L);
             })
                       .isInstanceOf(NotFoundEntityException.class);
+        }
+    
+        @Test
+        @DisplayName("중복 입력시 예외")
+        void shouldThrowDuplicateExceptionWhenTagNameDuplicated() {
+            doReturn(true).when(memberRepository)
+                          .existsById(any()); // 회원 검증 통과
+            doReturn(true).when(tagRepository)
+                          .existsByMemberIdAndTagName(any(), any()); // 중복 입력 예외
+        
+            Assertions.assertThatThrownBy(() -> tagService.addTag(TagRequest.builder()
+                                                                            .build(),
+                                                                  1L))
+                      .isInstanceOf(NotAddDuplicateEntityException.class);
         }
     }
 
