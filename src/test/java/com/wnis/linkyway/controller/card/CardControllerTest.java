@@ -62,7 +62,6 @@ public class CardControllerTest {
                                  .build();
     }
 
-    @DisplayName("카드(북마크) 추가 성공")
     private CardRequest makeCardRequest() {
         Set<Long> tagIdSet = new HashSet<>(Arrays.asList(1L, 2L));
         return CardRequest.builder()
@@ -76,43 +75,17 @@ public class CardControllerTest {
     }
 
     private Long cardId = 100L;
-
-    private CardResponse makeCardResponse() {
-        TagResponse tagResponse1 = TagResponse.builder()
-                                              .tagName("t1")
-                                              .isPublic(true)
-                                              .build();
-        TagResponse tagResponse2 = TagResponse.builder()
-                                              .tagName("t2")
-                                              .isPublic(false)
-                                              .build();
-        return CardResponse.builder()
-                           .cardId(cardId)
-                           .link("https://www.naver.com/")
-                           .title("title1")
-                           .content("content1")
-                           .isPublic(true)
-                           .tags(Arrays.asList(tagResponse1, tagResponse2))
-                           .build();
-    }
-
+    
     @Test
+    @DisplayName("카드(북마크) 추가 성공")
     void addCardSuccess() throws Exception {
         // given
-        CardRequest addCardRequest = CardRequest.builder()
-                                                .link("https://www.naver.com/")
-                                                .title("title1")
-                                                .content("content1")
-                                                .isPublic(true)
-                                                .folderId(1L)
-                                                .build();
+        CardRequest addCardRequest = makeCardRequest();
         AddCardResponse addCardResponse = AddCardResponse.builder()
-                                                         .cardId(3L)
+                                                         .cardId(1L)
                                                          .build();
-
-//        doReturn(addCardResponse).when(cardService)
-//                                 .addCard(Mockito.any(CardRequest.class));
-
+        doReturn(addCardResponse).when(cardService)
+                                 .addCard(any(), any(CardRequest.class));
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/cards").contentType("application/json")
                                                                         .content(objectMapper.writeValueAsString(addCardRequest)));
