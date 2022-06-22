@@ -1,6 +1,8 @@
 package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.entity.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,22 +27,87 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql("/sqltest/card-test.sql")
 public class CardRepositoryTest {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(CardRepositoryTest.class);
+
     @Autowired
     CardTagRepository cardTagRepository;
+    
     @Autowired
     EntityManager em;
+    
     @Autowired
     TagRepository tagRepository;
+    
     @Autowired
     MemberRepository memberRepository;
+    
     @Autowired
     FolderRepository folderRepository;
+    
     @Autowired
     private CardRepository cardRepository;
 
-    
+    private Folder folder;
+    private Folder folder2;
+
+    @BeforeEach
+    void setUp() {
+        Member member = Member.builder()
+                              .email("maee@naver.com")
+                              .nickname("sssee")
+                              .password("a!aA212341")
+                              .build();
+
+        folder = Folder.builder()
+                       .member(member)
+                       .depth(1L)
+                       .name("f")
+                       .build();
+
+        folder2 = Folder.builder()
+                        .member(member)
+                        .depth(2L)
+                        .name("f2")
+                        .parent(folder)
+                        .build();
+
+        memberRepository.save(member);
+        folderRepository.save(folder);
+        folderRepository.save(folder2);
+    }
+
+    private Card makeCard() {
+        return Card.builder()
+                   .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
+                   .title("카드 조회")
+                   .content("카드 조회 issue")
+                   .isPublic(true)
+                   .folder(folder)
+                   .build();
+    }
+
+    @Test
+    @DisplayName("지정된 카드 조회 성공")
+    public void findCardByIdSuccess() {
+        // given
+        final Card card = makeCard();
+        final Card savedCard = cardRepository.save(card);
+
+        // when
+        cardRepository.findById(savedCard.getId())
+                      // then
+                      .ifPresent(selectCard -> { // 카드 존재 시 출력
+                          System.out.println("card:" + selectCard.getId() + selectCard.getTitle());
+                      });
+
+        assertThat(savedCard.getLink()).isEqualTo("https://github.com/DHKH-null29/linky_way_back/issues/12");
+        assertThat(savedCard.getTitle()).isEqualTo("카드 조회");
+        assertThat(savedCard.getContent()).isEqualTo("카드 조회 issue");
+        assertThat(savedCard.getIsPublic()).isEqualTo(true);
+        assertThat(savedCard.getFolder()).isEqualTo(folder);
+        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
+    }
 
     
 //    @Test

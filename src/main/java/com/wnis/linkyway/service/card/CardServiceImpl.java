@@ -14,6 +14,7 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.dto.card.CopyCardsRequest;
 import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.card.SocialCardResponse;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
@@ -75,7 +76,8 @@ public class CardServiceImpl implements CardService {
                            .link(card.getLink())
                            .title(card.getTitle())
                            .content(card.getContent())
-                           .folderId(card.getFolder().getId())
+                           .folderId(card.getFolder()
+                                         .getId())
                            .isPublic(card.getIsPublic())
                            .tags(tagResponseList)
                            .build();
@@ -176,15 +178,17 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findShareableCardsByTagId(Long tagId) {
+    public List<SocialCardResponse> findIsPublicCardsByTagId(Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
         if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        List<Card> cardList = cardRepository.findShareableCardsByTagId(tagId);
-        return toResponseList(cardList);
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId);
+        return toResponseList(cardList).stream()
+                                       .map((cardResponse) -> new SocialCardResponse(cardResponse))
+                                       .collect(Collectors.toList());
     }
 
     @Override
@@ -214,21 +218,22 @@ public class CardServiceImpl implements CardService {
         List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
         for (Card card : cardList) {
             List<Tag> tagList = card.getCardTags()
-                                .stream()
-                                .map(CardTag::getTag)
-                                .collect(Collectors.toList());
-            
+                                    .stream()
+                                    .map(CardTag::getTag)
+                                    .collect(Collectors.toList());
+
             List<TagResponse> tagResponseList = tagList.stream()
-                                         .map((tag) -> new TagResponse(tag))
-                                         .collect(Collectors.toList());
-            
+                                                       .map((tag) -> new TagResponse(tag))
+                                                       .collect(Collectors.toList());
+
             cardResponseList.add(CardResponse.builder()
                                              .cardId(card.getId())
                                              .title(card.getTitle())
                                              .content(card.getContent())
                                              .link(card.getLink())
                                              .tags(tagResponseList)
-                                             .folderId(card.getFolder().getId())
+                                             .folderId(card.getFolder()
+                                                           .getId())
                                              .isPublic(card.getIsPublic())
                                              .build());
         }
