@@ -55,6 +55,15 @@ dependencies {
     // my sql
     runtimeOnly 'mysql:mysql-connector-java'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.7'
+    implementation('it.ozimov:embedded-redis:0.7.3') { exclude group: "org.slf4j", module: "slf4j-simple" }
+
+    // test with time-sleep
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.1'
+
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     // batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     testImplementation 'org.springframework.batch:spring-batch-test'

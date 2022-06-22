@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.MemberResponse;
 import com.wnis.linkyway.dto.member.PasswordRequest;
-import com.wnis.linkyway.exception.common.InvalidValueException;
-import com.wnis.linkyway.exception.common.ResourceConflictException;
-import com.wnis.linkyway.exception.common.ResourceNotFoundException;
+import com.wnis.linkyway.dto.member.UpdateMemberRequest;
+import com.wnis.linkyway.exception.common.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -126,6 +125,53 @@ class MemberServiceTest {
             }).isInstanceOf(ResourceNotFoundException.class)
               .hasMessage("회원을 찾을 수 없습니다");
 
+        }
+    }
+    
+    @Nested
+    @DisplayName("마이페이지 수정")
+    class UpdateMemberTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void shouldReturnIdAndUpdatedNicknameWhenResponseTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("쿠로사키 2치고").build();
+            // when
+            MemberResponse memberResponse = memberService.updateMyPage(updateMemberRequest, 1L);
+            
+            // then
+            assertThat(memberResponse.getMemberId()).isNotNull();
+            assertThat(memberResponse.getNickname()).isNotNull();
+        }
+        
+        @Test
+        @DisplayName("닉네임 중복 여부")
+        void shouldThrowDuplicateException_WhenInputDuplicateNicknameTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("Zeratu6")
+                    .build();
+            
+            
+            assertThatThrownBy(()-> {
+                // when
+                memberService.updateMyPage(updateMemberRequest, 1L);
+            }).isInstanceOf(NotAddDuplicateEntityException.class); // then
+        }
+        
+        @Test
+        @DisplayName("회원입력이 옳바르지 않은 경우")
+        void shouldThrowNotFoundException_WhenInputInvalidMemberIdTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                         .nickname("손흥민").build();
+    
+            assertThatThrownBy(()-> {
+                // when
+                memberService.updateMyPage(updateMemberRequest, 100L);
+            }).isInstanceOf(NotFoundEntityException.class); // then
         }
     }
 

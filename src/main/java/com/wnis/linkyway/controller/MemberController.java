@@ -1,5 +1,6 @@
 package com.wnis.linkyway.controller;
 
+import com.wnis.linkyway.aop.WithEmailVerification;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.member.*;
 import com.wnis.linkyway.security.annotation.Authenticated;
@@ -22,6 +23,7 @@ public class MemberController {
     
     @PostMapping
     @ApiOperation(value = "회원가입", notes = "회원정보를 입력해 회원가입(같은 IP로 N회 이상 요청 불가능하다)")
+    @WithEmailVerification
     public ResponseEntity<Response> join(
             @Validated(ValidationSequence.class) @RequestBody JoinRequest joinRequest) {
         MemberResponse response = memberService.join(joinRequest);
@@ -54,16 +56,18 @@ public class MemberController {
     @Authenticated
     public ResponseEntity<Response> searchMyPage(@CurrentMember Long memberId) {
         MemberResponse response = memberService.searchMyPage(memberId);
-        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회 성공"));
     }
     
-//    @PutMapping("/page/me")
-//    @ApiOperation(value = "회원 정보 수정", notes = "가지고 있는 토큰과 요청 정보를 활용해 회원 정보와 수정한다")
-//    @Authenticated
-//    public ResponseEntity<Response> updateMyPage(@CurrentMember Long memberId) {
-//        MemberResponse response = memberService.searchMyPage(memberId);
-//        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 조회"));
-//    }
+
+    @PutMapping("/page/me")
+    @Authenticated
+    public ResponseEntity<Response> updateMyPage(
+            @Validated(ValidationSequence.class) @RequestBody UpdateMemberRequest updateMemberRequest,
+            @CurrentMember Long memberId) {
+        MemberResponse response = memberService.updateMyPage(updateMemberRequest, memberId);
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "마이 페이지 수정 성공"));
+    }
     
     @PutMapping("/password")
     @ApiOperation(value = "회원 비밀번호 수정", notes = "회원 비밀번호를 수정한다")

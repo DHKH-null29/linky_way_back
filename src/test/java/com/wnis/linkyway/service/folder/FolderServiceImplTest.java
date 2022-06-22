@@ -1,12 +1,10 @@
 package com.wnis.linkyway.service.folder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.folder.AddFolderRequest;
 import com.wnis.linkyway.dto.folder.FolderResponse;
-import com.wnis.linkyway.dto.folder.SetFolderNameRequest;
-import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderNameRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.exception.common.LimitDepthException;
@@ -45,8 +43,7 @@ class FolderServiceImplTest {
     FolderRepository folderRepository;
     @Autowired
     MemberRepository memberRepository;
-    @Autowired
-    ObjectMapper objectMapper;
+    
 
     @BeforeEach
     void setup() {
@@ -101,11 +98,14 @@ class FolderServiceImplTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            Response<List<FolderResponse>> response = folderService.findAllFolderSuper(1L);
-            String s = objectMapper.writeValueAsString(response.getData());
-            logger.info(s);
-            assertThat(response.getCode()).isEqualTo(200);
+        void responseTest() {
+            List<FolderResponse> response = folderService.findAllFolderSuper(1L);
+            response.forEach(folderResponse -> {
+                assertThat(folderResponse.getFolderId()).isNotNull();
+                assertThat(folderResponse.getName()).isNotNull();
+                assertThat(folderResponse.getLevel()).isNotNull();
+                assertThat(folderResponse.getChildFolderList()).isNotNull();
+            });
         }
 
         @Test
@@ -123,10 +123,13 @@ class FolderServiceImplTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            Response<FolderResponse> folder = folderService.findFolder(1L);
-            String s = objectMapper.writeValueAsString(folder);
-            logger.info(s);
+        void responseTest() {
+            FolderResponse folderResponse = folderService.findFolder(1L);
+            assertThat(folderResponse.getFolderId()).isNotNull();
+            assertThat(folderResponse.getName()).isNotNull();
+            assertThat(folderResponse.getLevel()).isNotNull();
+            assertThat(folderResponse.getChildFolderList()).isNotNull();
+            
         }
 
         @Test
@@ -145,19 +148,25 @@ class FolderServiceImplTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
+        void responseTest() {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
                                                                 .parentFolderId(2L)
                                                                 .name("뻐꾸기")
                                                                 .build();
 
-            Response<FolderResponse> folderResponseResponse = folderService.addFolder(addFolderRequest, 1L);
-            String s = objectMapper.writeValueAsString(folderResponseResponse);
-            logger.info(s);
+            FolderResponse folderResponse = folderService.addFolder(addFolderRequest, 1L);
+            logger.info(folderResponse.getName());
+            logger.info("folder level: {}",folderResponse.getLevel());
+            logger.info("folder id: {}", folderResponse.getFolderId());
+            assertThat(folderResponse.getFolderId()).isNotNull();
+            assertThat(folderResponse.getName()).isNotNull();
+            assertThat(folderResponse.getLevel()).isNotNull();
+            assertThat(folderResponse.getChildFolderList()).isNotNull();
+            
         }
 
         @Test
-        @DisplayName("예외 테스트: 존재하지 않느 폴더를 입력한 경우")
+        @DisplayName("예외 테스트: 존재하지 않는 폴더를 입력한 경우")
         void exceptionTest1() {
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
                                                                 .parentFolderId(100L)
@@ -208,29 +217,32 @@ class FolderServiceImplTest {
 
     @Nested
     @DisplayName("폴더 경로 수정")
-    class SetFolderTest {
+    class UpdateFolderTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
-                                                                            .targetFolderId(2L)
-                                                                            .build();
+        void responseTest() {
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
+                                                                                     .targetFolderId(2L)
+                                                                                     .build();
 
-            Response<FolderResponse> folderResponseResponse = folderService.setFolderPath(setFolderPathRequest, 4L);
-
-            String s = objectMapper.writeValueAsString(folderResponseResponse);
-            logger.info(s);
+            FolderResponse folderResponse = folderService.updateFolderPath(updateFolderPathRequest, 4L);
+    
+            assertThat(folderResponse.getFolderId()).isNotNull();
+            assertThat(folderResponse.getName()).isNotNull();
+            assertThat(folderResponse.getLevel()).isNotNull();
+            assertThat(folderResponse.getChildFolderList()).isNotNull();
+            
         }
 
         @Test
         @DisplayName("예외 테스트1")
         void exceptionTest1() {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(200L)
                                                                             .build();
 
-            assertThatThrownBy(() -> folderService.setFolderPath(setFolderPathRequest,
+            assertThatThrownBy(() -> folderService.updateFolderPath(updateFolderPathRequest,
                                                                  4L)).isInstanceOf(ResourceConflictException.class)
                                                                      .hasMessage("목표 부모 폴더가 존재하지 않아 수정 작업을 진행할 수 없습니다");
 
@@ -239,11 +251,11 @@ class FolderServiceImplTest {
         @Test
         @DisplayName("예외 테스트2")
         void exceptionTest2() {
-            SetFolderPathRequest setFolderPathRequest = SetFolderPathRequest.builder()
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
                                                                             .targetFolderId(4L)
                                                                             .build();
 
-            assertThatThrownBy(() -> folderService.setFolderPath(setFolderPathRequest,
+            assertThatThrownBy(() -> folderService.updateFolderPath(updateFolderPathRequest,
                                                                  2L)).isInstanceOf(ResourceConflictException.class)
                                                                      .hasMessage("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다");
         }
@@ -251,27 +263,29 @@ class FolderServiceImplTest {
 
     @Nested
     @DisplayName("폴더 이름 수정")
-    class SetFolderNameTest {
+    class UpdateFolderNameTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                            .name("스프링")
-                                                                            .build();
+        void responseTest() {
+            UpdateFolderNameRequest updateFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                                  .name("스프링")
+                                                                                  .build();
 
-            Response<FolderResponse> folderResponseResponse = folderService.setFolderName(setFolderNameRequest, 1L);
-            String s = objectMapper.writeValueAsString(folderResponseResponse);
-            logger.info(s);
+            FolderResponse folderResponse = folderService.updateFolderName(updateFolderNameRequest, 1L);
+            
+            assertThat(folderResponse.getName()).isNotNull();
+            assertThat(folderResponse.getFolderId()).isNotNull();
+            
         }
 
         @Test
         @DisplayName("예외 테스트")
         void exceptionTest() {
-            SetFolderNameRequest setFolderNameRequest = SetFolderNameRequest.builder()
-                                                                            .name("스프링")
-                                                                            .build();
-            assertThatThrownBy(() -> folderService.setFolderName(setFolderNameRequest,
+            UpdateFolderNameRequest updateFolderNameRequest = UpdateFolderNameRequest.builder()
+                                                                                  .name("스프링")
+                                                                                  .build();
+            assertThatThrownBy(() -> folderService.updateFolderName(updateFolderNameRequest,
                                                                  100L)).isInstanceOf(ResourceConflictException.class)
                                                                        .hasMessage("해당 폴더가 존재하지 않아 수정을 할 수 없습니다");
         }
@@ -283,10 +297,11 @@ class FolderServiceImplTest {
 
         @Test
         @DisplayName("응답 테스트")
-        void responseTest() throws JsonProcessingException {
-            Response<FolderResponse> folderResponseResponse = folderService.deleteFolder(1L);
-            String s = objectMapper.writeValueAsString(folderResponseResponse);
-            logger.info(s);
+        void responseTest() {
+            FolderResponse folderResponse = folderService.deleteFolder(1L);
+            
+            assertThat(folderResponse.getFolderId()).isNotNull();
+            assertThat(folderResponse.getName()).isNotNull();
         }
 
         @Test

@@ -14,6 +14,7 @@ import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.card.SocialCardResponse;
 import com.wnis.linkyway.security.annotation.Authenticated;
 import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
@@ -116,9 +117,9 @@ public class CardController {
     @GetMapping("/package/{tagId}")
     @ApiOperation(value = "태그아이디를 통해 패키지 조회", notes = "태그 아이디를 활용해 여러 태그 아이디 조회")
     @Authenticated
-    public ResponseEntity<Response> findShareableCardsByTagId(@PathVariable Long tagId) {
+    public ResponseEntity<Response> findIsPublicCardsByTagId(@PathVariable Long tagId) {
 
-        List<CardResponse> cardResponses = cardService.findShareableCardsByTagId(tagId);
+        List<SocialCardResponse> cardResponses = cardService.findIsPublicCardsByTagId(tagId);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())

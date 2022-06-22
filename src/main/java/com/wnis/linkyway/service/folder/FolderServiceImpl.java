@@ -1,10 +1,9 @@
 package com.wnis.linkyway.service.folder;
 
-import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.folder.AddFolderRequest;
 import com.wnis.linkyway.dto.folder.FolderResponse;
-import com.wnis.linkyway.dto.folder.SetFolderNameRequest;
-import com.wnis.linkyway.dto.folder.SetFolderPathRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderNameRequest;
+import com.wnis.linkyway.dto.folder.UpdateFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.exception.common.*;
@@ -12,7 +11,6 @@ import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +29,7 @@ public class FolderServiceImpl implements FolderService {
     private Long limitDepth;
 
     @Override
-    public Response<List<FolderResponse>> findAllFolderSuper(Long memberId) {
+    public List<FolderResponse> findAllFolderSuper(Long memberId) {
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundEntityException("존재하지 않는 회원입니다");
         }
@@ -42,24 +40,23 @@ public class FolderServiceImpl implements FolderService {
             response.add(folderResponse);
 
         }
-        return Response.of(HttpStatus.OK, response, "폴더 조회 성공");
+        return response;
     }
 
     @Override
-    public Response<FolderResponse> findFolder(Long folderId) {
+    public FolderResponse findFolder(Long folderId) {
         Folder folder = folderRepository.findFolderById(folderId)
                                         .orElseThrow(() -> new NotFoundEntityException(
-                                                "해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다."));
-        FolderResponse folderResponse = new FolderResponse(folder);
-        return Response.of(HttpStatus.OK, folderResponse, "폴더를 성공적으로 조회했습니다.");
+                                                "해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다"));
+        return new FolderResponse(folder);
     }
 
     @Override
-    public Response<FolderResponse> addFolder(AddFolderRequest addFolderRequest, Long memberId) {
+    public FolderResponse addFolder(AddFolderRequest addFolderRequest, Long memberId) {
         Member member = memberRepository.findById(memberId)
                                         .orElseThrow(() -> new NotFoundEntityException("회원이 존재하지 않습니다"));
 
-        Long currentDepth = 1L;
+        long currentDepth = 1L;
         Long parentId = null;
         Folder parent = null;
 
@@ -89,16 +86,16 @@ public class FolderServiceImpl implements FolderService {
                               .build();
 
         folderRepository.save(folder);
-        FolderResponse response = FolderResponse.builder()
-                                                .parentId(parentId)
-                                                .folderId(folder.getId())
-                                                .level(folder.getDepth())
-                                                .build();
-        return Response.of(HttpStatus.OK, response, "폴더 생성 성공");
+        return FolderResponse.builder()
+                             .parentId(parentId)
+                             .folderId(folder.getId())
+                             .level(folder.getDepth())
+                             .name(folder.getName())
+                             .build();
     }
 
     @Override
-    public Response<FolderResponse> setFolderPath(SetFolderPathRequest setFolderPathRequest, Long folderId) {
+    public FolderResponse updateFolderPath(UpdateFolderPathRequest setFolderPathRequest, Long folderId) {
         Folder folder = folderRepository.findFolderById(folderId)
                                         .orElseThrow(() -> new NotModifyEmptyEntityException("수정 하려는 폴더가 존재하지 않습니다"));
 
@@ -115,28 +112,44 @@ public class FolderServiceImpl implements FolderService {
         }
 
         folder.modifyParent(destinationFolder);
-        return Response.of(HttpStatus.OK, null, "폴더 경로가 성공적으로 수정되었습니다");
 
+        Folder parent = folder.getParent();
+        Long parentId = parent == null ? null : parent.getId();
+    
+        return FolderResponse.builder()
+                             .parentId(parentId)
+                             .folderId(folder.getId())
+                             .name(folder.getName())
+                             .level(folder.getDepth())
+                             .build();
     }
 
     @Override
-    public Response<FolderResponse> setFolderName(SetFolderNameRequest setFolderNameRequest, Long folderId) {
+    public FolderResponse updateFolderName(UpdateFolderNameRequest updateFolderNameRequest, Long folderId) {
         Folder folder = folderRepository.findById(folderId)
                                         .orElseThrow(() -> new NotModifyEmptyEntityException(
                                                 "해당 폴더가 존재하지 않아 수정을 할 수 없습니다"));
 
-        folder.updateName(setFolderNameRequest.getName());
-        return Response.of(HttpStatus.OK, null, "폴더 이름이 성공적으로 수정되었습니다");
+        folder.updateName(updateFolderNameRequest.getName());
+    
+        return FolderResponse.builder()
+                             .folderId(folderId)
+                             .name(folder.getName())
+                             .build();
     }
 
     @Override
-    public Response<FolderResponse> deleteFolder(Long folderId) {
+    public FolderResponse deleteFolder(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
                                         .orElseThrow(() -> new NotDeleteEmptyEntityException(
                                                 "해당 폴더가 존재하지 않아 삭제 할 수 없습니다"));
 
         folderRepository.deleteById(folderId);
-        return Response.of(HttpStatus.OK, null, "폴더와 하위 폴더가 성공적으로 삭제되었습니다");
+    
+        return FolderResponse.builder()
+                             .folderId(folder.getId())
+                             .name(folder.getName())
+                             .build();
     }
 
 }
