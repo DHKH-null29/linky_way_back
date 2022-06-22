@@ -127,17 +127,35 @@ public class CardRepositoryTest {
                       });
     }
 
-//    @Test
-//    @DisplayName("카드(북마크) 수정 성공")
-//    public void updateCardSuccess() {
-//        // given
-//        final Card card = Card.builder()
-//                              .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
-//        assertThat(result.get()
-//                         .getFolder()).isNull();
-//    }
-    
-    
+    @Test
+    @DisplayName("카드 수정 성공")
+    public void updateCardSuccess() {
+        // given
+        final Card card = makeCard();
+        final Card savedCard = cardRepository.save(card);
+
+        // when
+        cardRepository.findById(savedCard.getId())
+                      .ifPresent(selectCard -> {
+                          selectCard.updateLink("https://github.com/DHKH-null29/linky_way_back/issues/121");
+                          selectCard.updateTitle("카드 조회2");
+                          selectCard.updateContent("카드 조회 issue2");
+                          selectCard.updateIsPublic(false);
+                          selectCard.updateFolder(folder2);
+                      });
+        // then
+        cardRepository.findById(savedCard.getId())
+                      .ifPresent(result -> {
+                          assertThat(result.getId()).isEqualTo(savedCard.getId());
+                          assertThat(result.getLink()).isEqualTo("https://github.com/DHKH-null29/linky_way_back/issues/121");
+                          assertThat(result.getTitle()).isEqualTo("카드 조회2");
+                          assertThat(result.getContent()).isEqualTo("카드 조회 issue2");
+                          assertThat(result.getIsPublic()).isEqualTo(false);
+                          assertThat(result.getFolder()).isEqualTo(folder2);
+                          assertThat(result.getIsDeleted()).isEqualTo(false);
+                      });
+    }
+
     @ParameterizedTest
     @CsvSource(value = {
             "1,spring",
