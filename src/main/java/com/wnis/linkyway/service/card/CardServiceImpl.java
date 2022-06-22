@@ -46,9 +46,16 @@ public class CardServiceImpl implements CardService {
         Folder folder = folderRepository.findByIdAndMemberId(memberId, cardRequest.getFolderId())
                                         .orElseThrow(() -> new NotFoundEntityException(
                                                 "해당 폴더가 존재하지 않습니다. 폴더를 먼저 생성해주세요."));
-        Card savedCard = cardRepository.save(cardRequest.toEntity(folder));
 
-        addCardTagByCard(memberId, savedCard, cardRequest.getTagIdSet());
+        Set<Long> tagIdList = cardRequest.getTagIdSet();
+        List<Tag> tagList = tagRepository.findAllById(tagIdList);
+        if (tagIdList.size() != tagList.size()) {
+            throw new NotFoundEntityException("존재하지 않는 태그는 사용할 수 없습니다. 태그를 먼저 추가해주세요.");
+        }
+
+        Card savedCard = cardRepository.save(cardRequest.toEntity(folder));
+        
+        addCardTag(savedCard, tagList);
 
         return AddCardResponse.builder()
                               .cardId(savedCard.getId())
@@ -136,6 +143,18 @@ public class CardServiceImpl implements CardService {
                 cardTagRepository.deleteById(oldCardTag.getId());
             }
         }
+    }
+    
+    private void addCardTag(Card card, List<Tag> tagList) {
+        List<CardTag> CardTagList = new ArrayList<>();
+        for (Tag tag : tagList) {
+            CardTag cardTag = CardTag.builder()
+                                     .card(card)
+                                     .tag(tag)
+                                     .build();
+            CardTagList.add(cardTag);
+        }
+        cardTagRepository.saveAll(CardTagList);
     }
 
     @Override
