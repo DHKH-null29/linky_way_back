@@ -39,6 +39,8 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
@@ -316,5 +318,37 @@ public class CardControllerTest {
                                                                               .containsPropertiesAsJson(Response.class)) // method
                                                .andReturn();
         }
+    }
+
+    @Test
+    @DisplayName("패키지 목록(태그 내부 카드 목록) 복사 성공") // not done
+    void copyCardsInPackageSuccess() throws Exception {
+        // given
+        List<CopyCardsRequest> copyCardsRequests = new ArrayList<CopyCardsRequest>(
+                Arrays.asList(CopyCardsRequest.builder()
+                                              .build(),
+                              CopyCardsRequest.builder()
+                                              .build()));
+        CopyPackageCardsRequest copyPackageCardsRequest = CopyPackageCardsRequest.builder()
+                                                                                 .tagId(1L)
+                                                                                 .folderId(10L)
+                                                                                 .isPublic(false)
+                                                                                 .copyCardsRequestList(copyCardsRequests)
+                                                                                 .build();
+        int copyCardsSize = copyPackageCardsRequest.getCopyCardsRequestList()
+                                                   .size();
+        doReturn(copyCardsSize)
+                 .when(cardService)
+                 .copyCardsInPackage(any(CopyPackageCardsRequest.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/api/cards/package/copy").contentType("application/json")
+                                                                            .content(objectMapper.writeValueAsString(copyPackageCardsRequest)));
+        // then
+        MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                           .andExpect(ResponseBodyMatchers.responseBody() // create
+                                                                          // ResponseBodyMatcher
+                                                                          .containsPropertiesAsJson(Response.class)) // method
+                                           .andReturn();
     }
 }

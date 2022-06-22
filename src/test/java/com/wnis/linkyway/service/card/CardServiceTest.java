@@ -2,6 +2,8 @@ package com.wnis.linkyway.service.card;
 
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
@@ -70,7 +72,7 @@ public class CardServiceTest {
 
     Tag tag1 = new Tag(101L, "t1", true, member);
     Tag tag2 = new Tag(102L, "t2", false, member);
-    
+
     private Card makeCard() {
         return new Card(cardId, link, title, content, isPublic, folder1.get());
     }
@@ -82,7 +84,8 @@ public class CardServiceTest {
                           .title(title)
                           .content(content)
                           .isPublic(isPublic)
-                          .folderId(folder1.get().getId())
+                          .folderId(folder1.get()
+                                           .getId())
                           .tagIdSet(tagSet)
                           .build();
     }
@@ -212,9 +215,9 @@ public class CardServiceTest {
             newTagList = Arrays.asList(tag3);
             Card savedCard = new Card(1L, "https://www.naver.com/", "네이버", "검색 서비스", false, folder2.get());
             CardTag cardTag = CardTag.builder()
-                                      .card(savedCard)
-                                      .tag(tag3)
-                                      .build();
+                                     .card(savedCard)
+                                     .tag(tag3)
+                                     .build();
             savedCardTagList = Arrays.asList(cardTag);
         }
 
@@ -223,11 +226,11 @@ public class CardServiceTest {
         void updateCardSuccess() throws Exception {
             // given
             doReturn(oldCard).when(cardRepository)
-                          .findById(anyLong());
+                             .findById(anyLong());
             doReturn(folder2).when(folderRepository)
                              .findByIdAndMemberId(anyLong(), anyLong());
             doReturn(newTagList).when(tagRepository)
-                          .findAllById(anySet());
+                                .findAllById(anySet());
             doReturn(savedCardTagList).when(cardTagRepository)
                                       .saveAll(anyList());
 
@@ -239,6 +242,70 @@ public class CardServiceTest {
             verify(folderRepository).findByIdAndMemberId(anyLong(), anyLong());
             verify(cardTagRepository).deleteAll(anyList());
             verify(tagRepository).findAllById(anySet());
+            verify(cardTagRepository).saveAll(anyList());
+        }
+    }
+
+    @Nested
+    @DisplayName("패키지 내부 카드 모두 복사")
+    class copyCardsInPackage {
+
+        CopyPackageCardsRequest copyPackageCardsRequest;
+        List<Card> savedCardList;
+        List<CardTag> savedCardTagList;
+
+        @BeforeEach
+        void setCopyPackageCardsRequest() {
+            List<CopyCardsRequest> copyCardsRequestList = Arrays.asList(CopyCardsRequest.builder()
+                                                                                        .link(link)
+                                                                                        .title(title)
+                                                                                        .content(content)
+                                                                                        .build(),
+                                                                        CopyCardsRequest.builder()
+                                                                                        .link(link + 123)
+                                                                                        .title(title + 123)
+                                                                                        .content(content + 123)
+                                                                                        .build());
+            copyPackageCardsRequest = CopyPackageCardsRequest.builder()
+                                                             .tagId(tag1.getId())
+                                                             .isPublic(isPublic)
+                                                             .copyCardsRequestList(copyCardsRequestList)
+                                                             .build();
+            savedCardList = Arrays.asList(new Card(cardId, link, title, content, isPublic, folder1.get()), new Card(
+                    cardId + 1, link + 123, title + 123, content + 123, isPublic, folder1.get()));
+        
+            savedCardTagList = Arrays.asList(CardTag.builder()
+                                             .card(savedCardList.get(0))
+                                             .tag(tag1)
+                                             .build(),
+                                             CardTag.builder()
+                                             .card(savedCardList.get(1))
+                                             .tag(tag1)
+                                             .build());
+        
+        }
+
+        @Test
+        @DisplayName("패키지의 모든 카드 복사 성공")
+        void copyCardsInPackageSuccess() throws Exception {
+            // given
+            Optional<Tag> tag = Optional.of(tag1);
+            doReturn(folder1).when(folderRepository)
+                             .findById(any());
+            doReturn(tag).when(tagRepository)
+                          .findById(anyLong());
+            doReturn(savedCardList).when(cardRepository)
+                                   .saveAll(anyList());
+            doReturn(savedCardTagList).when(cardTagRepository)
+                                      .saveAll(anyList());
+
+            // when
+            cardService.copyCardsInPackage(copyPackageCardsRequest);
+
+            // verify
+            verify(folderRepository).findById(any());
+            verify(tagRepository).findById(anyLong());
+            verify(cardRepository).saveAll(anyList());
             verify(cardTagRepository).saveAll(anyList());
         }
     }
