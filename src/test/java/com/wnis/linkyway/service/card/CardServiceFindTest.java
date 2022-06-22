@@ -58,49 +58,16 @@ public class CardServiceFindTest {
     @BeforeEach
     void setUp() {
         // given
-        member = Member.builder()
-                       .email("maee@naver.com")
-                       .nickname("sssee")
-                       .password("a!aA212341")
-                       .build();
-        member.setId(1L);
+        member = new Member(1L, "sssee", "a!aA212341", "maee@naver.com");
 
-        folder1 = Folder.builder()
-                        .member(member)
-                        .depth(1L)
-                        .name("f")
-                        .build();
-        folder1.setId(10L);
+        folder1 = new Folder(10L, "f1", 1L, null, member);
 
-        tag1 = Tag.builder()
-                  .name("t1")
-                  .isPublic(true)
-                  .build();
-        tag1.setId(100L);
+        tag1 = new Tag(101L, "t1", true, member);
+        tag2 = new Tag(102L, "t2", false, member);
 
-        tag2 = Tag.builder()
-                  .name("t2")
-                  .isPublic(false)
-                  .build();
-        tag2.setId(101L);
+        Card card1 = new Card(1001L, "https://www.naver.com/", "title1", "content1", true, folder1);
+        Card card2 = new Card(1002L, "https://www.daum.net/", "title2", "content2", true, folder1);
 
-        Card card1 = Card.builder()
-                         .link("https://www.naver.com/")
-                         .title("title1")
-                         .content("content1")
-                         .isPublic(true)
-                         .folder(folder1)
-                         .build();
-        card1.setId(1000L);
-
-        Card card2 = Card.builder()
-                         .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
-                         .title("카드 조회")
-                         .content("카드 조회 issue")
-                         .isPublic(true)
-                         .folder(folder1)
-                         .build();
-        card2.setId(1001L);
         cardList = new ArrayList<Card>(Arrays.asList(card1, card2));
     }
 

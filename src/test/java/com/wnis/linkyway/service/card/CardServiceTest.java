@@ -50,41 +50,34 @@ public class CardServiceTest {
     @Mock
     private CardTagRepository cardTagRepository;
 
-    private final Long cardId = 1L;
+    private final Long cardId = 1001L;
     private final String link = "https://github.com/DHKH-null29/linky_way_back/issues/12";
     private final String title = "카드 조회";
     private final String content = "카드 조회 issue";
     private final boolean isPublic = true;
-    private Optional<Folder> folder;
-    private final Set<Long> tagSet = new HashSet<Long>();
 
-    @BeforeEach
-    void setUp() {
-        Member member = Member.builder()
-                              .email("maee@naver.com")
-                              .nickname("sssee")
-                              .password("a!aA212341")
-                              .build();
+    Member member = new Member(1L, "sssee", "a!aA212341", "maee@naver.com");
 
-        folder = Optional.of(Folder.builder()
-                                   .member(member)
-                                   .depth(1L)
-                                   .name("f")
-                                   .build());
+    Optional<Folder> folder1 = Optional.of(new Folder(11L, "f1", 1L, null, member));
+    Optional<Folder> folder2 = Optional.of(new Folder(12L, "f2", 2L, folder1.get(), member));
 
-        tagSet.add(1L);
+    Tag tag1 = new Tag(101L, "t1", true, member);
+    Tag tag2 = new Tag(102L, "t2", false, member);
+    
+    private Card makeCard() {
+        return new Card(cardId, link, title, content, isPublic, folder1.get());
     }
 
-    private Card makeCard() {
-        Card card = Card.builder()
-                        .link(link)
-                        .title(title)
-                        .content(content)
-                        .isPublic(isPublic)
-                        .folder(folder.get())
-                        .build();
-        card.setId(cardId);
-        return card;
+    private CardRequest makeCardRequest() {
+        Set<Long> tagSet = new HashSet<>(Arrays.asList(tag1.getId(), tag2.getId()));
+        return CardRequest.builder()
+                          .link(link)
+                          .title(title)
+                          .content(content)
+                          .isPublic(isPublic)
+                          .folderId(folder1.get().getId())
+                          .tagIdSet(tagSet)
+                          .build();
     }
 
     @Test
