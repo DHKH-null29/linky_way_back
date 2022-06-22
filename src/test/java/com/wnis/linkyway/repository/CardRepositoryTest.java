@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
@@ -254,7 +255,8 @@ public class CardRepositoryTest {
     }
     
     @Test
-    void test() {
+    @DisplayName("findAllInIdsAndMemberId 테스트")
+    void findAllInIdsAndMemberIdTest() {
         final Long INVALID_MEMBER_ID = 100L;
         List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L, INVALID_MEMBER_ID));
         List<Card> result = cardRepository.findAllInIdsAndMemberId(ids, 1L);
@@ -262,5 +264,26 @@ public class CardRepositoryTest {
         assertThat(result.get(0)).extracting("id").isEqualTo(1L);
         assertThat(result.get(1)).extracting("id").isEqualTo(2L);
         assertThat(result.get(2)).extracting("id").isEqualTo(3L);
+    }
+    
+    @Test
+    @DisplayName("findAllByIsDeletedAndMemberId 테스트")
+    void findAllByIsDeletedAndMemberIdTest() {
+        final Long INVALID_MEMBER_ID = 100L;
+        List<Card> cardList = cardRepository.findAll();
+        cardList.get(0).updateIsDeleted(true);
+        cardList.get(1).updateIsDeleted(true);
+        em.flush();
+        
+        List<Card> result = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(0, 2));
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0)).extracting("id").isEqualTo(1L);
+    
+        List<Card> result2 = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(1, 2));
+        assertThat(result2.size()).isEqualTo(1);
+        assertThat(result2.get(0)).extracting("id").isEqualTo(6L);
+    
+        List<Card> result3 = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(2, 2));
+        assertThat(result3.size()).isEqualTo(0);
     }
 }
