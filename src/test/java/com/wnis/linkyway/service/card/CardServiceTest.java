@@ -191,57 +191,55 @@ public class CardServiceTest {
     @DisplayName("카드(북마크) 수정")
     class updateCard {
 
-//        private Card savedCard;
-//        private CardRequest cardRequest;
-//
-//        @BeforeEach
-//        void setCard() {
-//            Card card = card();
-//            BDDMockito.given(cardRepository.save(Mockito.any(Card.class)))
-//                      .willReturn(card);
-//            savedCard = cardRepository.save(card);
-//
-//            cardRequest = CardRequest.builder()
-//                                     .link(link + 2)
-//                                     .title(title + 2)
-//                                     .content(content + 2)
-//                                     .isPublic(!isPublic)
-//                                     .folderId(1L)
-//                                     .build();
-//        }
-//
-//        @Test
-//        @DisplayName("카드 수정 성공: 카드가 존재함")
-//        void CardExistFindingSuccess() throws Exception {
-//            // 성공 테스트는 Mock으로 하는건 큰 의미가 없어 보이긴 함... 노가다가 많음..
-//            // 임의 mock으로 설정했지만 함수가 실행된다는 것만 검증됨..
-//            doReturn(Optional.of(savedCard)).when(cardRepository)
-//                                            .findById(any());
-//            
-//            doReturn(true).when(folderRepository).existsById(any());
-//            doReturn(Folder.builder().build()).when(folderRepository).getById(any());
-//            doReturn(card()).when(cardRepository).save(any());
-//            doReturn(new HashSet<Tag>()).when(cardTagRepository).findAllTagIdByCardId(any());
-//            doReturn(new ArrayList<Tag>()).when(tagRepository).findAllById(any());
-//            doReturn(new ArrayList<Long>()).when(cardTagRepository).findAllCardTagIdInTagSet(any());
-//            doNothing().when(cardTagRepository).deleteAllCardTagInIds(any());
-//            cardService.updateCard(1L,1L, cardRequest);
-//            // then
-////            Assertions.assertNotNull(updatedCard);
-//        }
-//
-//        @Test
-//        @DisplayName("카드 수정 실패: 카드가 없음")
-//        void CardNotExistFindingFail() throws Exception {
-//            // given
-//            doReturn(Optional.empty()).when(cardRepository)
-//                                      .findById(Mockito.anyLong());
-//
-//            
-//            assertThatThrownBy(() -> {
-//                cardService.updateCard(1L, 1L, cardRequest);
-//            }).isInstanceOf(NotModifyEmptyEntityException.class);
-//            
-//        }
+        private Optional<Card> oldCard;
+        private CardRequest newCardRequest;
+        private List<Tag> newTagList;
+        private List<CardTag> savedCardTagList;
+
+        @BeforeEach
+        void setCard() {
+            oldCard = Optional.of(makeCard());
+            Tag tag3 = new Tag(103L, "t3", false, member);
+            Set<Long> tagSet = new HashSet<>(Arrays.asList(tag3.getId()));
+            newCardRequest = CardRequest.builder()
+                                        .link("https://www.naver.com/")
+                                        .title("네이버")
+                                        .content("검색 서비스")
+                                        .isPublic(false)
+                                        .folderId(12L)
+                                        .tagIdSet(tagSet)
+                                        .build();
+            newTagList = Arrays.asList(tag3);
+            Card savedCard = new Card(1L, "https://www.naver.com/", "네이버", "검색 서비스", false, folder2.get());
+            CardTag cardTag = CardTag.builder()
+                                      .card(savedCard)
+                                      .tag(tag3)
+                                      .build();
+            savedCardTagList = Arrays.asList(cardTag);
+        }
+
+        @Test
+        @DisplayName("카드 수정 성공: 모든 정보가 다름")
+        void updateCardSuccess() throws Exception {
+            // given
+            doReturn(oldCard).when(cardRepository)
+                          .findById(anyLong());
+            doReturn(folder2).when(folderRepository)
+                             .findByIdAndMemberId(anyLong(), anyLong());
+            doReturn(newTagList).when(tagRepository)
+                          .findAllById(anySet());
+            doReturn(savedCardTagList).when(cardTagRepository)
+                                      .saveAll(anyList());
+
+            // when
+            cardService.updateCard(1L, 1L, newCardRequest);
+
+            // verify
+            verify(cardRepository).findById(anyLong());
+            verify(folderRepository).findByIdAndMemberId(anyLong(), anyLong());
+            verify(cardTagRepository).deleteAll(anyList());
+            verify(tagRepository).findAllById(anySet());
+            verify(cardTagRepository).saveAll(anyList());
+        }
     }
 }

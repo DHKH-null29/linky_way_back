@@ -73,8 +73,6 @@ public class CardControllerTest {
                           .tagIdSet(tagIdSet)
                           .build();
     }
-
-    private Long cardId = 100L;
     
     @Test
     @DisplayName("카드(북마크) 추가 성공")
@@ -141,53 +139,41 @@ public class CardControllerTest {
     @DisplayName("북마크(카드) 수정")
     class updateCard {
 
-        Long cardId;
-        CardResponse cardResponse;
-        CardRequest cardRequest;
+        private Long cardId = 1000L;
+        private CardRequest cardRequest;
 
         @BeforeEach
         void setCard() {
-            cardId = 3L;
-            cardResponse = CardResponse.builder()
-                                       .cardId(3L)
-                                       .link("https://www.naver.com/")
-                                       .title("title1")
-                                       .content("content1")
-                                       .isPublic(true)
-                                       .build();
-            cardRequest = CardRequest.builder()
-                                     .link("https://www.daum.net/")
-                                     .title("title2")
-                                     .content("content2")
-                                     .isPublic(false)
-                                     .folderId(1L)
-                                     .build();
+            cardRequest = makeCardRequest();
         }
 
         @Test
         @DisplayName("카드 수정 성공: 올바른 URL")
         void updateCardSuccess() throws Exception {
+            // given
+            CardRequest cardRequest = makeCardRequest();
+            doReturn(cardId).when(cardService)
+                            .updateCard(any(), any(), any(CardRequest.class));
             // when
             ResultActions resultActions = mockMvc.perform(put("/api/cards/" + cardId).contentType("application/json")
                                                                                      .content(objectMapper.writeValueAsString(cardRequest)));
-
             // then
             resultActions.andExpect(status().isOk())
                          .andExpect(ResponseBodyMatchers.responseBody()
                                                         .containsPropertiesAsJson(Response.class))
                          .andReturn();
 
-//            verify(cardService).updateCard(Mockito.anyLong(),
-//                    any(CardRequest.class));
+            verify(cardService).updateCard(any(), any(), any(CardRequest.class));
         }
 
         @Test
         @DisplayName("카드 수정 실패: 잘못된 URL")
         void updateCardFail() throws Exception {
+            // given
+            CardRequest cardRequest = makeCardRequest();
             // when
             ResultActions resultActions = mockMvc.perform(patch("/api/cards/").contentType("application/json")
                                                                               .content(objectMapper.writeValueAsString(cardRequest)));
-
             // then
             resultActions.andExpect(status().isMethodNotAllowed())
                          .andExpect(result -> Assertions.assertThat(Objects.requireNonNull(result.getResolvedException())
@@ -196,11 +182,13 @@ public class CardControllerTest {
                          .andReturn();
         }
     }
+
     @Nested
     @DisplayName("카드 목록 조회")
     class findCards {
 
         private List<CardResponse> cardResponses = new ArrayList<CardResponse>();
+        private Long cardId = 1000L;
         private Long tagId1 = 1L;
         private Long tagId2 = 2L;
         private Long folderId = 10L;
