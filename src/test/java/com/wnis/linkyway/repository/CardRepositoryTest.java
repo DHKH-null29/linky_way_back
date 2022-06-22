@@ -27,24 +27,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql("/sqltest/card-test.sql")
 public class CardRepositoryTest {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CardRepositoryTest.class);
 
     @Autowired
     CardTagRepository cardTagRepository;
-    
+
     @Autowired
     EntityManager em;
-    
+
     @Autowired
     TagRepository tagRepository;
-    
+
     @Autowired
     MemberRepository memberRepository;
-    
+
     @Autowired
     FolderRepository folderRepository;
-    
+
     @Autowired
     private CardRepository cardRepository;
 
@@ -157,22 +157,18 @@ public class CardRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "1,spring",
-            "1,명륜진사갈비",
-            "1,고기"
-    })
+    @CsvSource(value = { "1,spring", "1,명륜진사갈비", "1,고기" })
     @DisplayName("findAllCardByKeyword 응답 테스트")
     void findAllCardByKeywordResponseTest(Long memberId, String keyword) {
         List<Card> cardList = cardRepository.findAllCardByKeyword(keyword, memberId);
         cardList.forEach(card -> {
-            logger.info("id: {}, title: {}, link: {}, content: {}",
-                        card.getId(), card.getTitle(), card.getLink(), card.getContent() );
+            logger.info("id: {}, title: {}, link: {}, content: {}", card.getId(), card.getTitle(), card.getLink(),
+                        card.getContent());
             assertThat(card.getTitle() + card.getContent()).contains(keyword);
-            
+
         });
     }
-    
+
     @Test
     @DisplayName("deleteAllCardTagInTagSet 테스트")
     void deleteAllCardTagInIds() {
@@ -182,26 +178,28 @@ public class CardRepositoryTest {
             logger.info("{}", cardTag.getId());
         });
     }
-    
+
     @Test
     @DisplayName("findAllCardTagIdInTagSet 테스트")
     void findAllCardTagIdInTagSetTest() {
         Set<Long> s = new HashSet<>(Arrays.asList(1L, 2L));
         List<Long> list = cardTagRepository.findAllCardTagIdInTagSet(s);
-        list.forEach(id-> {
+        list.forEach(id -> {
             logger.info("{}", id);
         });
-    
+
     }
-    
+
     @Test
     @DisplayName("findAllIdToDeletedCard 테스트")
     void findAllIdToDeletedCardTest() {
-        
-        List<Long> ids = cardRepository.findAllIdToDeletedCard(LocalDateTime.now().minusDays(7));
+
+        List<Long> ids = cardRepository.findAllIdToDeletedCard(LocalDateTime.now()
+                                                                            .minusDays(7));
         assertThat(ids.size()).isEqualTo(1);
-        Card c = cardRepository.findById(ids.get(0)).orElse(null);
-        logger.info("{}",c.getModifiedBy());
+        Card c = cardRepository.findById(ids.get(0))
+                               .orElse(null);
+        logger.info("{}", c.getModifiedBy());
         assertThat(c.getIsDeleted()).isEqualTo(true);
     }
 }

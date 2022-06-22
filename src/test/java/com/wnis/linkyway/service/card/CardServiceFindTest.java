@@ -264,6 +264,7 @@ public class CardServiceFindTest {
                                       .findByIdAndMemberId(anyLong(), anyLong());
             // then
             assertThrows(ResourceConflictException.class, () -> cardService.findCardsByFolderId(100L, 1L, true));
+            
             // verify
             verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
             verify(cardRepository, times(0)).findCardsByFolderId(anyLong());

@@ -73,7 +73,7 @@ public class CardControllerTest {
                           .tagIdSet(tagIdSet)
                           .build();
     }
-    
+
     @Test
     @DisplayName("카드(북마크) 추가 성공")
     void addCardSuccess() throws Exception {
