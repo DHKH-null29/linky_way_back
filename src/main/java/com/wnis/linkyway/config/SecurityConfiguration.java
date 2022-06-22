@@ -1,6 +1,7 @@
 package com.wnis.linkyway.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wnis.linkyway.redis.RedisProvider;
 import com.wnis.linkyway.security.filter.JwtAuthenticationFilter;
 import com.wnis.linkyway.security.filter.JwtAuthorizationFilter;
 import com.wnis.linkyway.security.jwt.JwtProvider;
@@ -27,6 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final RedisProvider redisProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -71,7 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter jwtLoginFilter = new JwtAuthenticationFilter(objectMapper, jwtProvider);
+        JwtAuthenticationFilter jwtLoginFilter = new JwtAuthenticationFilter(objectMapper, jwtProvider, redisProvider);
         jwtLoginFilter.setAuthenticationManager(authenticationManagerBean());
         return jwtLoginFilter;
     }
