@@ -24,4 +24,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     public Optional<Tag> findByIdAndMemberId(@Param(value = "memberId") Long memberId,
             @Param(value = "tagId") Long tagId);
     
+    @Query("select count(*) from Tag t join t.member m where m.id = :memberId")
+    public long countTagByMemberId(@Param(value = "memberId") Long memberId);
 }
