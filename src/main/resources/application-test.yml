@@ -29,6 +29,8 @@ spring:
       - classpath:jwt.yml
       - classpath:redis.yml
       - classpath:email.yml
+      - classpath:tag.yml
+      - classpath:folder.yml
 
 logging:
   level:
