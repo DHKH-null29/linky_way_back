@@ -53,13 +53,12 @@ public class Card extends BaseEntity {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
-    private Card(String link, String title, String content, Boolean isPublic, Boolean isDeleted, Folder folder) {
+    private Card(String link, String title, String content, Boolean isPublic, Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
         this.isPublic = isPublic;
         this.folder = folder;
-        this.isDeleted = isDeleted;
         if (folder != null)
             folder.getCards()
                   .add(this);

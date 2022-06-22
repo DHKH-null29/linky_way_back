@@ -62,7 +62,7 @@ public class CardRepositoryTest {
         folder = Folder.builder()
                        .member(member)
                        .depth(1L)
-                       .name("f")
+                       .name("f1")
                        .build();
 
         folder2 = Folder.builder()
@@ -88,6 +88,25 @@ public class CardRepositoryTest {
     }
 
     @Test
+    @DisplayName("카드 추가 성공")
+    public void saveCardSuccess() {
+        // given
+        final Card card = makeCard();
+
+        // when
+        final Card result = cardRepository.save(card);
+
+        // then
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getLink()).isEqualTo("https://github.com/DHKH-null29/linky_way_back/issues/12");
+        assertThat(result.getTitle()).isEqualTo("카드 조회");
+        assertThat(result.getContent()).isEqualTo("카드 조회 issue");
+        assertThat(result.getIsPublic()).isEqualTo(true);
+        assertThat(result.getFolder()
+                         .getName()).isEqualTo("f1");
+        assertThat(result.getIsDeleted()).isEqualTo(false);
+    }
+    @Test
     @DisplayName("지정된 카드 조회 성공")
     public void findCardByIdSuccess() {
         // given
@@ -107,31 +126,6 @@ public class CardRepositoryTest {
                       });
     }
 
-    
-//    @Test
-//    @DisplayName("카드(북마크) 추가 성공")
-//    public void addCardSuccess() {
-//        // given
-//        final Card card = Card.builder()
-//                              .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
-//                              .title("카드 조회")
-//                              .content("카드 조회 issue")
-//                              .isPublic(true)
-//                              .folder(null)
-//                              .build();
-//
-//        // when
-//        final Card result = cardRepository.save(card);
-//
-//        // then
-//        assertThat(result.getId()).isNotNull();
-//        assertThat(result.getLink()).isNotNull();
-//        assertThat(result.getTitle()).isEqualTo("카드 조회");
-//        assertThat(result.getContent()).isEqualTo("카드 조회 issue");
-//        assertThat(result.getIsPublic()).isEqualTo(true);
-//        assertThat(result.getFolder()).isNull();
-//    }
-//
 //    @Test
 //    @DisplayName("지정된 카드 조회 성공")
 //    public void findCardByIdSuccess() {
@@ -171,35 +165,6 @@ public class CardRepositoryTest {
 //        // given
 //        final Card card = Card.builder()
 //                              .link("https://github.com/DHKH-null29/linky_way_back/issues/12")
-//                              .title("카드 조회")
-//                              .content("카드 조회 issue")
-//                              .isPublic(true)
-//                              .folder(null)
-//                              .build();
-//        final Card savedCard = cardRepository.save(card);
-//
-//        // when
-//        Optional<Card> resultCard = cardRepository.findById(savedCard.getId());
-//        resultCard.ifPresent(selectCard -> {
-//            selectCard.updateLink("https://github.com/DHKH-null29/linky_way_back/issues/12");
-//            selectCard.updateTitle("카드 조회2");
-//            selectCard.updateContent("카드 조회 issue2");
-//            selectCard.updateIsPublic(false);
-//            cardRepository.flush();
-//        });
-//
-//        // then
-//        Optional<Card> result = cardRepository.findById(savedCard.getId());
-//        assertThat(result.get()
-//                         .getId()).isEqualTo(savedCard.getId());
-//        assertThat(result.get()
-//                         .getLink()).isEqualTo("https://github.com/DHKH-null29/linky_way_back/issues/12");
-//        assertThat(result.get()
-//                         .getTitle()).isEqualTo("카드 조회2");
-//        assertThat(result.get()
-//                         .getContent()).isEqualTo("카드 조회 issue2");
-//        assertThat(result.get()
-//                         .getIsPublic()).isEqualTo(false);
 //        assertThat(result.get()
 //                         .getFolder()).isNull();
 //    }
