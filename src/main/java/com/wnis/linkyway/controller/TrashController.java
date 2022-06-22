@@ -1,0 +1,29 @@
+package com.wnis.linkyway.controller;
+
+import com.wnis.linkyway.dto.Response;
+import com.wnis.linkyway.security.annotation.CurrentMember;
+import com.wnis.linkyway.service.TrashService;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/trash")
+@RequiredArgsConstructor
+public class TrashController {
+    
+    private final TrashService trashService;
+    
+    @PutMapping
+    @ApiOperation(value = "삭제 & 복원", notes = "isDeleted가 true이면 삭제, isDeleted가 false이면 복원이 된다 List 형태로 card id를 받는다")
+    ResponseEntity<Response<List<Long>>> updateCardIsDeletedTrueOrFalse(@RequestBody List<Long> ids, @CurrentMember Long memberId,
+            @RequestParam Boolean isDeleted) {
+        List<Long> response = trashService.updateDeleteCardTrueOrFalse(ids, memberId, isDeleted);
+        String message = isDeleted ? "삭제 성공" : "복원 성공";
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, response, message));
+    }
+}

@@ -33,4 +33,10 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select c.id from Card c " +
             "where c.isDeleted = true and c.modifiedBy <= :deletedDateAt")
     public List<Long> findAllIdToDeletedCard(@Param(value = "deletedDateAt")LocalDateTime deletedDateAt);
+    
+    @Query("select c from Card c " +
+            "join c.folder f join f.member m " +
+            "where c.id in :ids and m.id = :memberId")
+    List<Card> findAllInIdsAndMemberId(@Param(value = "ids") List<Long> ids,
+            @Param(value = "memberId") Long memberId);
 }
