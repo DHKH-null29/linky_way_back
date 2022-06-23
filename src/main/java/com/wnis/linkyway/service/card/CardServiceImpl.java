@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,8 +148,8 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId) {
-        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
+    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId, Pageable pageable) {
+        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId, pageable);
         List<CardResponse> cardResponseList = new ArrayList<>();
         for (Card card : cardsList) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());

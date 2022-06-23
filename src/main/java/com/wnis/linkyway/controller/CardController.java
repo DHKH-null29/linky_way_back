@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -94,8 +95,8 @@ public class CardController {
     @ApiOperation(value = "키워드를 통한 카드 조회", notes = "키워드를 활용해 여러 카드를 조회한다")
     @Authenticated
     public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
-            @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(keyword, memberId);
+            @CurrentMember Long memberId, Pageable pageable) {
+        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(keyword, memberId, pageable);
         return ResponseEntity.ok()
                              .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }

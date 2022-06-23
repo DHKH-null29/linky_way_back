@@ -6,6 +6,7 @@ import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.card.SocialCardResponse;
 import com.wnis.linkyway.entity.Card;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface CardService {
 
     public void deleteCard(Long cardId);
 
-    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId);
+    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId, Pageable pageable);
 
     public List<CardResponse> findCardsByTagId(Long memberId, Long tagId);
 

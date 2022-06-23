@@ -1,6 +1,7 @@
 package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.entity.Card;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,9 +11,10 @@ import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     
-    @Query("select c from CardTag ct join ct.card c join c.folder f " +
-            "where f.member.id = :memberId and (c.title like %:keyword% or c.content like %:keyword%)")
-    List<Card> findAllCardByKeyword(@Param(value = "keyword") String keyword, @Param(value = "memberId") Long memberId);
+    @Query("select c from Card c join c.folder f " +
+            "where f.member.id = :memberId and " +
+            "c.isDeleted = false and (c.title like %:keyword% or c.content like %:keyword%)")
+    List<Card> findAllCardByKeyword(@Param(value = "keyword") String keyword, @Param(value = "memberId") Long memberId, Pageable pageable);
 
     @Query("select ct.card from CardTag ct join ct.card join ct.tag where ct.tag.id = :tagId")
     public List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId);
