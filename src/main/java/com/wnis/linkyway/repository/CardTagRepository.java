@@ -37,11 +37,6 @@ public interface CardTagRepository extends JpaRepository<CardTag, Long> {
             "where t.id in :tagIdSet")
     List<Long> findAllCardTagIdInTagSet(@Param(value = "tagIdSet") Set<Long> tagIdSet);
     
-    
-    @Query("select new com.wnis.linkyway.dto.PackageDto(m.id, m.nickname, t.id, t.name) from CardTag ct join ct.tag t " +
-            "join t.member m " +
-            "where t.name like %:tagName%")
-    List<PackageDto> findAllPackageDtoByTagName(@Param(value = "tagName") String tagName);
 
     @Query("select ct.id from CardTag ct join ct.card c " +
             "where c.id in :ids")
