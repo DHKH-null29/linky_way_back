@@ -2,6 +2,7 @@ package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +27,9 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     
     @Query("select count(*) from Tag t join t.member m where m.id = :memberId")
     public long countTagByMemberId(@Param(value = "memberId") Long memberId);
+    
+    @Query("select distinct t "
+            + "from Tag t join fetch t.member m " +
+            "where t.name like %:tagName%")
+    public List<Tag> findAllDistinctTagListByTagName(@Param(value = "tagName") String tagName, Pageable pageable);
 }

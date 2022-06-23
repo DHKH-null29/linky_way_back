@@ -1,6 +1,5 @@
 package com.wnis.linkyway.repository;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
@@ -36,9 +35,12 @@ public interface CardTagRepository extends JpaRepository<CardTag, Long> {
     @Query("select ct.id from CardTag ct join ct.tag t " +
             "where t.id in :tagIdSet")
     List<Long> findAllCardTagIdInTagSet(@Param(value = "tagIdSet") Set<Long> tagIdSet);
-    
 
     @Query("select ct.id from CardTag ct join ct.card c " +
             "where c.id in :ids")
     List<Long> findAllCardTagIdInCardIds(@Param(value = "ids") List<Long> cardIds);
+    
+    @Query("select count(*) from CardTag ct join ct.card c join ct.tag t " +
+            "where t.id = :tagId and c.isPublic = true")
+    long countByTagId(@Param(value = "tagId") Long tagId);
 }
