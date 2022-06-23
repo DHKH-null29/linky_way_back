@@ -1,6 +1,5 @@
 package com.wnis.linkyway.controller.trash;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.repository.CardRepository;
