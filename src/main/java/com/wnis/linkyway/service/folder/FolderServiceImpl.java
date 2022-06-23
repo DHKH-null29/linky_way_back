@@ -27,7 +27,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Value("${folder.limit.depth}")
     private Long limitDepth;
-
+    
+    @Value("${folder.limit.num}")
+    private Long limitNumberOfFolder;
+    
     @Override
     public List<FolderResponse> findAllFolderSuper(Long memberId) {
         if (!memberRepository.existsById(memberId)) {
@@ -56,6 +59,11 @@ public class FolderServiceImpl implements FolderService {
         Member member = memberRepository.findById(memberId)
                                         .orElseThrow(() -> new NotFoundEntityException("회원이 존재하지 않습니다"));
 
+        long numOfSuperFolder = folderRepository.countSuperFolderByMemberId(memberId); // 상위 폴더 갯수
+        if (numOfSuperFolder > limitNumberOfFolder) {
+            throw new LimitAddException(String.format("%d 초과로 상위 폴더를 생성 할 수 없습니다", limitNumberOfFolder));
+        }
+        
         long currentDepth = 1L;
         Long parentId = null;
         Folder parent = null;
