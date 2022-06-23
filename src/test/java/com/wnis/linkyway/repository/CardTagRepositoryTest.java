@@ -1,6 +1,5 @@
 package com.wnis.linkyway.repository;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,6 +74,15 @@ class CardTagRepositoryTest {
             .isDeleted(false)
             .build();
     
+    Card card3 = Card.builder()
+                     .folder(folder)
+                     .isPublic(true)
+                     .content("")
+                     .link("2")
+                     .title("card")
+                     .isDeleted(false)
+                     .build();
+    
     CardTag cardTag1 = CardTag.builder()
                               .card(card)
                               .tag(tag1)
@@ -90,6 +98,11 @@ class CardTagRepositoryTest {
             .tag(tag2)
             .build();
     
+    CardTag cardTag4 = CardTag.builder()
+                              .card(card3)
+                              .tag(tag1)
+                              .build();
+    
     @BeforeEach
     void setUp() {
         em.persist(member);
@@ -98,9 +111,11 @@ class CardTagRepositoryTest {
         em.persist(tag2);
         em.persist(card);
         em.persist(card2);
+        em.persist(card3);
         em.persist(cardTag1);
         em.persist(cardTag2);
         em.persist(cardTag3);
+        em.persist(cardTag4);
         em.flush();
     }
     
@@ -167,7 +182,7 @@ class CardTagRepositoryTest {
         @DisplayName("응답 테스트")
         void shouldReturnCardIds() {
             List<CardTag> all = cardTagRepository.findAll();
-            assertThat(all.size()).isEqualTo(3);
+            assertThat(all.size()).isEqualTo(4);
             List<Long> ids = cardTagRepository.findAllCardTagIdInCardIds(
                     new ArrayList<>(Arrays.asList(1L)));
             logger.info("ids: {} ", ids);
@@ -176,6 +191,21 @@ class CardTagRepositoryTest {
     
             
         }
+    }
+    
+    @Nested
+    @DisplayName("countByTagId 테스트")
+    class countByTagIdTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void shouldReturnCountCardTagByTagIdTest() {
+            
+            long count = cardTagRepository.countByTagId(1L);
+            logger.info("{}", count);
+            assertThat(count).isEqualTo(1);
+        }
+        
     }
     
 }

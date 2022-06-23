@@ -1,6 +1,8 @@
 package com.wnis.linkyway.repository;
 
 import com.wnis.linkyway.dto.tag.TagResponse;
+import com.wnis.linkyway.entity.Tag;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -9,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,5 +52,16 @@ class TagRepositoryTest {
     void countTagTest() {
         long numOfTag = tagRepository.countTagByMemberId(VALID_MEMBER_ID);
         assertThat(numOfTag).isEqualTo(4);
+    }
+    
+    @Test
+    @DisplayName("findAllDistinctTagList 테스트")
+    void findAllDistinctTagListTest() {
+        List<Tag> spring = tagRepository.findAllDistinctTagListByTagName("spring", PageRequest.of(0, 2));
+        assertThat(spring.size()).isEqualTo(2);
+        for (Tag tag : spring) {
+            logger.info("id: {}, name: {}", tag.getId(), tag.getName());
+            
+        }
     }
 }
