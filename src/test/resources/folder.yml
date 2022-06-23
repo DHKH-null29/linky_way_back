@@ -1,0 +1,4 @@
+folder:
+  limit:
+    depth: 2
+    num: 5
