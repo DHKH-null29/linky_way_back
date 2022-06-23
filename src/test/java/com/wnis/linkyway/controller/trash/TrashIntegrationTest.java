@@ -34,11 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("/sqltest/card-test.sql")
 public class TrashIntegrationTest {
     
-    @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired WebApplicationContext ctx;
-    
-    @Autowired CardRepository cardRepository;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
+    @Autowired
+    WebApplicationContext ctx;
+    @Autowired
+    CardRepository cardRepository;
     
     @BeforeEach
     void setup() {
