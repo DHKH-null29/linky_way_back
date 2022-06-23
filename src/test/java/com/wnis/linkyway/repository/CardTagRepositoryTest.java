@@ -160,20 +160,6 @@ class CardTagRepositoryTest {
     }
     
     @Nested
-    @DisplayName("findAllPackageDtoByTagName 테스트")
-    class findAllPackageDtoByTagName {
-        
-        @Test
-        @DisplayName("응답 테스트")
-        void shouldReturnListPackageDtoTest() {
-            List<PackageDto> packageDtoList = cardTagRepository.findAllPackageDtoByTagName("t1");
-            assertThat(packageDtoList).isNotEmpty();
-            assertThat(packageDtoList.get(0)).extracting("tagName").isEqualTo("t1");
-            assertThat(packageDtoList.get(0)).extracting("nickname").isEqualTo("hello");
-        }
-    }
-    
-    @Nested
     @DisplayName("findAllCardTagIdInCardIds 테스트")
     class findAllCardTagIdINCardIdsTest {
         

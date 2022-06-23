@@ -223,5 +223,12 @@ class FolderRepositoryTest {
         assertThat(Objects.requireNonNull(folder1)
                           .getMember()).isNotNull();
     }
+    
+    @Test
+    @DisplayName("최상위 폴더 갯수 세기")
+    void countSuperFolderByMemberIdTest() {
+        long count = folderRepository.countSuperFolderByMemberId(1L);
+        assertThat(count).isEqualTo(1);
+    }
 
 }

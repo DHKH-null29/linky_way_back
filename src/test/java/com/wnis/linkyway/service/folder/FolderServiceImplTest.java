@@ -7,6 +7,7 @@ import com.wnis.linkyway.dto.folder.UpdateFolderNameRequest;
 import com.wnis.linkyway.dto.folder.UpdateFolderPathRequest;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.exception.common.LimitAddException;
 import com.wnis.linkyway.exception.common.LimitDepthException;
 import com.wnis.linkyway.exception.common.ResourceConflictException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
@@ -200,6 +201,24 @@ class FolderServiceImplTest {
 
             assertThatThrownBy(() -> folderService.addFolder(addFolderRequest,
                                                              1L)).isInstanceOf(LimitDepthException.class);
+        }
+    
+        @Test
+        @DisplayName("예외 테스트: 상위 폴더를 N개 이상 생성하는 경우")
+        void shouldThrowLimitAddException_WhenCreateFolderOver() {
+            assertThatThrownBy(()-> {
+                for (int i = 0; i <= 6; ++i) {
+                    AddFolderRequest addFolderRequest = AddFolderRequest.builder()
+                                                                        .name("뻐꾸기")
+                                                                        .build();
+                    folderService.addFolder(addFolderRequest, 1L);
+                }
+            }).isInstanceOf(LimitAddException.class);
+            
+            
+            
+        
+           
         }
 
         @Test

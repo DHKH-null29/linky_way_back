@@ -45,7 +45,7 @@ class TagRepositoryTest {
     }
     
     @Test
-    void test() {
+    void countTagTest() {
         long numOfTag = tagRepository.countTagByMemberId(VALID_MEMBER_ID);
         assertThat(numOfTag).isEqualTo(4);
     }
