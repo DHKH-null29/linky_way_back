@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
@@ -215,7 +216,8 @@ public class CardRepositoryTest {
     })
     @DisplayName("findAllCardByKeyword 응답 테스트")
     void findAllCardByKeywordResponseTest(Long memberId, String keyword) {
-        List<Card> cardList = cardRepository.findAllCardByKeyword(keyword, memberId);
+        List<Card> cardList = cardRepository.findAllCardByKeyword(keyword, memberId, PageRequest.of(0, 1));
+        assertThat(cardList.size()).isEqualTo(1);
         cardList.forEach(card -> {
             logger.info("id: {}, title: {}, link: {}, content: {}",
                         card.getId(), card.getTitle(), card.getLink(), card.getContent() );

@@ -81,22 +81,36 @@ public class PersonalSearchIntegrationTest {
                             .isPublic(false)
 //                            .isDeleted(false)
                             .build();
+    
+            Card card2 = Card.builder()
+                            .folder(folder2)
+                            .link("www.google2.co.kr")
+                            .title("hello2")
+                            .content("yeah")
+                            .isPublic(false)
+                            .build();
+            
             Tag tag = Tag.builder()
                          .isPublic(false)
                          .name("spring")
                          .member(member)
                          .build();
+            
             CardTag cardTag = CardTag.builder()
                                      .card(card)
                                      .tag(tag)
                                      .build();
+    
+
 
             entityManager.persist(member);
             entityManager.persist(folder);
             entityManager.persist(folder2);
             entityManager.persist(card);
+            entityManager.persist(card2);
             entityManager.persist(tag);
             entityManager.persist(cardTag);
+
             entityManager.flush();
         }
 
@@ -104,7 +118,7 @@ public class PersonalSearchIntegrationTest {
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void shouldOkAndDataFormatTest() throws Exception {
 
-            mockMvc.perform(get("/api/cards/personal/keyword").param("keyword", "hello"))
+            mockMvc.perform(get("/api/cards/personal/keyword?page=0&size=2").param("keyword", "hello"))
                    .andExpect(status().is(200))
                    .andExpect(jsonPath("$.data").isNotEmpty());
         }
