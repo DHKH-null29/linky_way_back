@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -31,15 +32,15 @@ public class PackageServiceTest {
     @DisplayName("findAllPackageByTagNameTest")
     void findAllPackageByTagNameTest() {
     
-        List<PackageResponse> java = packageService.findAllPackageByTagName("java");
-        java.forEach(packageResponse -> {
-            assertThat(packageResponse).extracting("tagName").isEqualTo("java");
+        List<PackageResponse> spring = packageService.findAllPackageByTagName("spring", PageRequest.of(0, 1));
+        assertThat(spring.size()).isEqualTo(1);
+        spring.forEach(packageResponse -> {
+            assertThat(packageResponse).extracting("tagName").isEqualTo("spring");
         });
-    
-        // 조회시는 대소문자 구분 없이 모두 조회
-        List<PackageResponse> food = packageService.findAllPackageByTagName("food");
+        
+        List<PackageResponse> food = packageService.findAllPackageByTagName("food", PageRequest.of(0, 2));
         logger.info("{}", food.get(0).getNumberOfCard());
-        assertThat(food.get(0).getNumberOfCard()).isEqualTo(4);
+        assertThat(food.get(0).getNumberOfCard()).isEqualTo(1);
         food.forEach(packageResponse -> {
             assertThat(packageResponse).extracting("tagName").isEqualTo("food");
         });

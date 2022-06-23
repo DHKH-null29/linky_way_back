@@ -1,13 +1,10 @@
 package com.wnis.linkyway.controller;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.PackageResponse;
 import com.wnis.linkyway.service.PackageService;
-import org.apache.http.client.methods.RequestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,13 +56,13 @@ class PackageControllerTest {
                 .tagId(1L)
                 .nickname("hello")
                 .tagName("t1")
-                .numberOfCard(10)
+                .numberOfCard(10L)
                 .build();
         List<PackageResponse> responseList = new ArrayList<>();
         responseList.add(packageResponse);
-        doReturn(responseList).when(packageService).findAllPackageByTagName(any());
+        doReturn(responseList).when(packageService).findAllPackageByTagName(any(), any());
         
-        mockMvc.perform(get("/api/search/social/hello"))
+        mockMvc.perform(get("/api/search/social/hello?page=0&size=2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..memberId").isNotEmpty())
                 .andExpect(jsonPath("$..nickname").isNotEmpty())
