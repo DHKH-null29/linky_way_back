@@ -1,13 +1,10 @@
 package com.wnis.linkyway.controller;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.PackageResponse;
 import com.wnis.linkyway.service.PackageService;
-import org.apache.http.client.methods.RequestBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +49,7 @@ class PackageControllerTest {
     
     
     @Test
-    @DisplayName("displayName")
+    @DisplayName("응답 형식 테스트")
     void ControllerTest() throws Exception {
         PackageResponse packageResponse = PackageResponse.builder()
                 .memberId(1L)
@@ -65,7 +62,7 @@ class PackageControllerTest {
         responseList.add(packageResponse);
         doReturn(responseList).when(packageService).findAllPackageByTagName(any());
         
-        mockMvc.perform(get("/api/search/social/hello"))
+        mockMvc.perform(get("/api/search/social").param("tagName", "hello"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..memberId").isNotEmpty())
                 .andExpect(jsonPath("$..nickname").isNotEmpty())
@@ -73,4 +70,5 @@ class PackageControllerTest {
                 .andExpect(jsonPath("$..tagName").isNotEmpty())
                 .andExpect(jsonPath("$..tagId").isNotEmpty());
     }
+    
 }
