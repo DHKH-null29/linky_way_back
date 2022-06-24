@@ -4,6 +4,7 @@ import com.wnis.linkyway.entity.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
@@ -106,7 +109,7 @@ public class CardRepositoryTest {
         assertThat(savedCard.getContent()).isEqualTo("카드 조회 issue");
         assertThat(savedCard.getIsPublic()).isEqualTo(true);
         assertThat(savedCard.getFolder()).isEqualTo(folder);
-        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
+//        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
     }
 
     
@@ -245,14 +248,47 @@ public class CardRepositoryTest {
     
     }
     
-    @Test
-    @DisplayName("findAllIdToDeletedCard 테스트")
-    void findAllIdToDeletedCardTest() {
+    @Nested
+    @DisplayName("findAllIdToDeletedCard paging 테스트")
+    class findAllIdToDeletedCardPagingTest {
+        @Test
+        @DisplayName("findAllIdToDeletedCard 테스트")
+        void findAllIdToDeletedCardTest() {
         
-        List<Long> ids = cardRepository.findAllIdToDeletedCard(LocalDateTime.now().minusDays(7));
-        assertThat(ids.size()).isEqualTo(1);
-        Card c = cardRepository.findById(ids.get(0)).orElse(null);
-        logger.info("{}",c.getModifiedBy());
-        assertThat(c.getIsDeleted()).isEqualTo(true);
+            Slice<Long> idSlice = cardRepository.findAllIdToDeletedCardUsingPage(LocalDateTime.now().minusDays(7), PageRequest.of(0, 200));
+            List<Long> ids = idSlice.getContent();
+            assertThat(ids.size()).isEqualTo(1);
+            Card c = cardRepository.findById(ids.get(0)).orElse(null);
+            logger.info("{}",c.getModifiedBy());
+            assertThat(c.getIsDeleted()).isEqualTo(true);
+            
+        }
+        
+        @Test
+        void findAllIdToDeletedCardCursorPagingTest() {
+            Slice<Long> idSlice = cardRepository.findAllIdToDeletedCardUsingCursorPage(LocalDateTime.now().minusDays(7),7L, PageRequest.of(0, 200));
+            List<Long> ids = idSlice.getContent();
+            assertThat(ids.size()).isEqualTo(1);
+            Card c = cardRepository.findById(ids.get(0)).orElse(null);
+            logger.info("{}",c.getModifiedBy());
+            assertThat(c.getIsDeleted()).isEqualTo(true);
+        }
+    }
+    
+    @Nested
+    @DisplayName("findAll paging 테스트")
+    class findAllPageTest {
+        
+        @Test
+        void findAllUsingPageTest() {
+            Slice<Card> allUsingPage = cardRepository.findAllUsingPage(PageRequest.of(0, 100));
+            assertThat(allUsingPage.getContent().size()).isEqualTo(6);
+        }
+    
+        @Test
+        void findAllUsingCursorPageTest() {
+            Slice<Card> allUsingPage = cardRepository.findAllUsingCursorPage(7L, PageRequest.of(0, 100));
+            assertThat(allUsingPage.getContent().size()).isEqualTo(6);
+        }
     }
 }
