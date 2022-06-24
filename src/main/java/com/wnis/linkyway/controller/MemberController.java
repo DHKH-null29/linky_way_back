@@ -78,6 +78,15 @@ public class MemberController {
         MemberResponse response = memberService.updatePassword(passwordRequest, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "패스워드 변경 성공"));
     }
+
+    @PutMapping("/password/noauth")
+    @ApiOperation(value = "비인증 회원 비밀번호 수정", notes = "비밀번호를 잊은 사용자의 비밀번호를 수정한다")
+    @WithEmailVerification
+    public ResponseEntity<Response<Object>> updatePasswordByVerifiedEmail(
+            @Validated(ValidationSequence.class) @RequestBody PasswordByEmailRequest passwordRequest) {
+        memberService.updatePasswordByVerifiedEmail(passwordRequest.getPassword(), passwordRequest.getEmail());
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, "패스워드 변경 성공"));
+    }
     
     @DeleteMapping
     @ApiOperation(value = "회원 탈퇴", notes = "회원을 삭제한다")
