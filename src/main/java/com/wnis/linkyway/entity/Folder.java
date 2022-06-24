@@ -73,14 +73,15 @@ public class Folder {
         }
 
         // 기존 부모 자식연결 부분에서 현재 폴더 엔티티 제거
-        Folder parent = this.getParent();
-        parent.getChildren()
-              .removeIf((f) -> f.getId() == this.getId());
-
+        Folder parent = this.parent;
+        if(parent != null){
+            parent.getChildren()
+                    .removeIf((f) -> f.getId() == this.getId());
+        }
         this.parent = destination; // 현재 폴더의 부모를 destination 설정
+        this.depth = destination.depth + 1;
         destination.getChildren()
                    .add(this); // destination 자식에 현재 폴더 엔티티 추가
-
     }
 
     public boolean isDirectAncestor(Folder folder) {
