@@ -22,7 +22,7 @@ public class MemberController {
     private final MemberService memberService;
     
     @PostMapping
-    @ApiOperation(value = "회원가입", notes = "회원정보를 입력해 회원가입(같은 IP로 N회 이상 요청 불가능하다)")
+    @ApiOperation(value = "회원가입", notes = "회원정보를 입력해 회원가입")
     @WithEmailVerification
     public ResponseEntity<Response> join(
             @Validated(ValidationSequence.class) @RequestBody JoinRequest joinRequest) {
@@ -31,7 +31,7 @@ public class MemberController {
     }
     
     @PostMapping("/login")
-    @ApiOperation(value = "로그인", notes = "로그인 이후 JWT 토큰 리턴(같은 IP로 N회 이상 요청 불가능하다)")
+    @ApiOperation(value = "로그인", notes = "로그인 이후 JWT 토큰 리턴")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok().build();
     }
