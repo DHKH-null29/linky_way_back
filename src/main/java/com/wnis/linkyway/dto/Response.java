@@ -19,4 +19,8 @@ public class Response<T> {
         return new Response<>(httpStatus.value(), data, message);
     }
 
+    public static <T> Response<T> of(HttpStatus httpStatus, String message) {
+        return new Response<>(httpStatus.value(), null, message);
+    }
+
 }

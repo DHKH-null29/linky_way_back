@@ -22,7 +22,7 @@ public class MemberController {
     private final MemberService memberService;
     
     @PostMapping
-    @ApiOperation(value = "회원가입", notes = "회원정보를 입력해 회원가입(같은 IP로 N회 이상 요청 불가능하다)")
+    @ApiOperation(value = "회원가입", notes = "회원정보를 입력해 회원가입")
     @WithEmailVerification
     public ResponseEntity<Response> join(
             @Validated(ValidationSequence.class) @RequestBody JoinRequest joinRequest) {
@@ -31,7 +31,7 @@ public class MemberController {
     }
     
     @PostMapping("/login")
-    @ApiOperation(value = "로그인", notes = "로그인 이후 JWT 토큰 리턴(같은 IP로 N회 이상 요청 불가능하다)")
+    @ApiOperation(value = "로그인", notes = "로그인 이후 JWT 토큰 리턴")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok().build();
     }
@@ -77,6 +77,15 @@ public class MemberController {
             @CurrentMember Long memberId) {
         MemberResponse response = memberService.updatePassword(passwordRequest, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "패스워드 변경 성공"));
+    }
+
+    @PutMapping("/password/noauth")
+    @ApiOperation(value = "비인증 회원 비밀번호 수정", notes = "비밀번호를 잊은 사용자의 비밀번호를 수정한다")
+    @WithEmailVerification
+    public ResponseEntity<Response<Object>> updatePasswordByVerifiedEmail(
+            @Validated(ValidationSequence.class) @RequestBody PasswordByEmailRequest passwordRequest) {
+        memberService.updatePasswordByVerifiedEmail(passwordRequest.getPassword(), passwordRequest.getEmail());
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, "패스워드 변경 성공"));
     }
     
     @DeleteMapping
