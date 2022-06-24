@@ -19,5 +19,6 @@ public class PasswordRequest {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*\\W)(?=\\S+$).{4,16}$",
              message = "최소 대/소 문자 하나, 숫자 하나, 특수문자를 4 ~ 16 글자로 입력해주세요",
              groups = ValidationGroup.PatternCheckGroup.class)
-    String password;
+    private String password;
+    
 }
