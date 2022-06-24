@@ -63,7 +63,7 @@ public class DeleteCardIfLinkIsInvalidTasklet implements Tasklet {
             url = new URL(domain);
             http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod("HEAD");
-            if (http.getResponseCode() == 200) {
+            if (http.getResponseCode() < 400) {
                 return true;
             }
         } catch (MalformedURLException e) {
