@@ -95,16 +95,12 @@ public class Folder {
 
     private void changeRecursiveDepth(Folder currentFolder, long depthChangeAmount) {
         currentFolder.setDepth(depthChangeAmount);
-        if (currentFolder.children.isEmpty()) {
-            return;
-        }
         currentFolder.children.forEach(folder -> changeRecursiveDepth(folder, depthChangeAmount));
     }
 
     public void deleteParent() {
         this.parent = null;
         modifyChildrenFolderDepth(-this.depth + 1);
-        removeParentConnection();
     }
 
     public int getDistanceOfFarthestChildren() {
