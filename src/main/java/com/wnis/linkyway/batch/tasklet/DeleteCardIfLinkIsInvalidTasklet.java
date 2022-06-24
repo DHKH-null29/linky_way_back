@@ -9,7 +9,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
@@ -33,24 +32,12 @@ public class DeleteCardIfLinkIsInvalidTasklet implements Tasklet {
     
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        Page<Card> cardPage = cardRepository.findAll(PageRequest.of(0, PAGE_SIZE));
-        int totalPage = cardPage.getTotalPages();
-        List<Long> ids = new ArrayList<>(PAGE_SIZE);
-    
-        for (int i = 0; i < totalPage; i++) {
-            Slice<Card> cardSlice = cardRepository.findAll(PageRequest.of(i, PAGE_SIZE));
-            for (Card card : cardSlice.getContent()) {
-                if (!checkLink(card)) {
-                    ids.add(card.getId());
-                }
-            }
-            List<Long> cardTagIds = cardTagRepository.findAllCardTagIdInCardIds(ids);
-            cardTagRepository.deleteAllCardTagInIds(cardTagIds);
-            cardRepository.deleteAllByIdInBatch(ids);
-            ids.clear();
-        }
-    
-    
+        Slice<Card> cardSlice = cardRepository.findAllUsingPage(PageRequest.of(0, PAGE_SIZE));
+       
+        do {
+            cardSlice = deleteInvalidLink(cardSlice);
+        } while(cardSlice.hasNext());
+        
         return RepeatStatus.FINISHED;
     }
     
@@ -73,5 +60,24 @@ public class DeleteCardIfLinkIsInvalidTasklet implements Tasklet {
         }
         
         return false;
+    }
+    
+    private Slice<Card> deleteInvalidLink(Slice<Card> cardSlice) {
+        
+        int lastIndex = cardSlice.getContent().size() - 1;
+        long lastCardId = cardSlice.getContent().get(lastIndex).getId();
+        List<Long> ids = new ArrayList<>();
+    
+        for (Card card : cardSlice.getContent()) {
+            if (!checkLink(card)) {
+                ids.add(card.getId());
+            }
+        }
+        List<Long> cardTagIds = cardTagRepository.findAllCardTagIdInCardIds(ids);
+        cardTagRepository.deleteAllCardTagInIds(cardTagIds);
+        cardRepository.deleteAllByIdInBatch(ids);
+    
+        Slice<Card> nextCardSlice = cardRepository.findAllUsingCursorPage(lastCardId, PageRequest.of(0, PAGE_SIZE));
+        return nextCardSlice;
     }
 }
