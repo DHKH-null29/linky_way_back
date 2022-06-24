@@ -11,6 +11,7 @@ import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +45,11 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public FolderResponse findFolder(Long folderId) {
+    public FolderResponse findFolder(Long folderId, Long memberId) {
         Folder folder = folderRepository.findFolderById(folderId)
                 .orElseThrow(() -> new NotFoundEntityException(
-                        "해당 회원의 폴더가 존재하지 않아 조회 할 수 없습니다"));
+                        "존재하지 않는 폴더입니다."));
+        checkRequestMyFolder(memberId, folder,  "존재하지 않는 폴더입니다.");
         return new FolderResponse(folder);
     }
 
@@ -96,10 +98,10 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     @Transactional
-    public FolderResponse updateFolderPath(UpdateFolderPathRequest setFolderPathRequest, Long folderId) {
+    public FolderResponse updateFolderPath(UpdateFolderPathRequest setFolderPathRequest, Long folderId, Long memberId) {
         Folder folder = folderRepository.findFolderById(folderId)
                 .orElseThrow(() -> new NotModifyEmptyEntityException("수정 하려는 폴더가 존재하지 않습니다"));
-
+        checkRequestMyFolder(memberId, folder, "수정 하려는 폴더가 존재하지 않습니다");
         if (setFolderPathRequest.getTargetFolderId() == null) {
             folder.deleteParent();
             return FolderResponse.builder()
@@ -138,10 +140,11 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public FolderResponse updateFolderName(UpdateFolderNameRequest updateFolderNameRequest, Long folderId) {
+    public FolderResponse updateFolderName(UpdateFolderNameRequest updateFolderNameRequest, Long folderId, Long memberId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotModifyEmptyEntityException(
                         "해당 폴더가 존재하지 않아 수정을 할 수 없습니다"));
+        checkRequestMyFolder(memberId, folder, "해당 폴더가 존재하지 않아 수정을 할 수 없습니다");
         folder.updateName(updateFolderNameRequest.getName());
 
         return FolderResponse.builder()
@@ -151,17 +154,24 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public FolderResponse deleteFolder(Long folderId) {
+    public FolderResponse deleteFolder(Long folderId, Long memberId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotDeleteEmptyEntityException(
                         "해당 폴더가 존재하지 않아 삭제 할 수 없습니다"));
-
+        checkRequestMyFolder(memberId, folder, "해당 폴더가 존재하지 않아 삭제 할 수 없습니다");
         folderRepository.deleteById(folderId);
 
         return FolderResponse.builder()
                 .folderId(folder.getId())
                 .name(folder.getName())
                 .build();
+    }
+
+    private void checkRequestMyFolder(long memberId, Folder folder, String message) {
+        if (memberId != folder.getMember().getId()) {
+            // 다른 status를 반환한다는 건 존재하는 자원이라는 걸 알려주는 것이기 때문에 그러면 안된다.
+            throw new ResourceNotFoundException(message);
+        }
     }
 
 }
