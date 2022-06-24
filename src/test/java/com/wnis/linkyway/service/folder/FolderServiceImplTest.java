@@ -260,6 +260,18 @@ class FolderServiceImplTest {
                                                                  2L)).isInstanceOf(ResourceConflictException.class)
                                                                      .hasMessage("직계 자손을 목표 부모 폴더로 지정 할 수 없습니다");
         }
+
+        @Test
+        @DisplayName("최상위 경로로의 이동 요청에 대한 동작 테스트")
+        void changeRequestForSuperPathTest() {
+            UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder().build();
+            FolderResponse folderResponse = folderService.updateFolderPath(updateFolderPathRequest, 3L);
+            assertThat(folderResponse).isNotNull();
+            assertThat(folderResponse.getParentId()).isNull();
+            Folder folder3 = folderRepository.findFolderById(3L).orElse(null);
+            assertThat(folder3).isNotNull();
+            assertThat(folder3.getParent()).isNull();
+        }
     }
 
     @Nested
