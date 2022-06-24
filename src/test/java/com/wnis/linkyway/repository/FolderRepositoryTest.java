@@ -138,7 +138,7 @@ class FolderRepositoryTest {
         Folder folder6 = folderRepository.findFolderById(5L)
                                          .get();
 
-        folder2.modifyParent(folder6);
+        folder2.modifyParent(folder6, folder6.getDepth());
 
         // 트랜잭션 전에 DB로 바로 flush
         folderRepository.saveAndFlush(folder2);
@@ -183,7 +183,7 @@ class FolderRepositoryTest {
         Folder folder4 = folderRepository.findFolderById(4L)
                                          .get();
 
-        Assertions.assertThatThrownBy(() -> folder2.modifyParent(folder4))
+        Assertions.assertThatThrownBy(() -> folder2.modifyParent(folder4, folder4.getDepth()))
                   .isInstanceOf(IllegalStateException.class);
 
     }

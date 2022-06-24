@@ -261,10 +261,10 @@ public class FolderControllerIntegrationTest {
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void LimitFolderDepthTest() throws Exception {
             UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
-                                                                            .targetFolderId(5L)
+                                                                            .targetFolderId(3L)
                                                                             .build();
 
-            MvcResult mvcResult = mockMvc.perform(put("/api/folders/3/path").contentType("application/json")
+            mockMvc.perform(put("/api/folders/1/path").contentType("application/json")
                                                                             .content(objectMapper.writeValueAsString(updateFolderPathRequest)))
                                          .andExpect(status().is(409))
                                          .andReturn();
@@ -288,28 +288,11 @@ public class FolderControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("목표 부모 폴더가 없는 경우 테스트")
-        @WithMockMember(id = 1L, email = "marrin1101@naver.com")
-        void NotExistTargetFolderTest() throws Exception {
-            UpdateFolderPathRequest setFolderPathRequest = UpdateFolderPathRequest.builder()
-                                                                            .targetFolderId(100L)
-                                                                            .build();
-
-            MvcResult mvcResult = mockMvc.perform(put("/api/folders/1/path").contentType("application/json")
-                                                                            .content(objectMapper.writeValueAsString(setFolderPathRequest)))
-                                         .andExpect(status().is(409))
-                                         .andReturn();
-
-            logger.info(mvcResult.getResponse()
-                                 .getContentAsString());
-        }
-
-        @Test
         @DisplayName("목표부모가 직계후손인 경우 테스트")
         @WithMockMember(id = 1L, email = "marrin1101@naver.com")
         void TargetFolderIsDirectDescendantFolderTest() throws Exception {
             UpdateFolderPathRequest setFolderPathRequest = UpdateFolderPathRequest.builder()
-                                                                            .targetFolderId(3L)
+                                                                            .targetFolderId(5L)
                                                                             .build();
 
             MvcResult mvcResult = mockMvc.perform(put("/api/folders/1/path").contentType("application/json")

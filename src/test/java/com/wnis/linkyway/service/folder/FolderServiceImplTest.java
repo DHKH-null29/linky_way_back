@@ -191,10 +191,11 @@ class FolderServiceImplTest {
         }
 
         @Test
-        @DisplayName("예외 테스트: 폴더 깊이가 2를 초과하는 경우")
+        @DisplayName("예외 테스트: 폴더 깊이가 M을 초과하는 경우")
         void exceptionTest3() {
+            int maxFolderDepth = 3;
             AddFolderRequest addFolderRequest = AddFolderRequest.builder()
-                                                                .parentFolderId(3L)
+                                                                .parentFolderId(4L)
                                                                 .name("뻐꾸기")
                                                                 .build();
 
