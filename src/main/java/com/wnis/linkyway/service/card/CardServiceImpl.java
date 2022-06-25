@@ -219,16 +219,30 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
-        folderRepository.findByIdAndMemberId(memberId, folderId)
-                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
-
+        Folder folder = folderRepository.findByIdAndMemberId(memberId, folderId)
+                                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
+    
         List<Card> cardList;
         if (!findDeep) {
             cardList = cardRepository.findCardsByFolderId(folderId);
         } else {
-            cardList = cardRepository.findDeepFoldersCardsByFolderId(folderId);
+            List<Long> folderList = findAllFolderId(folder);
+            cardList = cardRepository.findAllInFolderIds(folderList);
         }
         return toResponseList(cardList);
+    }
+    
+    private List<Long> findAllFolderId(Folder folder) {
+        List<Long> folderList = new ArrayList<>();
+        findAllFolderIdRecursive(folder, folderList);
+        return folderList;
+    }
+    private void findAllFolderIdRecursive(Folder folder, List<Long> folderList) {
+        folderList.add(folder.getId());
+    
+        for (Folder f : folder.getChildren()) {
+            findAllFolderIdRecursive(f, folderList);
+        }
     }
 
     @Override
@@ -243,7 +257,7 @@ public class CardServiceImpl implements CardService {
     }
 
     private List<CardResponse> toResponseList(List<Card> cardList) {
-        List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
+        List<CardResponse> cardResponseList = new ArrayList<>();
         for (Card card : cardList) {
             List<Tag> tagList = card.getCardTags()
                                     .stream()
@@ -296,4 +310,5 @@ public class CardServiceImpl implements CardService {
 
         return savedCardList.size();
     }
+    
 }
