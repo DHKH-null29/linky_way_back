@@ -48,9 +48,9 @@ public class CardController {
     @GetMapping("/{cardId}")
     @ApiOperation(value = "ID를 통해 카드 조회", notes = "Card ID를 활용해 하나의 카드를 조회한다")
     @Authenticated
-    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId) {
+    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId, @CurrentMember Long memberId) {
 
-        CardResponse cardResponse = cardService.findCardByCardId(cardId);
+        CardResponse cardResponse = cardService.findCardByCardId(cardId, memberId);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
