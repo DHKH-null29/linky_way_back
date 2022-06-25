@@ -19,10 +19,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -109,7 +106,7 @@ public class CardRepositoryTest {
         assertThat(savedCard.getContent()).isEqualTo("카드 조회 issue");
         assertThat(savedCard.getIsPublic()).isEqualTo(true);
         assertThat(savedCard.getFolder()).isEqualTo(folder);
-//        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
+        assertThat(savedCard.getIsDeleted()).isEqualTo(false);
     }
 
     
@@ -290,5 +287,44 @@ public class CardRepositoryTest {
             Slice<Card> allUsingPage = cardRepository.findAllUsingCursorPage(7L, PageRequest.of(0, 100));
             assertThat(allUsingPage.getContent().size()).isEqualTo(6);
         }
+    }
+    
+    @Test
+    @DisplayName("findAllInIdsAndMemberId 테스트")
+    void findAllInIdsAndMemberIdTest() {
+        final Long INVALID_MEMBER_ID = 100L;
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L, INVALID_MEMBER_ID));
+        List<Card> result = cardRepository.findAllInIdsAndMemberId(ids, 1L);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0)).extracting("id").isEqualTo(1L);
+        assertThat(result.get(1)).extracting("id").isEqualTo(2L);
+        assertThat(result.get(2)).extracting("id").isEqualTo(3L);
+    }
+    
+    @Test
+    @DisplayName("findAllByIsDeletedAndMemberId 테스트")
+    void findAllByIsDeletedAndMemberIdTest() {
+        List<Card> cardList = cardRepository.findAll();
+        cardList.get(0).updateIsDeleted(true);
+        cardList.get(1).updateIsDeleted(true);
+        em.flush();
+        
+        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingPage(true, 1L, PageRequest.of(0, 2));
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0)).extracting("id").isEqualTo(6L);
+        
+    }
+    
+    @Test
+    @DisplayName("findAllByIsDeletedAndMemberId CursorPaging 테스트")
+    void findAllByIsDeletedAndMemberIdCursorPagingTest() {
+        List<Card> cardList = cardRepository.findAll();
+        cardList.get(0).updateIsDeleted(true);
+        cardList.get(1).updateIsDeleted(true);
+        em.flush();
+    
+        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingCursorPage(true, 6L,1L, PageRequest.of(0, 2));
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0)).extracting("id").isEqualTo(2L);
     }
 }
