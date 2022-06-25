@@ -1,9 +1,7 @@
 package com.wnis.linkyway.dto.folder;
 
-import com.wnis.linkyway.validation.ValidationGroup.NotBlankGroup;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @Getter
@@ -12,7 +10,6 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 public class UpdateFolderPathRequest {
 
-    @NotNull(message = "타겟 상위 폴더의 id를 입력해주세요", groups = NotBlankGroup.class)
-    @Positive(message = "targetFolderId는 1 이상의 id를 입력하셔야 합니다.")
+    @Positive(message = "올바른 목표 폴더 id를 입력하세요")
     private Long targetFolderId;
 }

@@ -1,14 +1,15 @@
 package com.wnis.linkyway.redis.values;
 
 import com.wnis.linkyway.exception.common.EmailSendException;
+import com.wnis.linkyway.redis.RedisConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import static com.wnis.linkyway.redis.RedisConstants.*;
 
 @Getter
 @AllArgsConstructor
 public class EmailVerificationValue {
-
-    private static final int RETRY_COUNT = 5;
 
     private int currentCount;
     private String code;
@@ -31,9 +32,9 @@ public class EmailVerificationValue {
     }
 
     private void checkRetryCount() {
-        if (currentCount >= RETRY_COUNT) {
+        if (currentCount >= EMAIL_VALIDATION_RETRY_COUNT) {
             throw new EmailSendException(
-                    "연속 " + RETRY_COUNT + "회 인증 요청으로 일시적으로 메일 전송이 제한되었습니다. 잠시후 다시 시도해주세요");
+                    "연속 " + EMAIL_VALIDATION_RETRY_COUNT + "회 인증 요청으로 일시적으로 메일 전송이 제한되었습니다. 잠시후 다시 시도해주세요");
         }
     }
 

@@ -17,8 +17,8 @@ public class PackageController {
 
     private final PackageService packageService;
     
-    @GetMapping("/social/{tagName}")
-    ResponseEntity<Response> searchSocialByTagName(@PathVariable(value = "tagName") String tagName) {
+    @GetMapping("/social")
+    ResponseEntity<Response> searchSocialByTagName(@RequestParam(value = "tagName", required = false) String tagName) {
         List<PackageResponse> allPackageByTagName = packageService.findAllPackageByTagName(tagName);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, allPackageByTagName, "개인 검색 성공"));
     }

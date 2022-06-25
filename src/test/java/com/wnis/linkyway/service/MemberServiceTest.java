@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.dto.member.JoinRequest;
 import com.wnis.linkyway.dto.member.MemberResponse;
 import com.wnis.linkyway.dto.member.PasswordRequest;
-import com.wnis.linkyway.exception.common.InvalidValueException;
-import com.wnis.linkyway.exception.common.ResourceConflictException;
-import com.wnis.linkyway.exception.common.ResourceNotFoundException;
+import com.wnis.linkyway.dto.member.UpdateMemberRequest;
+import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.exception.common.*;
+import com.wnis.linkyway.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
@@ -32,11 +34,16 @@ class MemberServiceTest {
 
     private final Logger logger = LoggerFactory.getLogger(MemberServiceTest.class);
     @Autowired
-    MemberService memberService;
-    
+    private MemberService memberService;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Nested
     @DisplayName("회원가입")
@@ -52,7 +59,7 @@ class MemberServiceTest {
                                                  .build();
 
             MemberResponse response = memberService.join(joinRequest);
-            
+
             assertThat(response.getEmail()).isNotNull();
             assertThat(response.getMemberId()).isNotNull();
             assertThat(response.getNickname()).isNotNull();
@@ -96,8 +103,7 @@ class MemberServiceTest {
             String email = "aaasdbadafdaf@naver.com";
             assertThatThrownBy(() -> {
                 memberService.searchEmail(email);
-            }).isInstanceOf(ResourceNotFoundException.class)
-              .hasMessage("조회한 이메일이 존재하지 않습니다");
+            }).isInstanceOf(ResourceNotFoundException.class);
         }
     }
 
@@ -111,7 +117,7 @@ class MemberServiceTest {
             Long memberId = 1L;
             MemberResponse response = memberService.searchMyPage(memberId);
             logger.info(objectMapper.writeValueAsString(response));
-    
+
             assertThat(response).extracting("memberId").isNotNull();
             assertThat(response).extracting("email").isNotNull();
             assertThat(response).extracting("nickname").isNotNull();
@@ -130,6 +136,53 @@ class MemberServiceTest {
     }
 
     @Nested
+    @DisplayName("마이페이지 수정")
+    class UpdateMemberTest {
+
+        @Test
+        @DisplayName("응답 테스트")
+        void shouldReturnIdAndUpdatedNicknameWhenResponseTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("쿠로사키 2치고").build();
+            // when
+            MemberResponse memberResponse = memberService.updateMyPage(updateMemberRequest, 1L);
+
+            // then
+            assertThat(memberResponse.getMemberId()).isNotNull();
+            assertThat(memberResponse.getNickname()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("닉네임 중복 여부")
+        void shouldThrowDuplicateException_WhenInputDuplicateNicknameTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                    .nickname("Zeratu6")
+                    .build();
+
+
+            assertThatThrownBy(()-> {
+                // when
+                memberService.updateMyPage(updateMemberRequest, 1L);
+            }).isInstanceOf(NotAddDuplicateEntityException.class); // then
+        }
+
+        @Test
+        @DisplayName("회원입력이 옳바르지 않은 경우")
+        void shouldThrowNotFoundException_WhenInputInvalidMemberIdTest() {
+            // given
+            UpdateMemberRequest updateMemberRequest = UpdateMemberRequest.builder()
+                         .nickname("손흥민").build();
+
+            assertThatThrownBy(()-> {
+                // when
+                memberService.updateMyPage(updateMemberRequest, 100L);
+            }).isInstanceOf(NotFoundEntityException.class); // then
+        }
+    }
+
+    @Nested
     @DisplayName("패스워드 변경")
     class SetPasswordTest {
 
@@ -143,7 +196,7 @@ class MemberServiceTest {
             MemberResponse response = memberService.updatePassword(passwordRequest, memberId);
 
             logger.info(objectMapper.writeValueAsString(response));
-    
+
             assertThat(response).extracting("memberId").isNull();
             assertThat(response).extracting("email").isNull();
             assertThat(response).extracting("nickname").isNull();
@@ -161,6 +214,22 @@ class MemberServiceTest {
                 memberService.updatePassword(passwordRequest, memberId);
             }).isInstanceOf(ResourceConflictException.class)
               .hasMessage("회원이 존재하지 않아 비밀번호를 바꿀 수 없습니다");
+        }
+    }
+
+    @Nested
+    @DisplayName("비인증 상황에서 이메일 인증 후 패스워드 변경 동작 테스트")
+    class SetPasswordTestByVerfiedEmail {
+
+        private final String EXIST_EMAIL = "marrin1101@hanmail.com";
+        private final String REQUEST_PASSWORD = "aasd!@!asdA";
+
+        @Test
+        @DisplayName("존재하는 회원(이메일)로의 요청으로 정상적으로 비밀번호 변경이 수행된다.")
+        void shouldDoChangePasswordByEmail() {
+            memberService.updatePasswordByVerifiedEmail("aasd!@!asdA",EXIST_EMAIL);
+            Member member = memberRepository.findByEmail(EXIST_EMAIL).orElse(null);
+            assertThat(passwordEncoder.matches(REQUEST_PASSWORD,member.getPassword())).isTrue();
         }
     }
 

@@ -21,12 +21,15 @@ public class BatchScheduler {
 
     private final JobLauncher jobLauncher;
     private final BatchConfig batchConfig;
-    
+
+
     private final long MINUTE = 1000L * 60;
-    
-    @Scheduled(fixedDelay = 5 * MINUTE)
+
+
+
+    @Scheduled(fixedDelay = 45 * MINUTE)
     public void runJob() {
-        
+
         // job Parameter 설정
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
