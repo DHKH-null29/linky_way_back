@@ -31,8 +31,9 @@ public class TrashController {
     
     @GetMapping
     @ApiOperation(value = "삭제된 카드 조회", notes = "isDeleted가 true인 카드들을 조회한다")
-    ResponseEntity<Response<List<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId, Pageable pageable) {
-        List<CardResponse> response = trashService.findAllDeletedCard(memberId, pageable);
+    ResponseEntity<Response<List<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId,
+            @RequestParam(value = "lastCardId", required = false) Long lastCardId, Pageable pageable) {
+        List<CardResponse> response = trashService.findAllDeletedCard(memberId,lastCardId, pageable);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "삭제된 카드 조회 성공"));
     }
 }
