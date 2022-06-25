@@ -178,6 +178,13 @@ public class CardRepositoryTest {
             logger.info("{}", cardTag.getId());
         });
     }
+    
+    @Test
+    @DisplayName("deleteAllCardTagInTagSet ids가 비어있는 경우 테스트")
+    void deleteAllCardTagInIds_WhenIdsIsNotNull() {
+        cardTagRepository.deleteAllCardTagInIds(new ArrayList<>());
+        
+    }
 
     @Test
     @DisplayName("findAllCardTagIdInTagSet 테스트")
