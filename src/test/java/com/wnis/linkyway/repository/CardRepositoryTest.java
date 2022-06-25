@@ -288,4 +288,19 @@ public class CardRepositoryTest {
         List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L));
         assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L, 6L);
     }
+    
+    @Test
+    @DisplayName("해당 카드가 회원의 카드인지 검증")
+    void findByCardIdAndMemberIdTest() {
+        final long MEMBER_ID = 1L;
+        final long CARD_ID = 1L;
+        
+        final long ANOTHER_MEMBER_ID = 3L;
+    
+        Card card = cardRepository.findByCardIdAndMemberId(CARD_ID, MEMBER_ID).orElse(null);
+        assertThat(card).isNotNull();
+        
+        Card card2 = cardRepository.findByCardIdAndMemberId(CARD_ID, ANOTHER_MEMBER_ID).orElse(null);
+        assertThat(card2).isNull();
+    }
 }
