@@ -18,8 +18,14 @@ public class PackageService {
     private final CardTagRepository cardTagRepository;
     
     public List<PackageResponse> findAllPackageByTagName(String tagName) {
-        
-        List<PackageDto> packageDtoList = cardTagRepository.findAllPackageDtoByTagName(tagName);
+        List<PackageDto> packageDtoList = null;
+        if (tagName == null) {
+            System.out.println("tagName은 null이다");
+            packageDtoList = cardTagRepository.findAllPackageDto();
+        } else {
+            packageDtoList = cardTagRepository.findAllPackageDtoByTagName(tagName);
+        }
+       
         Map<Long, Map<Long, List<PackageDto>>> map = packageDtoList.stream()
                                                                    .collect(Collectors.groupingBy(
                                                                                PackageDto::getMemberId,

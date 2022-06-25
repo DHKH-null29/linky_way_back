@@ -1,0 +1,5 @@
+batch:
+  page-size: 100
+  days-ago: 7
+  minutes-ago: 30
+  cron: 0/10 * * * * ?
