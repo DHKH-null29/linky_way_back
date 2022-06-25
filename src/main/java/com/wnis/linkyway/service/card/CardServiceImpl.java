@@ -164,7 +164,10 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId) {
-        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
+        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId)
+                                             .stream()
+                                             .filter(card -> !card.getIsDeleted()).collect(Collectors.toList());
+        
         List<CardResponse> cardResponseList = new ArrayList<>();
         for (Card card : cardsList) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
@@ -189,7 +192,10 @@ public class CardServiceImpl implements CardService {
                      .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<Card> cardList = cardRepository.findCardsByTagId(tagId);
-        return toResponseList(cardList);
+        List<Card> result = cardList.stream().filter(card -> !card.getIsDeleted())
+                .collect(Collectors.toList());
+        
+        return toResponseList(result);
     }
 
     @Override
@@ -201,7 +207,10 @@ public class CardServiceImpl implements CardService {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId);
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId)
+                                            .stream()
+                                            .filter(card -> card.getIsDeleted()).collect(Collectors.toList());
+        
         return toResponseList(cardList).stream()
                                        .map((cardResponse) -> new SocialCardResponse(cardResponse))
                                        .collect(Collectors.toList());
@@ -225,7 +234,10 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public List<CardResponse> findCardsByMemberId(Long memberId) {
-        List<Card> cardList = cardRepository.findCardsByMemberId(memberId);
+        List<Card> cardList = cardRepository.findCardsByMemberId(memberId)
+                                            .stream()
+                                            .filter(card -> !card.getIsDeleted())
+                                            .collect(Collectors.toList());
 
         return toResponseList(cardList);
     }
@@ -266,14 +278,14 @@ public class CardServiceImpl implements CardService {
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<CopyCardsRequest> cardRequestList = copyPackageCardsRequest.getCopyCardsRequestList();
-        List<Card> cardList = new ArrayList<Card>();
+        List<Card> cardList = new ArrayList<>();
         for (CopyCardsRequest card : cardRequestList) {
             cardList.add(card.toEntity(folder, copyPackageCardsRequest.isPublic()));
         }
 
         List<Card> savedCardList = cardRepository.saveAll(cardList);
 
-        List<CardTag> cardTagList = new ArrayList<CardTag>();
+        List<CardTag> cardTagList = new ArrayList<>();
         for (Card savedCard : savedCardList) {
             cardTagList.add(CardTag.builder()
                                    .card(savedCard)
