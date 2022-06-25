@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     
@@ -32,6 +33,10 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     @Query("select c from Card c join c.folder f where f.member.id = :memberId")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId);
+    
+    @Query("select c from Card c join c.folder f join f.member m " +
+            "where c.id = :cardId and m.id = :memberId")
+    public Optional<Card> findByCardIdAndMemberId(Long cardId, Long memberId);
     
     @Query("select c from Card c " +
             "join c.folder f join f.member m " +
