@@ -151,10 +151,15 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void deleteCard(Long cardId) {
+    public Long deleteCard(Long cardId) {
         cardRepository.findById(cardId)
                       .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다."));
-        cardRepository.deleteById(cardId);
+        
+        Card card = cardRepository.findById(cardId)
+                                  .orElseThrow(()-> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
+        
+        card.updateIsDeleted(true);
+        return card.getId();
     }
 
     @Override

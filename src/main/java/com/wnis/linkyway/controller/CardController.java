@@ -37,7 +37,7 @@ public class CardController {
 
         AddCardResponse addCardResponse = cardService.addCard(memberId, cardRequest);
 
-        return ResponseEntity.created(URI.create("/card/" + addCardResponse))
+        return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.CREATED.value())
                                            .data(addCardResponse)
@@ -78,15 +78,16 @@ public class CardController {
     }
 
     @DeleteMapping("/{cardId}")
-    @ApiOperation(value = "카드 완전 삭제", notes = "DB에서 카드를 완전히 삭제한다")
+    @ApiOperation(value = "카드 완전 삭제", notes = "카드 하나를 휴지통으로 보낸다")
     @Authenticated
     public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
 
-        cardService.deleteCard(cardId);
+        Long response = cardService.deleteCard(cardId);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
+                                           .data(response)
                                            .message("카드 삭제 완료")
                                            .build());
     }
