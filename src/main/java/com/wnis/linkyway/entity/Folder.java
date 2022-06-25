@@ -22,7 +22,6 @@ public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "folder_id", nullable = false)
-    @Setter
     private Long id;
 
     @Column(name = "name", nullable = false, length = 10)
@@ -65,6 +64,23 @@ public class Folder {
         if (member != null) {
             member.getFolders()
                     .add(this);
+        }
+    }
+    
+    public Folder(Long id, String name, Long depth, Folder parent, Member member) {
+        this.id = id;
+        this.name = name;
+        this.depth = depth;
+
+        this.parent = parent;
+        if (parent != null)
+            parent.getChildren()
+                  .add(this);
+
+        this.member = member;
+        if (member != null) {
+            member.getFolders()
+                  .add(this);
         }
     }
 

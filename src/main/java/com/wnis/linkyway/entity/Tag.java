@@ -20,7 +20,6 @@ public class Tag extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id", nullable = false)
-    @Setter
     private Long id;
 
     @Column(name = "name", length = 10, nullable = false)
@@ -71,6 +70,16 @@ public class Tag extends BaseEntity{
             member.getTags()
                   .add(this);
         }
-
+    }
+    
+    public Tag(Long id, String name, Boolean isPublic, Member member) {
+        this.id = id;
+        this.name = name;
+        this.isPublic = isPublic;
+        this.member = member;
+        if (member != null) {
+            member.getTags()
+                  .add(this);
+        }
     }
 }

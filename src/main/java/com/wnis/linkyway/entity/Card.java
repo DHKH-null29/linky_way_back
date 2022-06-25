@@ -25,7 +25,6 @@ public class Card extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "card_id", nullable = false)
-    @Setter
     private Long id;
 
     @Column(name = "link", nullable = false)
@@ -54,13 +53,24 @@ public class Card extends BaseEntity {
     private List<CardTag> cardTags = new ArrayList<>();
 
     @Builder
-    private Card(String link, String title, String content, Boolean isPublic, Boolean isDeleted, Folder folder) {
+    private Card(String link, String title, String content, Boolean isPublic, Folder folder) {
         this.link = link;
         this.title = title;
         this.content = content;
         this.isPublic = isPublic;
         this.folder = folder;
-        this.isDeleted = isDeleted;
+        if (folder != null)
+            folder.getCards()
+                  .add(this);
+    }
+    
+    public Card(Long id, String link, String title, String content, Boolean isPublic, Folder folder) {
+        this.id = id;
+        this.link = link;
+        this.title = title;
+        this.content = content;
+        this.isPublic = isPublic;
+        this.folder = folder;
         if (folder != null)
             folder.getCards()
                   .add(this);

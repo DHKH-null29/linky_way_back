@@ -67,11 +67,12 @@ public class CardController {
             @PathVariable Long cardId,
             @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
-        cardService.updateCard(memberId, cardId, cardRequest);
+        Long updatedCardId = cardService.updateCard(memberId, cardId, cardRequest);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
+                                           .data(updatedCardId)
                                            .message("카드 변경 완료")
                                            .build());
     }

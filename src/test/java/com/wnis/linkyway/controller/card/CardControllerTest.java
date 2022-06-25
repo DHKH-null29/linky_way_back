@@ -39,6 +39,8 @@ import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.AddCardResponse;
 import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
@@ -62,7 +64,6 @@ public class CardControllerTest {
                                  .build();
     }
 
-    @DisplayName("카드(북마크) 추가 성공")
     private CardRequest makeCardRequest() {
         Set<Long> tagIdSet = new HashSet<>(Arrays.asList(1L, 2L));
         return CardRequest.builder()
@@ -75,44 +76,16 @@ public class CardControllerTest {
                           .build();
     }
 
-    private Long cardId = 100L;
-
-    private CardResponse makeCardResponse() {
-        TagResponse tagResponse1 = TagResponse.builder()
-                                              .tagName("t1")
-                                              .isPublic(true)
-                                              .build();
-        TagResponse tagResponse2 = TagResponse.builder()
-                                              .tagName("t2")
-                                              .isPublic(false)
-                                              .build();
-        return CardResponse.builder()
-                           .cardId(cardId)
-                           .link("https://www.naver.com/")
-                           .title("title1")
-                           .content("content1")
-                           .isPublic(true)
-                           .tags(Arrays.asList(tagResponse1, tagResponse2))
-                           .build();
-    }
-
     @Test
+    @DisplayName("카드(북마크) 추가 성공")
     void addCardSuccess() throws Exception {
         // given
-        CardRequest addCardRequest = CardRequest.builder()
-                                                .link("https://www.naver.com/")
-                                                .title("title1")
-                                                .content("content1")
-                                                .isPublic(true)
-                                                .folderId(1L)
-                                                .build();
+        CardRequest addCardRequest = makeCardRequest();
         AddCardResponse addCardResponse = AddCardResponse.builder()
-                                                         .cardId(3L)
+                                                         .cardId(1L)
                                                          .build();
-
-//        doReturn(addCardResponse).when(cardService)
-//                                 .addCard(Mockito.any(CardRequest.class));
-
+        doReturn(addCardResponse).when(cardService)
+                                 .addCard(any(), any(CardRequest.class));
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/cards").contentType("application/json")
                                                                         .content(objectMapper.writeValueAsString(addCardRequest)));
@@ -129,16 +102,32 @@ public class CardControllerTest {
     @DisplayName("단일 북마크(카드) 상세 조회")
     class findCardByCardId {
 
+        Long cardId;
+        CardResponse cardResponse;
+
+        @BeforeEach
+        void setCard() {
+            cardId = 3L;
+            cardResponse = CardResponse.builder()
+                                       .cardId(cardId)
+                                       .link("https://www.naver.com/")
+                                       .title("title1")
+                                       .content("content1")
+                                       .isPublic(true)
+                                       .build();
+        }
+
         @Test
         @DisplayName("상세 조회 성공: 올바른 URL")
         void CardExistFindingSuccess() throws Exception {
             // given
-            CardResponse cardResponse = makeCardResponse();
             doReturn(cardResponse).when(cardService)
                                   .findCardByCardId(any());
+
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/" + cardId).contentType("application/json")
                                                                                      .content(objectMapper.writeValueAsString(cardResponse)));
+
             // then
             MvcResult mvcResult = resultActions.andExpect(status().isOk())
                                                .andExpect(ResponseBodyMatchers.responseBody()
@@ -150,11 +139,10 @@ public class CardControllerTest {
         @Test
         @DisplayName("상세 조회 실패: 잘못된 URL")
         void CardNotExistFindingFail() throws Exception {
-            // given
-            CardResponse cardResponse = makeCardResponse();
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/").contentType("application/json")
                                                                             .content(objectMapper.writeValueAsString(cardResponse)));
+
             // then
             resultActions.andExpect(status().isMethodNotAllowed())
                          .andExpect(result -> Assertions.assertThat(Objects.requireNonNull(result.getResolvedException())
@@ -168,53 +156,41 @@ public class CardControllerTest {
     @DisplayName("북마크(카드) 수정")
     class updateCard {
 
-        Long cardId;
-        CardResponse cardResponse;
-        CardRequest cardRequest;
+        private Long cardId = 1000L;
+        private CardRequest cardRequest;
 
         @BeforeEach
         void setCard() {
-            cardId = 3L;
-            cardResponse = CardResponse.builder()
-                                       .cardId(3L)
-                                       .link("https://www.naver.com/")
-                                       .title("title1")
-                                       .content("content1")
-                                       .isPublic(true)
-                                       .build();
-            cardRequest = CardRequest.builder()
-                                     .link("https://www.daum.net/")
-                                     .title("title2")
-                                     .content("content2")
-                                     .isPublic(false)
-                                     .folderId(1L)
-                                     .build();
+            cardRequest = makeCardRequest();
         }
 
         @Test
         @DisplayName("카드 수정 성공: 올바른 URL")
         void updateCardSuccess() throws Exception {
+            // given
+            CardRequest cardRequest = makeCardRequest();
+            doReturn(cardId).when(cardService)
+                            .updateCard(any(), any(), any(CardRequest.class));
             // when
             ResultActions resultActions = mockMvc.perform(put("/api/cards/" + cardId).contentType("application/json")
                                                                                      .content(objectMapper.writeValueAsString(cardRequest)));
-
             // then
             resultActions.andExpect(status().isOk())
                          .andExpect(ResponseBodyMatchers.responseBody()
                                                         .containsPropertiesAsJson(Response.class))
                          .andReturn();
 
-//            verify(cardService).updateCard(Mockito.anyLong(),
-//                    any(CardRequest.class));
+            verify(cardService).updateCard(any(), any(), any(CardRequest.class));
         }
 
         @Test
         @DisplayName("카드 수정 실패: 잘못된 URL")
         void updateCardFail() throws Exception {
+            // given
+            CardRequest cardRequest = makeCardRequest();
             // when
             ResultActions resultActions = mockMvc.perform(patch("/api/cards/").contentType("application/json")
                                                                               .content(objectMapper.writeValueAsString(cardRequest)));
-
             // then
             resultActions.andExpect(status().isMethodNotAllowed())
                          .andExpect(result -> Assertions.assertThat(Objects.requireNonNull(result.getResolvedException())
@@ -223,11 +199,13 @@ public class CardControllerTest {
                          .andReturn();
         }
     }
+
     @Nested
     @DisplayName("카드 목록 조회")
     class findCards {
 
         private List<CardResponse> cardResponses = new ArrayList<CardResponse>();
+        private Long cardId = 1000L;
         private Long tagId1 = 1L;
         private Long tagId2 = 2L;
         private Long folderId = 10L;
@@ -340,5 +318,37 @@ public class CardControllerTest {
                                                                               .containsPropertiesAsJson(Response.class)) // method
                                                .andReturn();
         }
+    }
+
+    @Test
+    @DisplayName("패키지 목록(태그 내부 카드 목록) 복사 성공") // not done
+    void copyCardsInPackageSuccess() throws Exception {
+        // given
+        List<CopyCardsRequest> copyCardsRequests = new ArrayList<CopyCardsRequest>(
+                Arrays.asList(CopyCardsRequest.builder()
+                                              .build(),
+                              CopyCardsRequest.builder()
+                                              .build()));
+        CopyPackageCardsRequest copyPackageCardsRequest = CopyPackageCardsRequest.builder()
+                                                                                 .tagId(1L)
+                                                                                 .folderId(10L)
+                                                                                 .isPublic(false)
+                                                                                 .copyCardsRequestList(copyCardsRequests)
+                                                                                 .build();
+        int copyCardsSize = copyPackageCardsRequest.getCopyCardsRequestList()
+                                                   .size();
+        doReturn(copyCardsSize)
+                 .when(cardService)
+                 .copyCardsInPackage(any(CopyPackageCardsRequest.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/api/cards/package/copy").contentType("application/json")
+                                                                            .content(objectMapper.writeValueAsString(copyPackageCardsRequest)));
+        // then
+        MvcResult mvcResult = resultActions.andExpect(status().isOk())
+                                           .andExpect(ResponseBodyMatchers.responseBody() // create
+                                                                          // ResponseBodyMatcher
+                                                                          .containsPropertiesAsJson(Response.class)) // method
+                                           .andReturn();
     }
 }
