@@ -13,7 +13,7 @@ public interface CardService {
 
     public AddCardResponse addCard(Long memberId, CardRequest cardRequest);
 
-    public CardResponse findCardByCardId(Long cardId);
+    public CardResponse findCardByCardId(Long cardId, Long memberId);
 
     public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest);
 
