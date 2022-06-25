@@ -11,13 +11,13 @@ public interface FolderService {
 
     List<FolderResponse> findAllFolderSuper(Long memberId);
 
-    FolderResponse findFolder(Long folderId);
+    FolderResponse findFolder(Long folderId, Long memberId);
 
     FolderResponse addFolder(AddFolderRequest addFolderRequest, Long memberId);
 
-    FolderResponse updateFolderPath(UpdateFolderPathRequest setFolderPathRequest, Long folderId);
+    FolderResponse updateFolderPath(UpdateFolderPathRequest setFolderPathRequest, Long folderId, Long memberId);
 
-    FolderResponse updateFolderName(UpdateFolderNameRequest setFolderNameRequest, Long folderId);
+    FolderResponse updateFolderName(UpdateFolderNameRequest setFolderNameRequest, Long folderId, Long memberId);
 
-    FolderResponse deleteFolder(Long folderId);
+    FolderResponse deleteFolder(Long folderId, Long memberId);
 }

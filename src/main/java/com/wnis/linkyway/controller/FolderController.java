@@ -36,8 +36,8 @@ public class FolderController {
     @GetMapping("/{folderId}")
     @ApiOperation(value = "폴더 조회", notes = "해당 회원이 가지고 있는 폴더를 ID를 통해 조회한다")
     @Authenticated
-    public ResponseEntity<Response<FolderResponse>> searchFolder(@PathVariable(value = "folderId") Long folderId) {
-        FolderResponse response = folderService.findFolder(folderId);
+    public ResponseEntity<Response<FolderResponse>> searchFolder(@PathVariable(value = "folderId") Long folderId, @CurrentMember Long memberId) {
+        FolderResponse response = folderService.findFolder(folderId, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "폴더를 성공적으로 조회했습니다"));
     }
 
@@ -57,9 +57,9 @@ public class FolderController {
     @Authenticated
     public ResponseEntity<Response<FolderResponse>> updateFolderName(
             @Validated(ValidationSequence.class) @RequestBody UpdateFolderNameRequest updateFolderNameRequest,
-            @PathVariable Long folderId) {
+            @PathVariable Long folderId, @CurrentMember Long memberId) {
 
-        FolderResponse response = folderService.updateFolderName(updateFolderNameRequest, folderId);
+        FolderResponse response = folderService.updateFolderName(updateFolderNameRequest, folderId, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "폴더 이름이 성공적으로 수정되었습니다"));
     }
 
@@ -68,17 +68,17 @@ public class FolderController {
     @Authenticated
     public ResponseEntity<Response<FolderResponse>> updateFolderPath(
             @Validated(ValidationSequence.class) @RequestBody UpdateFolderPathRequest updateFolderPathRequest,
-            @PathVariable(value = "folderId") Long folderId) {
+            @PathVariable(value = "folderId") Long folderId, @CurrentMember Long memberId) {
 
-        FolderResponse response = folderService.updateFolderPath(updateFolderPathRequest, folderId);
+        FolderResponse response = folderService.updateFolderPath(updateFolderPathRequest, folderId, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "폴더 경로가 성공적으로 수정되었습니다"));
     }
 
     @DeleteMapping("/{folderId}")
     @ApiOperation(value = "폴더 삭제", notes = "해당 폴더를 삭제한다")
     @Authenticated
-    public ResponseEntity<Response<FolderResponse>> deleteFolder(@PathVariable(value = "folderId") Long folderId) {
-        FolderResponse response = folderService.deleteFolder(folderId);
+    public ResponseEntity<Response<FolderResponse>> deleteFolder(@PathVariable(value = "folderId") Long folderId, @CurrentMember Long memberId) {
+        FolderResponse response = folderService.deleteFolder(folderId, memberId);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "폴더와 하위 폴더가 성공적으로 삭제되었습니다"));
     }
 }
