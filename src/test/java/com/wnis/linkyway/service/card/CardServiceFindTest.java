@@ -232,8 +232,8 @@ public class CardServiceFindTest {
                      .when(folderRepository)
                      .findByIdAndMemberId(anyLong(), anyLong());
             lenient().doReturn(cardList)
-                     .when(cardRepository)
-                     .findDeepFoldersCardsByFolderId(anyLong());
+                    .when(cardRepository)
+                    .findAllInFolderIds(any());
             // when
             List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), true);
 
@@ -253,7 +253,7 @@ public class CardServiceFindTest {
             // verify
             verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
             verify(cardRepository, times(0)).findCardsByFolderId(anyLong());
-            verify(cardRepository, times(1)).findDeepFoldersCardsByFolderId(anyLong());
+            verify(cardRepository, times(1)).findAllInFolderIds(any());
         }
 
         @Test
