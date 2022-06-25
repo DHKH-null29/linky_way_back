@@ -70,7 +70,7 @@ public class TrashIntegrationTest {
         cardList.get(1).updateIsDeleted(true);
         cardRepository.flush();
         
-        mockMvc.perform(get("/api/trash?page=1&size=2"))
+        mockMvc.perform(get("/api/trash?lastCardId=3&size=2"))
                .andExpect(status().isOk());
     }
     

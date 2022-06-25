@@ -54,7 +54,7 @@ public class TrashServiceTest {
     @DisplayName("삭제된 카드 조회")
     void shouldReturnDeletedCardFormatTest() {
         // 제대로 응답 되는지 테스트
-        List<CardResponse> cardResponseList = trashService.findAllDeletedCard(VALID_MEMBER_ID, PageRequest.of(0, 2));
+        List<CardResponse> cardResponseList = trashService.findAllDeletedCard(VALID_MEMBER_ID, 7L, PageRequest.of(0, 2));
         
         assertThat(cardResponseList.size()).isEqualTo(1);
         assertThat(cardResponseList.get(0).getCardId()).isNotNull();
