@@ -51,6 +51,7 @@ public class CardServiceLogicTest {
             CardRequest cardRequest = CardRequest.builder()
                     .link("www.google.com")
                     .title("구글 주소")
+                    .content("hello world")
                     .isPublic(false)
                     .tagIdSet(tagIdSet)
                     .folderId(1L)
@@ -72,40 +73,18 @@ public class CardServiceLogicTest {
             assertThat(cardTagRepository.findAll().size()).isEqualTo(beforeCardTagSize + 3);
         }
     
-        @Test
-        @DisplayName("응답 테스트 title이 없는 경우")
-        void addCardSuccessWhenNoTitleTest() {
-            Set<Long> tagIdSet = new HashSet<>(Arrays.asList(1L, 2L, 3L));
-            CardRequest cardRequest = CardRequest.builder()
-                                                 .link("www.google.com")
-                                                 .isPublic(false)
-                                                 .tagIdSet(tagIdSet)
-                                                 .folderId(1L)
-                                                 .build();
-            int beforeSize = cardRepository.findAll().size();
-            int beforeCardTagSize = cardTagRepository.findAll().size();
-            cardService.addCard(1L, cardRequest);
-            List<CardTag> cardTagList = cardTagRepository.findAll();
-            cardTagList.forEach(cardTag -> {
-                logger.info("CardTag ID: {}, Card ID: {}, Card Title: {},TagID: {} Tag Name: {}",
-                            cardTag.getId(), cardTag.getCard().getId(), cardTag.getCard().getTitle(),
-                            cardTag.getTag().getId(), cardTag.getTag().getName());
-                Long id = cardTag.getId();
-                if (id > 6 && id < 10) {
-                    assertThat(cardTag.getCard().getId()).isEqualTo(7);
-                }
-            });
-            assertThat(cardRepository.findAll().size()).isEqualTo(beforeSize + 1);
-            assertThat(cardTagRepository.findAll().size()).isEqualTo(beforeCardTagSize + 3);
-        }
+        
     
         @Test
-        @DisplayName("응답 테스트 태그가 없는 경우")
+        @DisplayName("응답 테스트 태그가 비어있는 경우")
         void addCardSuccessWhenNoTagTest() {
             CardRequest cardRequest = CardRequest.builder()
                                                  .link("www.google.com")
                                                  .isPublic(false)
                                                  .folderId(1L)
+                                                 .title("world")
+                                                 .content("hello")
+                                                 .tagIdSet(new HashSet<>(Arrays.asList()))
                                                  .build();
             int beforeSize = cardRepository.findAll().size();
             int beforeCardTagSize = cardTagRepository.findAll().size();
@@ -160,6 +139,8 @@ public class CardServiceLogicTest {
             CardRequest cardRequest = CardRequest.builder()
                                                  .link("www.google.com")
                                                  .isPublic(false)
+                                                 .title("hello")
+                                                 .content("world")
                                                  .tagIdSet(tagIdSet)
                                                  .folderId(1L)
                                                  .build();

@@ -79,9 +79,9 @@ public class PersonalSearchIntegrationTest {
                             .title("hello")
                             .content("yeah")
                             .isPublic(false)
-//                            .isDeleted(false)
+                            .isDeleted(false)
                             .build();
-    
+ 
             Card card2 = Card.builder()
                             .folder(folder2)
                             .link("www.google2.co.kr")
@@ -89,6 +89,7 @@ public class PersonalSearchIntegrationTest {
                             .content("yeah")
                             .isPublic(false)
                             .build();
+
             
             Tag tag = Tag.builder()
                          .isPublic(false)

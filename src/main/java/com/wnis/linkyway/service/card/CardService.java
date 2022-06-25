@@ -16,7 +16,7 @@ public interface CardService {
 
     public CardResponse findCardByCardId(Long cardId);
 
-    public Card updateCard(Long memberId, Long cardId, CardRequest cardRequest);
+    public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest);
 
     public void deleteCard(Long cardId);
 

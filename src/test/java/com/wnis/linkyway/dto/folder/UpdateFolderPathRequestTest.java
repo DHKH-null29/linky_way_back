@@ -1,6 +1,5 @@
 package com.wnis.linkyway.dto.folder;
 
-import com.wnis.linkyway.validation.ValidationGroup;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,21 +30,6 @@ class UpdateFolderPathRequestTest {
     @AfterAll
     static void close() {
         factory.close();
-    }
-
-    @Test
-    @DisplayName("Not Blank 테스트")
-    void notBlankTest() {
-        UpdateFolderPathRequest updateFolderPathRequest = UpdateFolderPathRequest.builder()
-                                                                        .build();
-
-        Set<ConstraintViolation<UpdateFolderPathRequest>> constraintViolations = validator.validate(updateFolderPathRequest,
-                                                                                                 ValidationGroup.NotBlankGroup.class);
-
-        constraintViolations.forEach((e) -> {
-            logger.info(e.getMessage());
-            assertThat(e).isInstanceOf(ConstraintViolationImpl.class);
-        });
     }
 
     @Test

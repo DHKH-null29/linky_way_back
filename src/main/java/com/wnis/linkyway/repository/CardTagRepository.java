@@ -36,6 +36,10 @@ public interface CardTagRepository extends JpaRepository<CardTag, Long> {
             "where t.id in :tagIdSet")
     List<Long> findAllCardTagIdInTagSet(@Param(value = "tagIdSet") Set<Long> tagIdSet);
 
+    @Query("select new com.wnis.linkyway.dto.PackageDto(m.id, m.nickname, t.id, t.name) from CardTag ct join ct.tag t " +
+            "join t.member m")
+    List<PackageDto> findAllPackageDto();
+    
     @Query("select ct.id from CardTag ct join ct.card c " +
             "where c.id in :ids")
     List<Long> findAllCardTagIdInCardIds(@Param(value = "ids") List<Long> cardIds);
@@ -43,4 +47,5 @@ public interface CardTagRepository extends JpaRepository<CardTag, Long> {
     @Query("select count(*) from CardTag ct join ct.card c join ct.tag t " +
             "where t.id = :tagId and c.isPublic = true")
     long countByTagId(@Param(value = "tagId") Long tagId);
+
 }

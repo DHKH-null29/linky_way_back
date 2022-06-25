@@ -14,7 +14,6 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", nullable = false)
-    @Setter
     private Long id;
 
     @Column(name = "nickname", nullable = false, length = 10)
@@ -64,6 +63,13 @@ public class Member {
     // ***************** 생성자 ****************************
     @Builder
     private Member(String nickname, String password, String email) {
+        this.nickname = nickname;
+        this.password = password;
+        this.email = email;
+    }
+    
+    public Member(Long id, String nickname, String password, String email) {
+        this.id = id;
         this.nickname = nickname;
         this.password = password;
         this.email = email;

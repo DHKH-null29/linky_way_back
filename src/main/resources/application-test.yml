@@ -31,6 +31,7 @@ spring:
       - classpath:email.yml
       - classpath:tag.yml
       - classpath:folder.yml
+      - classpath:batch.yml
 
 logging:
   level:

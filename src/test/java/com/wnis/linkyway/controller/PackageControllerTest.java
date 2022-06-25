@@ -49,7 +49,7 @@ class PackageControllerTest {
     
     
     @Test
-    @DisplayName("displayName")
+    @DisplayName("응답 형식 테스트")
     void ControllerTest() throws Exception {
         PackageResponse packageResponse = PackageResponse.builder()
                 .memberId(1L)
@@ -63,6 +63,7 @@ class PackageControllerTest {
         doReturn(responseList).when(packageService).findAllPackageByTagName(any(), any());
         
         mockMvc.perform(get("/api/search/social/hello?page=0&size=2"))
+
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..memberId").isNotEmpty())
                 .andExpect(jsonPath("$..nickname").isNotEmpty())
@@ -70,4 +71,5 @@ class PackageControllerTest {
                 .andExpect(jsonPath("$..tagName").isNotEmpty())
                 .andExpect(jsonPath("$..tagId").isNotEmpty());
     }
+    
 }

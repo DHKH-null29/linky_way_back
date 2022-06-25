@@ -1,4 +1,5 @@
 folder:
   limit:
-    depth: 2
     num: 5
+    depth: 3
+
