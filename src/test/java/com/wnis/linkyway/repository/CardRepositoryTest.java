@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -279,5 +280,12 @@ public class CardRepositoryTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0)).extracting("id").isEqualTo(2L);
 
+    }
+    
+    @Test
+    @DisplayName("폴더 id로 카드 조회 테스트")
+    void findAllInFolderIdsTest() {
+        List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L));
+        assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L, 6L);
     }
 }
