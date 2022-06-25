@@ -91,7 +91,7 @@ public class CardControllerTest {
                                                                         .content(objectMapper.writeValueAsString(addCardRequest)));
 
         // then
-        MvcResult mvcResult = resultActions.andExpect(status().isCreated())
+        MvcResult mvcResult = resultActions.andExpect(status().isOk())
                                            .andExpect(ResponseBodyMatchers.responseBody() // create
                                                                           // ResponseBodyMatcher
                                                                           .containsPropertiesAsJson(Response.class)) // method
