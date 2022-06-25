@@ -9,6 +9,7 @@ import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.entity.Tag;
+import com.wnis.linkyway.exception.common.NotFoundEntityException;
 import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -243,6 +245,22 @@ public class CardServiceTest {
             verify(cardTagRepository).deleteAll(anyList());
             verify(tagRepository).findAllById(anySet());
             verify(cardTagRepository).saveAll(anyList());
+        }
+    }
+    
+    @Nested
+    @DisplayName("카드 삭제")
+    class DeleteCard {
+        
+        @Test
+        @DisplayName("회원 검증")
+        void verifyMember_WhenDeleteCard() {
+            
+            doReturn(false).when(memberRepository).existsById(any());
+            assertThatThrownBy(()-> {
+                cardService.deleteCard(1L, 100L);
+            }).isInstanceOf(NotFoundEntityException.class);
+            
         }
     }
 
