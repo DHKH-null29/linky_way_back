@@ -70,4 +70,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "where c.id < :lastId and c.isDeleted = :isDeleted and m.id = :memberId " +
             "order by c.id desc")
     List<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
+    
+    @Query("select c from Card c " +
+            "join c.folder f " +
+            "where f.id in :folderList")
+    List<Card> findAllInFolderIds(List<Long> folderList);
 }
