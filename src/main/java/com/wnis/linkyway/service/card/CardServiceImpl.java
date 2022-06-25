@@ -152,11 +152,11 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public Long deleteCard(Long cardId, Long memberId) {
         if (!memberRepository.existsById(memberId)) {
-            throw new NotFoundEntityException("해당 회원이 아니면 삭제를 수행 할 수 없습니다");
+            throw new NotFoundEntityException("회원이 존재하지 않습니다");
         }
-        
-        Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(()-> new NotFoundEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다"));
+    
+        Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
+                                  .orElseThrow(() -> new ResourceConflictException("회원 카드만 삭제가 가능합니다"));
         
         card.updateIsDeleted(true);
         return card.getId();
