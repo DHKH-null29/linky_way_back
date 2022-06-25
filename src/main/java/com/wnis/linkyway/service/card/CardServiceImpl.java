@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.wnis.linkyway.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,6 @@ import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.repository.CardRepository;
-import com.wnis.linkyway.repository.CardTagRepository;
-import com.wnis.linkyway.repository.FolderRepository;
-import com.wnis.linkyway.repository.TagRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +36,8 @@ public class CardServiceImpl implements CardService {
     private final CardTagRepository cardTagRepository;
 
     private final FolderRepository folderRepository;
+    
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional
@@ -151,12 +150,13 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public Long deleteCard(Long cardId) {
-        cardRepository.findById(cardId)
-                      .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다."));
+    public Long deleteCard(Long cardId, Long memberId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundEntityException("해당 회원이 아니면 삭제를 수행 할 수 없습니다");
+        }
         
         Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(()-> new NotFoundEntityException("해당 카드가 존재하지 않습니다"));
+                                  .orElseThrow(()-> new NotFoundEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다"));
         
         card.updateIsDeleted(true);
         return card.getId();

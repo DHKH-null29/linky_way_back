@@ -80,9 +80,9 @@ public class CardController {
     @DeleteMapping("/{cardId}")
     @ApiOperation(value = "카드 완전 삭제", notes = "카드 하나를 휴지통으로 보낸다")
     @Authenticated
-    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
+    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId, @CurrentMember Long memberId) {
 
-        Long response = cardService.deleteCard(cardId);
+        Long response = cardService.deleteCard(cardId, memberId);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
