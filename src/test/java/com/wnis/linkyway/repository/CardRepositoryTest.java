@@ -269,21 +269,27 @@ public class CardRepositoryTest {
     @Test
     @DisplayName("findAllByIsDeletedAndMemberId 테스트")
     void findAllByIsDeletedAndMemberIdTest() {
-        final Long INVALID_MEMBER_ID = 100L;
         List<Card> cardList = cardRepository.findAll();
         cardList.get(0).updateIsDeleted(true);
         cardList.get(1).updateIsDeleted(true);
         em.flush();
         
-        List<Card> result = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(0, 2));
+        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingPage(true, 1L, PageRequest.of(0, 2));
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0)).extracting("id").isEqualTo(1L);
+        assertThat(result.get(0)).extracting("id").isEqualTo(6L);
+        
+    }
     
-        List<Card> result2 = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(1, 2));
-        assertThat(result2.size()).isEqualTo(1);
-        assertThat(result2.get(0)).extracting("id").isEqualTo(6L);
+    @Test
+    @DisplayName("findAllByIsDeletedAndMemberId CursorPaging 테스트")
+    void findAllByIsDeletedAndMemberIdCursorPagingTest() {
+        List<Card> cardList = cardRepository.findAll();
+        cardList.get(0).updateIsDeleted(true);
+        cardList.get(1).updateIsDeleted(true);
+        em.flush();
     
-        List<Card> result3 = cardRepository.findAllByIsDeletedAndMemberId(true, 1L, PageRequest.of(2, 2));
-        assertThat(result3.size()).isEqualTo(0);
+        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingCursorPage(true, 6L,1L, PageRequest.of(0, 2));
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0)).extracting("id").isEqualTo(2L);
     }
 }
