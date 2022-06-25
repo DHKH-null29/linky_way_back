@@ -26,6 +26,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select c from Card c join c.folder f where f.id = :folderId")
     public List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId);
 
+    // 삭제 예정 쿼리
     @Query("select c from Card c join c.folder f where f.parent.id = :folderId or f.id = :folderId")
     public List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
 
