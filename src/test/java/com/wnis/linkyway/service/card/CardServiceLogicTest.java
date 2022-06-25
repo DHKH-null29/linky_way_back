@@ -114,7 +114,7 @@ public class CardServiceLogicTest {
         @Test
         @DisplayName("카드 조회 성공 테스트")
         void findCardByCardIdSuccessTest() {
-            CardResponse cardResponse = cardService.findCardByCardId(3L);
+            CardResponse cardResponse = cardService.findCardByCardId(3L, 1L);
             assertThat(cardResponse.getCardId()).isNotNull();
             assertThat(cardResponse.getLink()).isNotNull();
             assertThat(cardResponse.getTitle()).isNotNull();

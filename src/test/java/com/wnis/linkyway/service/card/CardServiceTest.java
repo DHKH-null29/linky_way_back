@@ -161,10 +161,11 @@ public class CardServiceTest {
             // given
             Optional<Card> savedCard = Optional.of(makeCard());
             doReturn(savedCard).when(cardRepository)
-                               .findById(any());
+                               .findByCardIdAndMemberId(any(), any());
+
             // when
             CardResponse cardResponse = cardService.findCardByCardId(savedCard.get()
-                                                                              .getId());
+                                                                              .getId(), 1001L);
 
             // then
             assertThat(cardResponse).isNotNull();
@@ -175,7 +176,7 @@ public class CardServiceTest {
             assertEquals(isPublic, cardResponse.getIsPublic());
 
             // verify
-            verify(cardRepository).findById(Mockito.anyLong());
+            verify(cardRepository).findByCardIdAndMemberId(any(), any());
         }
 
         @Test
@@ -183,12 +184,11 @@ public class CardServiceTest {
         void CardNotExistFindingFail() throws Exception {
             // when
             doReturn(Optional.empty()).when(cardRepository)
-                                      .findById(Mockito.anyLong());
-
+                                      .findByCardIdAndMemberId(Mockito.anyLong(), any());
             // then
             Assertions.assertThrows(ResourceNotFoundException.class,
-                                    () -> cardService.findCardByCardId(Mockito.anyLong()));
-            verify(cardRepository).findById(Mockito.anyLong());
+                                    () -> cardService.findCardByCardId(Mockito.anyLong(), any()));
+            verify(cardRepository).findByCardIdAndMemberId(Mockito.anyLong(), any());
         }
     }
 
@@ -228,19 +228,21 @@ public class CardServiceTest {
         void updateCardSuccess() throws Exception {
             // given
             doReturn(oldCard).when(cardRepository)
-                             .findById(anyLong());
+                             .findByCardIdAndMemberId(any(), any());
+            
             doReturn(folder2).when(folderRepository)
                              .findByIdAndMemberId(anyLong(), anyLong());
             doReturn(newTagList).when(tagRepository)
                                 .findAllById(anySet());
             doReturn(savedCardTagList).when(cardTagRepository)
                                       .saveAll(anyList());
-
+            
+            
             // when
             cardService.updateCard(1L, 1L, newCardRequest);
 
             // verify
-            verify(cardRepository).findById(anyLong());
+            verify(cardRepository).findByCardIdAndMemberId(any(), any());
             verify(folderRepository).findByIdAndMemberId(anyLong(), anyLong());
             verify(cardTagRepository).deleteAll(anyList());
             verify(tagRepository).findAllById(anySet());

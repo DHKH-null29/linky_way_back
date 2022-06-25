@@ -122,7 +122,7 @@ public class CardControllerTest {
         void CardExistFindingSuccess() throws Exception {
             // given
             doReturn(cardResponse).when(cardService)
-                                  .findCardByCardId(any());
+                                  .findCardByCardId(any(), any());
 
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/" + cardId).contentType("application/json")
@@ -133,7 +133,7 @@ public class CardControllerTest {
                                                .andExpect(ResponseBodyMatchers.responseBody()
                                                                               .containsPropertiesAsJson(Response.class))
                                                .andReturn();
-            verify(cardService).findCardByCardId(any());
+            verify(cardService).findCardByCardId(any(), any());
         }
 
         @Test
