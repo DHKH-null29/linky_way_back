@@ -41,8 +41,16 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     List<Card> findAllInIdsAndMemberId(@Param(value = "ids") List<Long> ids,
             @Param(value = "memberId") Long memberId);
     
+    //cursor Paging
     @Query("select c from Card c " +
             "join fetch c.folder f join f.member m " +
-            "where c.isDeleted = :isDeleted and m.id = :memberId")
-    List<Card> findAllByIsDeletedAndMemberId(boolean isDeleted, Long memberId, Pageable pageable);
+            "where c.isDeleted = :isDeleted and m.id = :memberId " +
+            "order by c.id desc")
+    List<Card> findAllByIsDeletedAndMemberIdUsingPage(boolean isDeleted, Long memberId, Pageable pageable);
+    
+    @Query("select c from Card c " +
+            "join fetch c.folder f join f.member m " +
+            "where c.id < :lastId and c.isDeleted = :isDeleted and m.id = :memberId " +
+            "order by c.id desc")
+    List<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
 }
