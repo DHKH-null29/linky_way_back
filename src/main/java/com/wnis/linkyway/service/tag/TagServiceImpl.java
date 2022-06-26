@@ -57,7 +57,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagResponse setTag(TagRequest tagRequest, Long tagId, Long memberId) {
         Tag tag = tagRepository.findById(tagId)
-                               .orElseThrow(() -> new NotModifyEmptyEntityException("태그가 존재하지 않아 수정 할 수 없습니다."));
+                               .orElseThrow(() -> new NotFoundEntityException("해당 태그가 존재하지 않아 수정 할 수 없습니다"));
 
         checkRequestMyTag(memberId, tag, "해당 태그가 존재하지 않아 수정 할 수 없습니다");
         
