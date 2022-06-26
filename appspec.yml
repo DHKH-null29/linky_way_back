@@ -5,5 +5,5 @@ files:
     destination: /home/ubuntu/linky/build/
 hooks:
   AfterInstall:
-    - location: /home/ubuntu/linky/deploy.sh
-      timeout: 480
+    - location: rundeploy.sh
+      timeout: 1200
