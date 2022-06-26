@@ -33,11 +33,11 @@ jobs:
         run: zip -r -qq -j ./linkyway-build.zip ./deploy
 
       - name: Deliver to AWS S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl private --delete
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_STAGING_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ap-northeast-2
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          --acl private \
+        ./linkyway-build.zip s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/
