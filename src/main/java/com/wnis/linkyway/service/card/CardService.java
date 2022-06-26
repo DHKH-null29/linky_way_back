@@ -13,11 +13,11 @@ public interface CardService {
 
     public AddCardResponse addCard(Long memberId, CardRequest cardRequest);
 
-    public CardResponse findCardByCardId(Long cardId);
+    public CardResponse findCardByCardId(Long cardId, Long memberId);
 
     public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest);
 
-    public void deleteCard(Long cardId);
+    public Long deleteCard(Long cardId, Long memberId);
 
     public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId);
 

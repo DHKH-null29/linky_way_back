@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class TrashService {
     private final CardTagRepository cardTagRepository;
     private final MemberRepository memberRepository;
     
-    public List<Long> updateDeleteCardTrueOrFalse(List<Long> ids, Long memberId, boolean isDeleted) {
+    public List<Long> updateDeleteCardFalse(List<Long> ids, Long memberId) {
         if (ids == null) {
             ids = new ArrayList<>();
         }
@@ -36,20 +36,42 @@ public class TrashService {
         
         List<Long> result = new ArrayList<>();
         
-        // 회원이 가지고 있는 편집할 id 목록 조회해서 업데이트
+        // 회원이 가지고 있는 편집할 id 목록 조회해서 업데이트 복원
         List<Card> cardList = cardRepository.findAllInIdsAndMemberId(ids, memberId);
         for (Card card : cardList) {
-            card.updateIsDeleted(isDeleted);
+            card.updateIsDeleted(false);
             result.add(card.getId());
         }
         return result;
+    }
+    
+    public List<Long> deleteCompletely(List<Long> ids, Long memberId) {
+        if (ids == null) {
+            ids = new ArrayList<>();
+        }
+        
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundEntityException("회원이 존재하지 않습니다");
+        }
+        
+        // card Id 중 본인 것의 cardId만 검증해서 가져옴
+        List<Long> cardIds = cardRepository.findAllInIdsAndMemberId(ids, memberId).stream()
+                                           .map(Card::getId).collect(Collectors.toList());
+
+        // 연관 관계 제거
+        List<Long> cardTagIds = cardTagRepository.findAllCardTagIdInCardIds(cardIds);
+        cardTagRepository.deleteAllCardTagInIds(cardTagIds);
+        // 카드 제거
+        cardRepository.deleteAllByIdInBatch(ids);
+        
+        return cardTagIds;
     }
     
     public List<CardResponse> findAllDeletedCard(Long memberId, Long lastCardId, Pageable pageable) {
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundEntityException("회원이 존재하지 않습니다");
         }
-        List<Card> cardList = null;
+        List<Card> cardList;
         
         // lastCardId 상태에 따라 최초 페이징이냐 커서페이징이냐 결정
         if (checkInvalidLastCardId(lastCardId)) {

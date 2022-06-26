@@ -2,6 +2,7 @@ package com.wnis.linkyway.service;
 
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.repository.CardRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,6 +30,9 @@ public class TrashServiceTest {
     TrashService trashService;
     
     @Autowired
+    CardRepository cardRepository;
+    
+    @Autowired
     EntityManager em;
     
     private final long VALID_MEMBER_ID = 1L;
@@ -35,19 +40,31 @@ public class TrashServiceTest {
     
     
     @Test
-    @DisplayName("카드 삭제 & 복원")
+    @DisplayName("카드 복원")
     void shouldChangeCardIsDeletedPropertiesTest() {
         // 내부 속성이 제대로 변했는지 테스트
         List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L));
-        trashService.updateDeleteCardTrueOrFalse(ids, VALID_MEMBER_ID, true);
+        trashService.updateDeleteCardFalse(ids, VALID_MEMBER_ID);
         em.flush();
         em.clear();
         
         Card c1 = em.find(Card.class, 1L);
         Card c2 = em.find(Card.class, 2L);
         
-        assertThat(c1.getIsDeleted()).isEqualTo(true);
-        assertThat(c2.getIsDeleted()).isEqualTo(true);
+        assertThat(c1.getIsDeleted()).isEqualTo(false);
+        assertThat(c2.getIsDeleted()).isEqualTo(false);
+    }
+    
+    @Test
+    @DisplayName("완전한 카드 삭제")
+    void shouldDeleteCardCompletelyInDB() {
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+        List<Long> deletedIds = trashService.deleteCompletely(ids, 1L);
+        List<Long> idList = cardRepository.findAll().stream().map(Card::getId).collect(Collectors.toList());
+        assertThat(idList.size()).isEqualTo(3);
+        assertThat(idList).doesNotContain(1L, 2L, 3L);
+        em.flush();
+        
     }
     
     @Test

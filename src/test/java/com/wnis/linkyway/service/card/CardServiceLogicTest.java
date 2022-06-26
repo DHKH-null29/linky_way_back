@@ -4,6 +4,8 @@ import com.wnis.linkyway.dto.card.CardRequest;
 import com.wnis.linkyway.dto.card.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
+import com.wnis.linkyway.entity.Folder;
+import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.repository.CardRepository;
 import com.wnis.linkyway.repository.CardTagRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -112,7 +114,7 @@ public class CardServiceLogicTest {
         @Test
         @DisplayName("카드 조회 성공 테스트")
         void findCardByCardIdSuccessTest() {
-            CardResponse cardResponse = cardService.findCardByCardId(3L);
+            CardResponse cardResponse = cardService.findCardByCardId(3L, 1L);
             assertThat(cardResponse.getCardId()).isNotNull();
             assertThat(cardResponse.getLink()).isNotNull();
             assertThat(cardResponse.getTitle()).isNotNull();
@@ -166,6 +168,50 @@ public class CardServiceLogicTest {
         
     }
     
-    
+    @Test
+    @DisplayName("카드 deep search test")
+    void cardTest() {
+        Member member = em.find(Member.class, 1L);
+        Folder folder2 = em.find(Folder.class, 2L);
+        
+        Folder newFolder1 = Folder.builder()
+                .member(member)
+                .parent(folder2)
+                .name("hello")
+                .depth(folder2.getDepth() + 1)
+                .build();
+        
+        Folder newFolder2 = Folder.builder()
+                .member(member)
+                .parent(newFolder1)
+                .name("heasdfaf")
+                .depth(newFolder1.getDepth())
+                .build();
+        Card newCard1 = Card.builder()
+                .folder(newFolder1)
+                .title("h")
+                .content("h")
+                .link("https://www.google.com")
+                .isPublic(false)
+                .build();
+        
+        Card newCard2 = Card.builder()
+                .folder(newFolder2)
+                .title("c")
+                .content("k")
+                .link("https://www.naver.com")
+                .isPublic(false)
+                .build();
+        
+        em.persist(newFolder1);
+        em.persist(newFolder2);
+        em.persist(newCard1);
+        em.persist(newCard2);
+        em.flush();
+        
+        List<CardResponse> cardResponseList = cardService.findCardsByFolderId(1L, 2L, true);
+        logger.info("{}", cardResponseList.size());
+        assertThat(cardResponseList.size()).isEqualTo(5);
+    }
     
 }

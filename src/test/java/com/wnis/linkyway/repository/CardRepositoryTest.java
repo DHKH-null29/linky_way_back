@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -178,6 +179,13 @@ public class CardRepositoryTest {
             logger.info("{}", cardTag.getId());
         });
     }
+    
+    @Test
+    @DisplayName("deleteAllCardTagInTagSet ids가 비어있는 경우 테스트")
+    void deleteAllCardTagInIds_WhenIdsIsNotNull() {
+        cardTagRepository.deleteAllCardTagInIds(new ArrayList<>());
+        
+    }
 
     @Test
     @DisplayName("findAllCardTagIdInTagSet 테스트")
@@ -272,5 +280,27 @@ public class CardRepositoryTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0)).extracting("id").isEqualTo(2L);
 
+    }
+    
+    @Test
+    @DisplayName("폴더 id로 카드 조회 테스트")
+    void findAllInFolderIdsTest() {
+        List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L));
+        assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L, 6L);
+    }
+    
+    @Test
+    @DisplayName("해당 카드가 회원의 카드인지 검증")
+    void findByCardIdAndMemberIdTest() {
+        final long MEMBER_ID = 1L;
+        final long CARD_ID = 1L;
+        
+        final long ANOTHER_MEMBER_ID = 3L;
+    
+        Card card = cardRepository.findByCardIdAndMemberId(CARD_ID, MEMBER_ID).orElse(null);
+        assertThat(card).isNotNull();
+        
+        Card card2 = cardRepository.findByCardIdAndMemberId(CARD_ID, ANOTHER_MEMBER_ID).orElse(null);
+        assertThat(card2).isNull();
     }
 }

@@ -37,7 +37,7 @@ public class CardController {
 
         AddCardResponse addCardResponse = cardService.addCard(memberId, cardRequest);
 
-        return ResponseEntity.created(URI.create("/card/" + addCardResponse))
+        return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.CREATED.value())
                                            .data(addCardResponse)
@@ -48,9 +48,9 @@ public class CardController {
     @GetMapping("/{cardId}")
     @ApiOperation(value = "ID를 통해 카드 조회", notes = "Card ID를 활용해 하나의 카드를 조회한다")
     @Authenticated
-    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId) {
+    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId, @CurrentMember Long memberId) {
 
-        CardResponse cardResponse = cardService.findCardByCardId(cardId);
+        CardResponse cardResponse = cardService.findCardByCardId(cardId, memberId);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
@@ -78,15 +78,16 @@ public class CardController {
     }
 
     @DeleteMapping("/{cardId}")
-    @ApiOperation(value = "카드 완전 삭제", notes = "DB에서 카드를 완전히 삭제한다")
+    @ApiOperation(value = "카드 완전 삭제", notes = "카드 하나를 휴지통으로 보낸다")
     @Authenticated
-    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId) {
+    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId, @CurrentMember Long memberId) {
 
-        cardService.deleteCard(cardId);
+        Long response = cardService.deleteCard(cardId, memberId);
 
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
+                                           .data(response)
                                            .message("카드 삭제 완료")
                                            .build());
     }

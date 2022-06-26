@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.wnis.linkyway.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +21,6 @@ import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.repository.CardRepository;
-import com.wnis.linkyway.repository.CardTagRepository;
-import com.wnis.linkyway.repository.FolderRepository;
-import com.wnis.linkyway.repository.TagRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +36,8 @@ public class CardServiceImpl implements CardService {
     private final CardTagRepository cardTagRepository;
 
     private final FolderRepository folderRepository;
+    
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional
@@ -64,9 +63,12 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public CardResponse findCardByCardId(Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(() -> new NotFoundEntityException("해당 카드가 존재하지 않습니다."));
+    public CardResponse findCardByCardId(Long cardId, Long memberId) {
+        Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
+                                  .orElseThrow(() -> new NotFoundEntityException("다른 회원 또는 존재하지 않는 카드를 조회 할 수 없습니다"));
+        if (card.getIsDeleted()) {
+            throw new NotFoundEntityException("삭제된 카드는 조회 할 수 없습니다");
+        }
         List<CardTag> cardTagList = card.getCardTags();
         List<TagResponse> tagResponseList = new ArrayList<>();
         for (CardTag cardTag : cardTagList) {
@@ -93,8 +95,8 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
-        Card card = cardRepository.findById(cardId)
-                                  .orElseThrow(() -> new NotModifyEmptyEntityException("해당 카드가 존재하지 않아 수정이 불가능합니다."));
+        Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
+                                  .orElseThrow(() -> new ResourceConflictException("해당 회원만 카드 수정 가능합니다"));
 
         Folder oldFolder = card.getFolder();
         if (cardRequest.getFolderId() != oldFolder.getId()) {
@@ -151,15 +153,24 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void deleteCard(Long cardId) {
-        cardRepository.findById(cardId)
-                      .orElseThrow(() -> new NotDeleteEmptyEntityException("해당 카드가 존재하지 않아 삭제가 불가능합니다."));
-        cardRepository.deleteById(cardId);
+    public Long deleteCard(Long cardId, Long memberId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new NotFoundEntityException("회원이 존재하지 않습니다");
+        }
+    
+        Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
+                                  .orElseThrow(() -> new ResourceConflictException("회원 카드만 삭제가 가능합니다"));
+        
+        card.updateIsDeleted(true);
+        return card.getId();
     }
 
     @Override
     public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId) {
-        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId);
+        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId)
+                                             .stream()
+                                             .filter(card -> !card.getIsDeleted()).collect(Collectors.toList());
+        
         List<CardResponse> cardResponseList = new ArrayList<>();
         for (Card card : cardsList) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
@@ -184,7 +195,10 @@ public class CardServiceImpl implements CardService {
                      .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<Card> cardList = cardRepository.findCardsByTagId(tagId);
-        return toResponseList(cardList);
+        List<Card> result = cardList.stream().filter(card -> !card.getIsDeleted())
+                .collect(Collectors.toList());
+        
+        return toResponseList(result);
     }
 
     @Override
@@ -196,7 +210,10 @@ public class CardServiceImpl implements CardService {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId);
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId)
+                                            .stream()
+                                            .filter(card -> card.getIsDeleted()).collect(Collectors.toList());
+        
         return toResponseList(cardList).stream()
                                        .map((cardResponse) -> new SocialCardResponse(cardResponse))
                                        .collect(Collectors.toList());
@@ -205,28 +222,45 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
-        folderRepository.findByIdAndMemberId(memberId, folderId)
-                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
-
+        Folder folder = folderRepository.findByIdAndMemberId(memberId, folderId)
+                                        .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
+    
         List<Card> cardList;
         if (!findDeep) {
             cardList = cardRepository.findCardsByFolderId(folderId);
         } else {
-            cardList = cardRepository.findDeepFoldersCardsByFolderId(folderId);
+            List<Long> folderList = findAllFolderId(folder);
+            cardList = cardRepository.findAllInFolderIds(folderList);
         }
         return toResponseList(cardList);
+    }
+    
+    private List<Long> findAllFolderId(Folder folder) {
+        List<Long> folderList = new ArrayList<>();
+        findAllFolderIdRecursive(folder, folderList);
+        return folderList;
+    }
+    private void findAllFolderIdRecursive(Folder folder, List<Long> folderList) {
+        folderList.add(folder.getId());
+    
+        for (Folder f : folder.getChildren()) {
+            findAllFolderIdRecursive(f, folderList);
+        }
     }
 
     @Override
     @Transactional
     public List<CardResponse> findCardsByMemberId(Long memberId) {
-        List<Card> cardList = cardRepository.findCardsByMemberId(memberId);
+        List<Card> cardList = cardRepository.findCardsByMemberId(memberId)
+                                            .stream()
+                                            .filter(card -> !card.getIsDeleted())
+                                            .collect(Collectors.toList());
 
         return toResponseList(cardList);
     }
 
     private List<CardResponse> toResponseList(List<Card> cardList) {
-        List<CardResponse> cardResponseList = new ArrayList<CardResponse>();
+        List<CardResponse> cardResponseList = new ArrayList<>();
         for (Card card : cardList) {
             List<Tag> tagList = card.getCardTags()
                                     .stream()
@@ -261,14 +295,14 @@ public class CardServiceImpl implements CardService {
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
         List<CopyCardsRequest> cardRequestList = copyPackageCardsRequest.getCopyCardsRequestList();
-        List<Card> cardList = new ArrayList<Card>();
+        List<Card> cardList = new ArrayList<>();
         for (CopyCardsRequest card : cardRequestList) {
             cardList.add(card.toEntity(folder, copyPackageCardsRequest.isPublic()));
         }
 
         List<Card> savedCardList = cardRepository.saveAll(cardList);
 
-        List<CardTag> cardTagList = new ArrayList<CardTag>();
+        List<CardTag> cardTagList = new ArrayList<>();
         for (Card savedCard : savedCardList) {
             cardTagList.add(CardTag.builder()
                                    .card(savedCard)
@@ -279,4 +313,5 @@ public class CardServiceImpl implements CardService {
 
         return savedCardList.size();
     }
+    
 }

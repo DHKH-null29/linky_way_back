@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     
@@ -26,11 +27,16 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select c from Card c join c.folder f where f.id = :folderId")
     public List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId);
 
+    // 삭제 예정 쿼리
     @Query("select c from Card c join c.folder f where f.parent.id = :folderId or f.id = :folderId")
     public List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
 
     @Query("select c from Card c join c.folder f where f.member.id = :memberId")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId);
+    
+    @Query("select c from Card c join c.folder f join f.member m " +
+            "where c.id = :cardId and m.id = :memberId")
+    public Optional<Card> findByCardIdAndMemberId(Long cardId, Long memberId);
     
     @Query("select c from Card c " +
             "join c.folder f join f.member m " +
@@ -70,4 +76,9 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "where c.id < :lastId and c.isDeleted = :isDeleted and m.id = :memberId " +
             "order by c.id desc")
     List<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
+    
+    @Query("select c from Card c " +
+            "join c.folder f " +
+            "where f.id in :folderList")
+    List<Card> findAllInFolderIds(List<Long> folderList);
 }
