@@ -32,6 +32,11 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select c from Card c join c.folder f where f.member.id = :memberId")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId);
     
+    @Query("select c from Card c " +
+            "join c.folder f join f.member m " +
+            "where c.id in :ids and m.id = :memberId")
+    List<Card> findAllInIdsAndMemberId(@Param(value = "ids") List<Long> ids,
+            @Param(value = "memberId") Long memberId);
     
     // cursor Paging
     @Query("select c.id from Card c " +
@@ -52,4 +57,17 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "where c.id < :lastId " +
             "order by c.id desc ")
     Slice<Card> findAllUsingCursorPage(Long lastId, Pageable pageable);
+    
+    //cursor Paging
+    @Query("select c from Card c " +
+            "join fetch c.folder f join f.member m " +
+            "where c.isDeleted = :isDeleted and m.id = :memberId " +
+            "order by c.id desc")
+    List<Card> findAllByIsDeletedAndMemberIdUsingPage(boolean isDeleted, Long memberId, Pageable pageable);
+    
+    @Query("select c from Card c " +
+            "join fetch c.folder f join f.member m " +
+            "where c.id < :lastId and c.isDeleted = :isDeleted and m.id = :memberId " +
+            "order by c.id desc")
+    List<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
 }
