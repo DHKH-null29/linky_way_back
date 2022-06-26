@@ -68,9 +68,9 @@ public class CardServiceImpl implements CardService {
     public CardResponse findCardByCardId(Long cardId, Long memberId) {
         Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
                                   .orElseThrow(() -> new NotFoundEntityException("다른 회원 또는 존재하지 않는 카드를 조회 할 수 없습니다"));
-        if (card.getIsDeleted()) {
-            throw new NotFoundEntityException("삭제된 카드는 조회 할 수 없습니다");
-        }
+        
+        checkDeletedCardOne(card);
+        
         List<CardTag> cardTagList = card.getCardTags();
         List<TagResponse> tagResponseList = new ArrayList<>();
         for (CardTag cardTag : cardTagList) {
@@ -99,7 +99,9 @@ public class CardServiceImpl implements CardService {
     public Long updateCard(Long memberId, Long cardId, CardRequest cardRequest) {
         Card card = cardRepository.findByCardIdAndMemberId(cardId, memberId)
                                   .orElseThrow(() -> new ResourceConflictException("해당 회원만 카드 수정 가능합니다"));
-
+    
+        checkDeletedCardOne(card);
+        
         Folder oldFolder = card.getFolder();
         if (cardRequest.getFolderId() != oldFolder.getId()) {
             Folder folder = folderRepository.findByIdAndMemberId(oldFolder.getMember()
@@ -317,4 +319,9 @@ public class CardServiceImpl implements CardService {
         return savedCardList.size();
     }
     
+    private void checkDeletedCardOne(Card card) {
+        if (card.getIsDeleted()) {
+            throw new ResourceNotFoundException("해당 카드를 수정 할 수 없습니다");
+        }
+    }
 }
