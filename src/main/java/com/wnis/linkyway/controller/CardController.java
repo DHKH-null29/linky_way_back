@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -96,8 +98,8 @@ public class CardController {
     @ApiOperation(value = "키워드를 통한 카드 조회", notes = "키워드를 활용해 여러 카드를 조회한다")
     @Authenticated
     public ResponseEntity<Response> searchCardByKeywordPersonalPage(@RequestParam(value = "keyword") String keyword,
-            @CurrentMember Long memberId) {
-        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(keyword, memberId);
+            @CurrentMember Long memberId, Pageable pageable) {
+        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(keyword, memberId, pageable);
         return ResponseEntity.ok()
                              .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
     }
@@ -107,7 +109,7 @@ public class CardController {
     @Authenticated
     public ResponseEntity<Response> findCardsByTagId(@CurrentMember Long memberId, @PathVariable Long tagId) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId);
+        List<CardResponse> cardResponses = cardService.findCardsByTagId(memberId, tagId, PageRequest.of(0, 200));
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
@@ -119,9 +121,9 @@ public class CardController {
     @GetMapping("/package/{tagId}")
     @ApiOperation(value = "태그아이디를 통해 패키지 조회", notes = "태그 아이디를 활용해 여러 태그 아이디 조회")
     @Authenticated
-    public ResponseEntity<Response> findIsPublicCardsByTagId(@PathVariable Long tagId) {
+    public ResponseEntity<Response> findIsPublicCardsByTagId(@PathVariable Long tagId, Pageable pageable) {
 
-        List<SocialCardResponse> cardResponses = cardService.findIsPublicCardsByTagId(tagId);
+        List<SocialCardResponse> cardResponses = cardService.findIsPublicCardsByTagId(tagId, pageable);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
@@ -135,9 +137,9 @@ public class CardController {
     @Authenticated
     public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
             @PathVariable Long folderId,
-            @RequestParam boolean findDeep) {
+            @RequestParam boolean findDeep, Pageable pageable) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep);
+        List<CardResponse> cardResponses = cardService.findCardsByFolderId(memberId, folderId, findDeep, pageable);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
@@ -149,9 +151,9 @@ public class CardController {
     @GetMapping("/all")
     @ApiOperation(value = "회원 카드 조회", notes = "회원이 가지고 있는 모든 카드 조회")
     @Authenticated
-    public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId) {
+    public ResponseEntity<Response> findCardsByMemberId(@CurrentMember Long memberId, Pageable pageable) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId);
+        List<CardResponse> cardResponses = cardService.findCardsByMemberId(memberId, pageable);
         return ResponseEntity.ok()
                              .body(Response.builder()
                                            .code(HttpStatus.OK.value())
