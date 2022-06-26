@@ -3,7 +3,10 @@ package com.wnis.linkyway.service.tag;
 import com.wnis.linkyway.dto.tag.TagRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.exception.common.*;
+import com.wnis.linkyway.exception.common.NotAddDuplicateEntityException;
+import com.wnis.linkyway.exception.common.NotFoundEntityException;
+import com.wnis.linkyway.exception.common.NotModifyEmptyEntityException;
+import com.wnis.linkyway.exception.common.ResourceNotFoundException;
 import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,12 +55,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagResponse setTag(TagRequest tagRequest, Long tagId) {
+    public TagResponse setTag(TagRequest tagRequest, Long tagId, Long memberId) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new NotModifyEmptyEntityException("태그가 존재하지 않아 수정 할 수 없습니다."));
 
+        checkRequestMyTag(memberId, tag, "해당 태그가 존재하지 않아 수정 할 수 없습니다");
+        
         if (tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), tagId)) {
-            throw new NotModifyDuplicateException("이미 존재하는 태그의 이름으로 수정 할 수 없습니다");
+            throw new NotFoundEntityException("이미 존재하는 태그의 이름으로 수정 할 수 없습니다");
         }
 
         tag.updateName(tagRequest.getTagName())
@@ -71,15 +76,22 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagResponse deleteTag(Long tagId) {
-        if (!tagRepository.existsById(tagId)) {
-            throw new NotDeleteEmptyEntityException("태그가 존재하지 않아 삭제 할 수 없습니다");
-        }
+    public TagResponse deleteTag(Long tagId, Long memberId) {
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() ->
+                new NotFoundEntityException("태그가 존재하지 않아 삭제 할 수 없습니다"));
+
+        
+        checkRequestMyTag(memberId, tag, "해당 태그가 존재하지 않아 삭제 할 수 없습니다");
 
         tagRepository.deleteById(tagId);
         return TagResponse.builder()
                           .tagId(tagId)
                           .build();
     }
-
+    
+    private void checkRequestMyTag(long memberId, Tag tag, String message) {
+        if (tag.getMember().getId() != memberId) {
+            throw new ResourceNotFoundException(message);
+        }
+    }
 }
