@@ -23,14 +23,17 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build --stacktrace
 
-      - name: Make Directory
-        run: mkdir deploy
+      - name: ls
+        run: ls
 
-      - name: Copy All Project
-        run: cp -r * ./deploy/
+#      - name: Make Directory
+#        run: mkdir deploy
+#
+#      - name: Copy All Project
+#        run: cp -r ./* ./deploy/
 
       - name: Make zip file
-        run: zip -r -qq -j ./linkyway-build.zip ./deploy
+        run: zip -r -qq -j ./linkyway-build.zip ./
 
       - name: Deliver to AWS S3
         env:
