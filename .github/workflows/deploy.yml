@@ -26,8 +26,8 @@ jobs:
       - name: Make Directory
         run: mkdir deploy
 
-      - name: Copy Jar
-        run: cp ./build/libs/*.jar ./deploy/
+      - name: Copy All Project
+        run: cp ./ ./deploy/
 
       - name: Make zip file
         run: zip -r -qq -j ./linkyway-build.zip ./deploy
