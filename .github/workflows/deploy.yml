@@ -2,7 +2,7 @@ name: Spring Boot Gradle CI/CD
 
 on:
   push:
-    branches: [ feat/#163/github_actions ]
+    branches: [ master ]
 
 jobs:
   build:
