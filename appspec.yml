@@ -1,0 +1,9 @@
+version: 0.0
+os: linux
+files:
+  - source:  /
+    destination: /home/ubuntu/linky/build/
+hooks:
+  AfterInstall:
+    - location: /home/ubuntu/linky/deploy.sh
+      timeout: 480
