@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.wnis.linkyway.repository.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -166,8 +168,8 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId) {
-        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId)
+    public List<CardResponse> SearchCardByKeywordPersonalPage(String keyword, Long memberId, Pageable pageable) {
+        List<Card> cardsList = cardRepository.findAllCardByKeyword(keyword, memberId, pageable)
                                              .stream()
                                              .filter(card -> !card.getIsDeleted()).collect(Collectors.toList());
         
@@ -190,11 +192,11 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByTagId(Long memberId, Long tagId) {
+    public List<CardResponse> findCardsByTagId(Long memberId, Long tagId, Pageable pageable) {
         tagRepository.findByIdAndMemberId(memberId, tagId)
                      .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
 
-        List<Card> cardList = cardRepository.findCardsByTagId(tagId);
+        List<Card> cardList = cardRepository.findCardsByTagId(tagId, pageable);
         List<Card> result = cardList.stream().filter(card -> !card.getIsDeleted())
                 .collect(Collectors.toList());
         
@@ -203,16 +205,16 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<SocialCardResponse> findIsPublicCardsByTagId(Long tagId) {
+    public List<SocialCardResponse> findIsPublicCardsByTagId(Long tagId, Pageable pageable) {
         Tag tag = tagRepository.findById(tagId)
                                .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
         if (!tag.getIsPublic()) {
             throw new NotAccessableException("소셜 공유가 허용되지 않은 태그입니다.");
         }
 
-        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId)
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tagId, pageable)
                                             .stream()
-                                            .filter(card -> card.getIsDeleted()).collect(Collectors.toList());
+                                            .filter(card -> !card.getIsDeleted()).collect(Collectors.toList());
         
         return toResponseList(cardList).stream()
                                        .map((cardResponse) -> new SocialCardResponse(cardResponse))
@@ -221,17 +223,18 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep) {
+    public List<CardResponse> findCardsByFolderId(Long memberId, Long folderId, boolean findDeep, Pageable pageable) {
         Folder folder = folderRepository.findByIdAndMemberId(memberId, folderId)
                                         .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
     
         List<Card> cardList;
         if (!findDeep) {
-            cardList = cardRepository.findCardsByFolderId(folderId);
+            cardList = cardRepository.findCardsByFolderId(folderId, pageable);
         } else {
             List<Long> folderList = findAllFolderId(folder);
-            cardList = cardRepository.findAllInFolderIds(folderList);
+            cardList = cardRepository.findAllInFolderIds(folderList, pageable);
         }
+        cardList = cardList.stream().filter(card-> !card.getIsDeleted()).collect(Collectors.toList());
         return toResponseList(cardList);
     }
     
@@ -250,8 +253,8 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByMemberId(Long memberId) {
-        List<Card> cardList = cardRepository.findCardsByMemberId(memberId)
+    public List<CardResponse> findCardsByMemberId(Long memberId, Pageable pageable) {
+        List<Card> cardList = cardRepository.findCardsByMemberId(memberId, pageable)
                                             .stream()
                                             .filter(card -> !card.getIsDeleted())
                                             .collect(Collectors.toList());

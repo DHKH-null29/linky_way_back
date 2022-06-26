@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.wnis.linkyway.controller.CardController;
+import com.wnis.linkyway.controller.TagController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +30,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -44,23 +52,30 @@ import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
+import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(MockitoExtension.class)
+@WebMvcTest(controllers = CardController.class,
+        excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                classes = WebSecurityConfigurerAdapter.class) })
 public class CardControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
+    
 
-    @InjectMocks
-    private CardController cardController;
-
-    @Mock
+    @MockBean
     private CardService cardService;
 
+    @Autowired
     private MockMvc mockMvc;
-
+    
+    @Autowired
+    WebApplicationContext ctx;
+    
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(cardController)
+        mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
+                                 .alwaysDo(print())
                                  .build();
     }
 
@@ -247,7 +262,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByTagId(any(), anyLong());
+                     .findCardsByTagId(any(), anyLong(), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/tag/"
                     + tagId1).contentType("application/json")
@@ -267,9 +282,9 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findIsPublicCardsByTagId(anyLong());
+                     .findIsPublicCardsByTagId(anyLong(), any());
             // when
-            ResultActions resultActions = mockMvc.perform(get("/api/cards/package/"
+            ResultActions resultActions = mockMvc.perform(get("/api/cards/package/1?page=0&size=10"
                     + tagId1).contentType("application/json")
                              .content(objectMapper.writeValueAsString(cardResponses)));
 
@@ -287,7 +302,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByFolderId(anyLong(), anyLong(), any(Boolean.class));
+                     .findCardsByFolderId(anyLong(), anyLong(), any(Boolean.class), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/folder/"
                     + folderId).param("findDeep", String.valueOf(true))
@@ -307,7 +322,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByMemberId(anyLong());
+                     .findCardsByMemberId(anyLong(), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/all").contentType("application/json")
                                                                                .content(objectMapper.writeValueAsString(cardResponses)));

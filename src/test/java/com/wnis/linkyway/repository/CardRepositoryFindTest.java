@@ -18,6 +18,7 @@ import com.wnis.linkyway.entity.CardTag;
 import com.wnis.linkyway.entity.Folder;
 import com.wnis.linkyway.entity.Member;
 import com.wnis.linkyway.entity.Tag;
+import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -138,7 +139,7 @@ public class CardRepositoryFindTest {
         // given
         Tag tag = savedTags.get(0);
         // when
-        List<Card> cardList = cardRepository.findCardsByTagId(tag.getId());
+        List<Card> cardList = cardRepository.findCardsByTagId(tag.getId(), PageRequest.of(0, 200));
         // then
         assertThat(cardList.size()).isEqualTo(2);
     }
@@ -149,7 +150,7 @@ public class CardRepositoryFindTest {
         // given
         Tag tag1 = savedTags.get(0);
         // when
-        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tag1.getId());
+        List<Card> cardList = cardRepository.findIsPublicCardsByTagId(tag1.getId(), PageRequest.of(0, 200));
         // then
         assertThat(cardList.size()).isEqualTo(1); // tag1에 카드 2개 But 1개는 공유 불가능한 카드
     }
@@ -161,8 +162,8 @@ public class CardRepositoryFindTest {
         Folder folder1 = savedFolders.get(0);
         Folder folder2 = savedFolders.get(1);
         // when
-        List<Card> cardList1 = cardRepository.findCardsByFolderId(folder1.getId());
-        List<Card> cardList2 = cardRepository.findCardsByFolderId(folder2.getId());
+        List<Card> cardList1 = cardRepository.findCardsByFolderId(folder1.getId(), PageRequest.of(0, 200));
+        List<Card> cardList2 = cardRepository.findCardsByFolderId(folder2.getId(), PageRequest.of(0, 200));
         // then
         assertThat(cardList1.size()).isEqualTo(3);
         assertThat(cardList2.size()).isEqualTo(1);
@@ -186,7 +187,7 @@ public class CardRepositoryFindTest {
     @DisplayName("사용자의 모든 카드 목록 조회 성공")
     public void findCardsByMemberIdSuccess() {
         // when
-        List<Card> cardList = cardRepository.findCardsByMemberId(savedMember.getId());
+        List<Card> cardList = cardRepository.findCardsByMemberId(savedMember.getId(), PageRequest.of(0, 200));
         // then
         assertThat(cardList.size()).isEqualTo(4);
     }
