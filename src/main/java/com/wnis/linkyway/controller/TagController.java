@@ -51,7 +51,7 @@ public class TagController {
             @PathVariable(value = "tagId") Long tagId,
             @Validated(ValidationSequence.class) @RequestBody TagRequest tagRequest) {
 
-        TagResponse response = tagService.setTag(tagRequest, tagId);
+        TagResponse response = tagService.setTag(tagRequest, tagId, memberId);
         return ResponseEntity.status(200)
                              .body(Response.of(HttpStatus.OK, response, "태그가 성공적으로 수정되었습니다"));
     }
@@ -59,9 +59,10 @@ public class TagController {
     @DeleteMapping("/tags/{tagId}")
     @ApiOperation(value = "태그 삭제", notes = "해당 회원이 가지오 있는 태그를 삭제한다.")
     @Authenticated
-    public ResponseEntity<Response> deleteTag(@PathVariable(value = "tagId") Long tagId) {
+    public ResponseEntity<Response> deleteTag(@PathVariable(value = "tagId") Long tagId,
+            @ApiIgnore @CurrentMember Long memberId) {
 
-        TagResponse response = tagService.deleteTag(tagId);
+        TagResponse response = tagService.deleteTag(tagId, memberId);
         return ResponseEntity.status(200)
                              .body(Response.of(HttpStatus.OK, response, "태그를 성공적으로 삭제했습니다"));
     }

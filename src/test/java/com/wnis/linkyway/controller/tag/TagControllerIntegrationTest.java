@@ -147,7 +147,7 @@ public class TagControllerIntegrationTest {
 
             MvcResult mvcResult = mockMvc.perform(put("/api/tags/4000").contentType(MediaType.APPLICATION_JSON)
                                                                        .content(objectMapper.writeValueAsString(tagRequest)))
-                                         .andExpect(status().is(409))
+                                         .andExpect(status().is(404))
                                          .andReturn();
 
             logger.info(mvcResult.getResponse()
@@ -177,7 +177,7 @@ public class TagControllerIntegrationTest {
         @WithMockMember(id = 1, email = "marrin1101@naver.com")
         void responseExceptionTest() throws Exception {
             mockMvc.perform(delete("/api/tags/1000"))
-                   .andExpect(status().is(409));
+                   .andExpect(status().is(404));
         }
     }
 }

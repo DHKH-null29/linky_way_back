@@ -11,8 +11,8 @@ public interface TagService {
 
     TagResponse addTag(TagRequest tagRequest, Long memberId);
 
-    TagResponse setTag(TagRequest tagRequest, Long tagId);
+    TagResponse setTag(TagRequest tagRequest, Long tagId, Long memberId);
 
-    TagResponse deleteTag(Long tagId);
+    TagResponse deleteTag(Long tagId, Long memberId);
 
 }

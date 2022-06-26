@@ -77,28 +77,12 @@ public class TagServiceBusinessExceptionTest {
             Assertions.assertThatThrownBy(() -> {
                 tagService.setTag(TagRequest.builder()
                                             .build(),
-                                  1L);
+                                  1L, 1L);
             })
-                      .isInstanceOf(NotModifyEmptyEntityException.class);
+                      .isInstanceOf(NotFoundEntityException.class);
         }
 
-        @Test
-        @DisplayName("이미 존재하는 태그이름으로 수정 요청시 예외")
-        void shouldThrowNotModifyExceptionWhenDuplicateTagName() {
-            doReturn(Optional.of(Tag.builder()
-                                    .build())).when(tagRepository)
-                                              .findById(any());
-            // 요청 tagName이랑 id로 탐색한 결과 이미 값이 존재한다면 중복 예외.
-            doReturn(true).when(tagRepository)
-                          .existsByMemberIdAndTagName(any(), any());
-
-            Assertions.assertThatThrownBy(() -> {
-                tagService.setTag(TagRequest.builder()
-                                            .build(),
-                                  1L);
-            })
-                      .isInstanceOf(NotModifyDuplicateException.class);
-        }
+        
     }
 
     @Nested
@@ -108,13 +92,13 @@ public class TagServiceBusinessExceptionTest {
         @Test
         @DisplayName("데이터가 없는데 삭제시 예외")
         void shouldThrowNotDeleteExceptionWhenHasNoTag() {
-            doReturn(false).when(tagRepository)
-                           .existsById(any());
+            doReturn(Optional.empty()).when(tagRepository)
+                           .findById(any());
 
             Assertions.assertThatThrownBy(() -> {
-                tagService.deleteTag(1L);
+                tagService.deleteTag(1L, 1L);
             })
-                      .isInstanceOf(NotDeleteEmptyEntityException.class);
+                      .isInstanceOf(NotFoundEntityException.class);
         }
     }
 }
