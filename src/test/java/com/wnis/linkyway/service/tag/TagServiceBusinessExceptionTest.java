@@ -79,7 +79,7 @@ public class TagServiceBusinessExceptionTest {
                                             .build(),
                                   1L, 1L);
             })
-                      .isInstanceOf(NotModifyEmptyEntityException.class);
+                      .isInstanceOf(NotFoundEntityException.class);
         }
 
         

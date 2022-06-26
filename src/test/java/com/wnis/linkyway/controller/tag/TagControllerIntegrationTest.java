@@ -147,7 +147,7 @@ public class TagControllerIntegrationTest {
 
             MvcResult mvcResult = mockMvc.perform(put("/api/tags/4000").contentType(MediaType.APPLICATION_JSON)
                                                                        .content(objectMapper.writeValueAsString(tagRequest)))
-                                         .andExpect(status().is(409))
+                                         .andExpect(status().is(404))
                                          .andReturn();
 
             logger.info(mvcResult.getResponse()
