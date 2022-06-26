@@ -53,7 +53,7 @@ public class TagServiceLogicTest {
                                               .tagName(tagName)
                                               .isPublic(shareable)
                                               .build();
-            TagResponse tagResponse = tagService.setTag(tagRequest, tagId);
+            TagResponse tagResponse = tagService.setTag(tagRequest, tagId, 1L);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
         }
     }
@@ -65,7 +65,7 @@ public class TagServiceLogicTest {
         @ParameterizedTest
         @CsvSource(value = { "1", "2", }, delimiter = ',')
         void addTagSuccessTest(Long tagId) {
-            TagResponse tagResponse = tagService.deleteTag(tagId);
+            TagResponse tagResponse = tagService.deleteTag(tagId, 1L);
             logger.info("tagId: {}, tagName: {}", tagResponse.getTagId(), tagResponse.getTagName());
         }
     }

@@ -177,7 +177,7 @@ public class TagControllerIntegrationTest {
         @WithMockMember(id = 1, email = "marrin1101@naver.com")
         void responseExceptionTest() throws Exception {
             mockMvc.perform(delete("/api/tags/1000"))
-                   .andExpect(status().is(409));
+                   .andExpect(status().is(404));
         }
     }
 }
