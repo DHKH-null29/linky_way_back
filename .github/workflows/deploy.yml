@@ -27,7 +27,7 @@ jobs:
         run: mkdir deploy
 
       - name: Copy All Project
-        run: cp ./* ./deploy/
+        run: cp -r * ./deploy/
 
       - name: Make zip file
         run: zip -r -qq -j ./linkyway-build.zip ./deploy
