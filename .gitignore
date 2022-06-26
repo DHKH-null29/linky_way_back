@@ -39,4 +39,4 @@ src/main/java/com/wnis/linkyway/LinkywayApplication.java
 
 ### properties
 
-email.yml
+#email.yml
