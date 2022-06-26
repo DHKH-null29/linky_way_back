@@ -40,4 +40,4 @@ jobs:
           aws s3 cp \
           --region ap-northeast-2 \
           --acl private \
-        ./linkyway-build.zip s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/
+          ./linkyway-build.zip s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/
