@@ -26,14 +26,14 @@ jobs:
       - name: ls
         run: ls
 
-#      - name: Make Directory
-#        run: mkdir deploy
-#
-#      - name: Copy All Project
-#        run: cp -r ./* ./deploy/
+      - name: Make Directory
+        run: mkdir deploy
+
+      - name: Copy All Project
+        run: rsync -av --progress ./ ./deploy --exclude deploy
 
       - name: Make zip file
-        run: zip -r -qq -j ./linkyway-build.zip ./
+        run: zip -r -qq -j ./linkyway-build.zip ./deploy
 
       - name: Deliver to AWS S3
         env:
