@@ -28,4 +28,9 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     @Query("select f from Folder f left outer join fetch f.parent "
             + "where f.id = :folderId and f.member.id = :memberId")
     public Optional<Folder> findByIdAndMemberId(@Param("memberId") Long memberId, @Param("folderId") Long folderId);
+    
+    @Query("select count(*) from Folder f join f.member m " +
+            "where m.id = :memberId and f.depth <= 1")
+    public long countSuperFolderByMemberId(@Param("memberId") Long memberId);
+    
 }
