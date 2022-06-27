@@ -4,6 +4,7 @@ import com.wnis.linkyway.dto.PackageResponse;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.service.PackageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,10 @@ public class PackageController {
     private final PackageService packageService;
     
     @GetMapping("/social")
-    ResponseEntity<Response> searchSocialByTagName(@RequestParam(value = "tagName", required = false) String tagName) {
-        List<PackageResponse> allPackageByTagName = packageService.findAllPackageByTagName(tagName);
+    ResponseEntity<Response> searchSocialByTagName(@RequestParam(value = "tagName", required = false) String tagName,
+            @RequestParam(value = "isLike", required = false) boolean isLike,
+            Pageable pageable) {
+        List<PackageResponse> allPackageByTagName = packageService.findAllPackageByTagName(tagName,isLike, pageable);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, allPackageByTagName, "개인 검색 성공"));
     }
     
