@@ -28,8 +28,7 @@ public class PackageService {
             tagName = "";
         }
         
-        List<Tag> tagList = findALlTagList(isLike, tagName, pageable)
-                .stream().filter(tag -> tag.getIsPublic()).collect(Collectors.toList());
+        List<Tag> tagList = findALlTagList(isLike, tagName, pageable);
         
         List<PackageResponse> packageResponseList = new ArrayList<>();
         for (Tag t : tagList) {
