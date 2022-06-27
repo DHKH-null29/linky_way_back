@@ -120,7 +120,6 @@ public class CardController {
 
     @GetMapping("/package/{tagId}")
     @ApiOperation(value = "태그아이디를 통해 패키지 조회", notes = "태그 아이디를 활용해 여러 태그 아이디 조회")
-    @Authenticated
     public ResponseEntity<Response> findIsPublicCardsByTagId(@PathVariable Long tagId, Pageable pageable) {
 
         List<SocialCardResponse> cardResponses = cardService.findIsPublicCardsByTagId(tagId, pageable);
