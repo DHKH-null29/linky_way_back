@@ -25,7 +25,7 @@ public class TagController {
     private final TagService tagService;
 
     @GetMapping("/tags/table")
-    @ApiOperation(value = "태그 조회", notes = "해당 회원이 가지고 있는 태그 리스트를 조회한다.")
+    @ApiOperation(value = "태그 조회", notes = "해당 회원이 가지고 있는 태그 리스트를 조회한다")
     @Authenticated
     public ResponseEntity<Response> searchTags(@CurrentMember Long memberId) {
         List<TagResponse> response = tagService.searchTags(memberId);
@@ -34,7 +34,7 @@ public class TagController {
     }
 
     @PostMapping("/tags")
-    @ApiOperation(value = "태그 추가", notes = "해당 회원이 가지고 있는 태그를 추가한다.")
+    @ApiOperation(value = "태그 추가", notes = "해당 회원이 가지고 있는 태그를 추가한다")
     @Authenticated
     public ResponseEntity<Response> addTag(@ApiIgnore @CurrentMember Long memberId,
             @Validated(ValidationSequence.class) @RequestBody TagRequest tagRequest) {
@@ -45,7 +45,7 @@ public class TagController {
     }
 
     @PutMapping("/tags/{tagId}")
-    @ApiOperation(value = "태그 수정", notes = "해당 회원이 가지고 있는 태그를 수정한다.")
+    @ApiOperation(value = "태그 수정", notes = "해당 회원이 가지고 있는 태그를 수정한다")
     @Authenticated
     public ResponseEntity<Response> setTag(@ApiIgnore @CurrentMember Long memberId,
             @PathVariable(value = "tagId") Long tagId,
@@ -57,7 +57,7 @@ public class TagController {
     }
 
     @DeleteMapping("/tags/{tagId}")
-    @ApiOperation(value = "태그 삭제", notes = "해당 회원이 가지오 있는 태그를 삭제한다.")
+    @ApiOperation(value = "태그 삭제", notes = "해당 회원이 가지오 있는 태그를 삭제한다")
     @Authenticated
     public ResponseEntity<Response> deleteTag(@PathVariable(value = "tagId") Long tagId,
             @ApiIgnore @CurrentMember Long memberId) {
