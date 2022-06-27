@@ -53,7 +53,7 @@ public class FolderController {
     }
 
     @PutMapping("/{folderId}/name")
-    @ApiOperation(value = "폴더 이름 수정", notes = "해당 폴더의 이름을 수정한다.")
+    @ApiOperation(value = "폴더 이름 수정", notes = "해당 폴더의 이름을 수정한다")
     @Authenticated
     public ResponseEntity<Response<FolderResponse>> updateFolderName(
             @Validated(ValidationSequence.class) @RequestBody UpdateFolderNameRequest updateFolderNameRequest,
@@ -64,7 +64,7 @@ public class FolderController {
     }
 
     @PutMapping("/{folderId}/path")
-    @ApiOperation(value = "폴더 경로 수정", notes = "해당 폴더의 경로를 수정한다.")
+    @ApiOperation(value = "폴더 경로 수정", notes = "해당 폴더의 경로를 수정한다")
     @Authenticated
     public ResponseEntity<Response<FolderResponse>> updateFolderPath(
             @Validated(ValidationSequence.class) @RequestBody UpdateFolderPathRequest updateFolderPathRequest,
