@@ -8,6 +8,7 @@ import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,9 @@ public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
 
     private final MemberRepository memberRepository;
+    
+    @Value("${tag.limit.num}")
+    private Long limitNumberOfTag;
 
     @Override
     public List<TagResponse> searchTags(Long memberId) {
@@ -34,10 +38,18 @@ public class TagServiceImpl implements TagService {
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundEntityException("회원을 찾을 수 없습니다");
         }
-
+    
         if (tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), memberId)) {
             throw new NotAddDuplicateEntityException("중복된 태그 이름을 추가 할 수 없습니다");
         }
+    
+    
+        if (tagRepository.countTagByMemberId(memberId) > limitNumberOfTag) {
+            throw new LimitAddException(String.format("%d 초과로 태그를 생성 할 수 없습니다", limitNumberOfTag));
+        }
+        
+        
+        
 
         Tag tag = Tag.builder()
                      .name(tagRequest.getTagName())
