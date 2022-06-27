@@ -34,4 +34,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
             + "from Tag t join fetch t.member m " +
             "where t.name = :tagName")
     public List<Tag> findAllDistinctTagListByTagName(@Param(value = "tagName") String tagName, Pageable pageable);
+    
+    @Query("select count(*) from Tag t join t.member m where m.id = :memberId")
+    public long countTagByMemberId(@Param(value = "memberId") Long memberId);
 }

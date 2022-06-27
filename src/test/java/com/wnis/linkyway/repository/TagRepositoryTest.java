@@ -26,7 +26,9 @@ class TagRepositoryTest {
     @Autowired
     TagRepository tagRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    
+    private final long VALID_MEMBER_ID = 1L;
+    
     @ParameterizedTest
     @CsvFileSource(resources = "/input/tag/repository/findAllTagList-test.csv", delimiter = ',', numLinesToSkip = 1)
     void findAllTagListTest(Long memberId) {
@@ -53,5 +55,12 @@ class TagRepositoryTest {
             logger.info("id: {}, name: {}", tag.getId(), tag.getName());
             
         }
+    }
+    
+    @Test
+    @DisplayName("해당 회원의 태그 갯수 세기")
+    void test() {
+        long numOfTag = tagRepository.countTagByMemberId(VALID_MEMBER_ID);
+        assertThat(numOfTag).isEqualTo(4);
     }
 }
