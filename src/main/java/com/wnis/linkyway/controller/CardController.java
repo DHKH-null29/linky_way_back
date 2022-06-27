@@ -132,7 +132,7 @@ public class CardController {
     }
 
     @GetMapping("/folder/{folderId}")
-    @ApiOperation(value = "폴더 아이디를 활용한 카드 조회", notes = "FOLDER ID에 속해있는 카드들 모두 조회")
+    @ApiOperation(value = "폴더 아이디를 활용한 카드 조회", notes = "폴더 ID에 속해있는 카드들 모두 조회")
     @Authenticated
     public ResponseEntity<Response> findCardsByFolderId(@CurrentMember Long memberId,
             @PathVariable Long folderId,

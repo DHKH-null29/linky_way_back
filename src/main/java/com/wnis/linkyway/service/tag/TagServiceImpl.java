@@ -57,11 +57,7 @@ public class TagServiceImpl implements TagService {
                                .orElseThrow(() -> new NotFoundEntityException("해당 태그가 존재하지 않아 수정 할 수 없습니다"));
 
         checkRequestMyTag(memberId, tag, "해당 태그가 존재하지 않아 수정 할 수 없습니다");
-    
-        log.info(tag.getName());
-        log.info(tagRequest.getTagName());
-        log.info("{}",tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), memberId));
-       
+        
         // 원래 태그 이름과 요청 태그이름이 다르면 기존 태그가 회원이 가지고 있는지 조회
         if (!tag.getName().equals(tagRequest.getTagName()) && tagRepository.existsByMemberIdAndTagName(tagRequest.getTagName(), memberId)) {
             throw new NotModifyDuplicateException("중복되는 태그 이름으로 수정 할 수 없습니다");
