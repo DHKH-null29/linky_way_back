@@ -1,6 +1,7 @@
 package com.wnis.linkyway.service;
 
 import com.wnis.linkyway.dto.PackageResponse;
+import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.repository.CardTagRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,24 +27,36 @@ public class PackageServiceTest {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     
-    @Autowired CardTagRepository cardTagRepository;
-    @Autowired PackageService packageService;
+    @Autowired
+    CardTagRepository cardTagRepository;
+    @Autowired
+    PackageService packageService;
+    
+    @Autowired
+    EntityManager em;
     
     @Test
     @DisplayName("findAllPackageByTagNameTest")
     void findAllPackageByTagNameTest() {
-    
-        List<PackageResponse> java = packageService.findAllPackageByTagName("java");
+        Card card1 = em.find(Card.class, 1L);
+        card1.updateIsPublic(true);
+        em.flush();
+        
+        List<PackageResponse> java = packageService.findAllPackageByTagName("java",false, PageRequest.of(0, 200));
         java.forEach(packageResponse -> {
             assertThat(packageResponse).extracting("tagName").isEqualTo("java");
         });
+        assertThat(java.size()).isEqualTo(1);
+        assertThat(java.get(0).getNumberOfCard()).isEqualTo(1);
     
-        // 조회시는 대소문자 구분 없이 모두 조회
-        List<PackageResponse> food = packageService.findAllPackageByTagName("food");
-        logger.info("{}", food.get(0).getNumberOfCard());
-        assertThat(food.get(0).getNumberOfCard()).isEqualTo(4);
-        food.forEach(packageResponse -> {
-            assertThat(packageResponse).extracting("tagName").isEqualTo("food");
-        });
+
+//        List<PackageResponse> food = packageService.findAllPackageByTagName("java", PageRequest.of(0, 200));
+//        logger.info("{}", food.get(0).getNumberOfCard());
+//        assertThat(food.get(0).getNumberOfCard()).isEqualTo(1);
+//        food.forEach(packageResponse -> {
+//            assertThat(packageResponse).extracting("tagName").isEqualTo("food");
+//        });
     }
+    
+    
 }
