@@ -22,7 +22,7 @@ public class TrashController {
     private final TrashService trashService;
     
     @PutMapping
-    @ApiOperation(value = "삭제 & 복원", notes = "isDeleted가 true이면 삭제, isDeleted가 false이면 복원이 된다 List 형태로 card id를 받는다")
+    @ApiOperation(value = "삭제 & 복원", notes = "isDeleted 키가 true이면 완전 삭제, false이면 복원이 된다 List 형태로 card id를 받는다")
     @Authenticated
     ResponseEntity<Response<List<Long>>> updateCardIsDeletedTrueOrFalse(@RequestBody List<Long> ids, @CurrentMember Long memberId,
             @RequestParam Boolean isDeleted) {
@@ -39,7 +39,7 @@ public class TrashController {
     }
     
     @GetMapping
-    @ApiOperation(value = "삭제된 카드 조회", notes = "isDeleted가 true인 카드들을 조회한다")
+    @ApiOperation(value = "삭제된 카드 조회", notes = "isDeleted 키가 true인 카드들을 조회한다")
     @Authenticated
     ResponseEntity<Response<List<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId,
             @RequestParam(value = "lastCardId", required = false) Long lastCardId, Pageable pageable) {

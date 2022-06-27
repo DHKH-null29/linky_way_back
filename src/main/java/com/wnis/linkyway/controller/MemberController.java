@@ -45,7 +45,7 @@ public class MemberController {
     }
 
     @GetMapping("/nickname")
-    @ApiOperation(value = "닉네입 조회", notes = "닉네임의 중복 여부를 확인하기 위한 조회한다")
+    @ApiOperation(value = "닉네임 조회", notes = "닉네임의 중복 여부를 확인하기 위한 조회한다")
     public ResponseEntity<Response<DuplicationResponse>> searchNicknameDuplicationInfo(@RequestParam String nickname) {
         DuplicationResponse response = memberService.isValidNickname(nickname);
         return  ResponseEntity.ok(Response.of(HttpStatus.OK, response, "닉네임 사용가능 여부 조회 성공"));
@@ -61,6 +61,7 @@ public class MemberController {
     
 
     @PutMapping("/page/me")
+    @ApiOperation(value = "회원 정보 수정", notes = "회원 정보를 수정한다")
     @Authenticated
     public ResponseEntity<Response> updateMyPage(
             @Validated(ValidationSequence.class) @RequestBody UpdateMemberRequest updateMemberRequest,
