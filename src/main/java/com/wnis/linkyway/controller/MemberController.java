@@ -61,6 +61,7 @@ public class MemberController {
     
 
     @PutMapping("/page/me")
+    @ApiOperation(value = "회원 정보 수정", notes = "회원 정보를 수정한다")
     @Authenticated
     public ResponseEntity<Response> updateMyPage(
             @Validated(ValidationSequence.class) @RequestBody UpdateMemberRequest updateMemberRequest,
