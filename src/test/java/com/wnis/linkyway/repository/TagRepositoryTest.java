@@ -49,8 +49,8 @@ class TagRepositoryTest {
     @Test
     @DisplayName("findAllDistinctTagList 테스트")
     void findAllDistinctTagListTest() {
-        List<Tag> spring = tagRepository.findAllDistinctTagListLikeTagName("spring", PageRequest.of(0, 2));
-        assertThat(spring.size()).isEqualTo(2);
+        List<Tag> spring = tagRepository.findAllDistinctTagListLikeTagName("sho", PageRequest.of(0, 2));
+        assertThat(spring.size()).isEqualTo(1);
         for (Tag tag : spring) {
             logger.info("id: {}, name: {}", tag.getId(), tag.getName());
             
