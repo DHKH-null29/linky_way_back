@@ -1,59 +1,59 @@
 package com.wnis.linkyway.service;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.PackageResponse;
+import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.entity.Tag;
 import com.wnis.linkyway.repository.CardTagRepository;
+import com.wnis.linkyway.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PackageService {
     
     private final CardTagRepository cardTagRepository;
     
-    public List<PackageResponse> findAllPackageByTagName(String tagName) {
-        List<PackageDto> packageDtoList = null;
+    private final TagRepository tagRepository;
+    
+    public List<PackageResponse> findAllPackageByTagName(String tagName, boolean isLike, Pageable pageable) {
         if (tagName == null) {
-            System.out.println("tagName은 null이다");
-            packageDtoList = cardTagRepository.findAllPackageDto();
-        } else {
-            packageDtoList = cardTagRepository.findAllPackageDtoByTagName(tagName);
+            tagName = "";
         }
-       
-        Map<Long, Map<Long, List<PackageDto>>> map = packageDtoList.stream()
-                                                                   .collect(Collectors.groupingBy(
-                                                                               PackageDto::getMemberId,
-                                                                               Collectors.groupingBy(
-                                                                                       PackageDto::getTagId)));
         
+        List<Tag> tagList = findALlTagList(isLike, tagName, pageable);
         
-        
-        return manufacturePackageDtoMapToPackageResponse(map);
-    }
-    
-    
-    private List<PackageResponse>  manufacturePackageDtoMapToPackageResponse(Map<Long, Map<Long, List<PackageDto>>> map) {
-        List<PackageResponse> response = new ArrayList<>();
-    
-        for (Map.Entry<Long, Map<Long, List<PackageDto>>> firstEntry : map.entrySet()) {
-            for (Map.Entry<Long, List<PackageDto>> secondEntry : firstEntry.getValue().entrySet()) {
-                List<PackageDto> items = secondEntry.getValue();
-                PackageResponse packageResponse = PackageResponse.builder()
-                                                                 .memberId(firstEntry.getKey())
-                                                                 .nickname(items.get(0).getNickname())
-                                                                 .tagId(secondEntry.getKey())
-                                                                 .tagName(items.get(0).getTagName())
-                                                                 .numberOfCard(items.size())
-                                                                 .build();
-                response.add(packageResponse);
+        List<PackageResponse> packageResponseList = new ArrayList<>();
+        for (Tag t : tagList) {
+            List<Card> cardList = cardTagRepository.findAllPublicCardByTagId(t.getId())
+                    .stream().filter(card -> !card.getIsDeleted()).collect(Collectors.toList());
+            
+            PackageResponse packageResponse = PackageResponse.builder()
+                                                             .tagId(t.getId())
+                                                             .tagName(t.getName())
+                                                             .memberId(t.getMember().getId())
+                                                             .nickname(t.getMember().getNickname())
+                                                             .numberOfCard(cardList.size())
+                                                             .build();
+            // 패키지에 존재하는 카드가 있어야 response 등록
+            if (packageResponse.getNumberOfCard() > 0) {
+                packageResponseList.add(packageResponse);
             }
         }
-        return response;
+        return packageResponseList;
+    }
+    
+    private List<Tag> findALlTagList(boolean isLike, String tagName, Pageable pageable) {
+        if (isLike) {
+            return tagRepository.findAllDistinctTagListLikeTagName(tagName, pageable);
+        }
+        return tagRepository.findAllDistinctTagListByTagName(tagName, pageable);
     }
 }
