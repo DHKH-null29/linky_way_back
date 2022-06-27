@@ -161,7 +161,7 @@ public class CardRepositoryTest {
     @CsvSource(value = { "1,spring", "1,명륜진사갈비", "1,고기" })
     @DisplayName("findAllCardByKeyword 응답 테스트")
     void findAllCardByKeywordResponseTest(Long memberId, String keyword) {
-        List<Card> cardList = cardRepository.findAllCardByKeyword(keyword, memberId);
+        List<Card> cardList = cardRepository.findAllCardByKeyword(keyword, memberId, PageRequest.of(0, 200));
         cardList.forEach(card -> {
             logger.info("id: {}, title: {}, link: {}, content: {}", card.getId(), card.getTitle(), card.getLink(),
                         card.getContent());
@@ -285,7 +285,7 @@ public class CardRepositoryTest {
     @Test
     @DisplayName("폴더 id로 카드 조회 테스트")
     void findAllInFolderIdsTest() {
-        List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L));
+        List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L), PageRequest.of(0, 200));
         assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L, 6L);
     }
     

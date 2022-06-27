@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,10 +86,10 @@ public class CardServiceFindTest {
                      .findByIdAndMemberId(anyLong(), anyLong());
             lenient().doReturn(cardList)
                      .when(cardRepository)
-                     .findCardsByTagId(anyLong());
+                     .findCardsByTagId(anyLong(), any());
 
             // when
-            List<CardResponse> cardResponses = cardService.findCardsByTagId(member.getId(), tag1.getId());
+            List<CardResponse> cardResponses = cardService.findCardsByTagId(member.getId(), tag1.getId(), PageRequest.of(0, 200));
             // then
             assertThat(cardResponses).size()
                                      .isEqualTo(cardList.size());
@@ -106,7 +107,7 @@ public class CardServiceFindTest {
 
             // verify
             verify(tagRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardRepository, times(1)).findCardsByTagId(anyLong());
+            verify(cardRepository, times(1)).findCardsByTagId(anyLong(), any());
         }
 
         @Test
@@ -116,7 +117,7 @@ public class CardServiceFindTest {
             doReturn(Optional.empty()).when(tagRepository)
                                       .findByIdAndMemberId(anyLong(), anyLong());
             // then
-            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByTagId(2L, 10000L));
+            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByTagId(2L, 10000L, PageRequest.of(0, 200)));
 
             // verify
             verify(tagRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
@@ -136,9 +137,9 @@ public class CardServiceFindTest {
                      .findById(anyLong());
             lenient().doReturn(cardList)
                      .when(cardRepository)
-                     .findIsPublicCardsByTagId(anyLong());
+                     .findIsPublicCardsByTagId(anyLong(), any());
             // when
-            List<SocialCardResponse> socialCardResponses = cardService.findIsPublicCardsByTagId(tag1.getId());
+            List<SocialCardResponse> socialCardResponses = cardService.findIsPublicCardsByTagId(tag1.getId(), PageRequest.of(0, 200));
 
             // then
             for (int index = 0; index < socialCardResponses.size(); index++) {
@@ -153,7 +154,7 @@ public class CardServiceFindTest {
 
             // verify
             verify(tagRepository, times(1)).findById(anyLong());
-            verify(cardRepository, times(1)).findIsPublicCardsByTagId(anyLong());
+            verify(cardRepository, times(1)).findIsPublicCardsByTagId(anyLong(), any());
         }
 
         @Test
@@ -163,11 +164,11 @@ public class CardServiceFindTest {
             doReturn(Optional.empty()).when(tagRepository)
                                       .findById(anyLong());
             // then
-            assertThrows(ResourceConflictException.class, () -> cardService.findIsPublicCardsByTagId(10000L));
+            assertThrows(ResourceConflictException.class, () -> cardService.findIsPublicCardsByTagId(10000L, PageRequest.of(0, 200)));
 
             // verify
             verify(tagRepository, times(1)).findById(anyLong());
-            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong());
+            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong(), any());
         }
 
         @Test
@@ -178,11 +179,11 @@ public class CardServiceFindTest {
             doReturn(tag).when(tagRepository)
                          .findById(anyLong());
             // then
-            assertThrows(NotAccessableException.class, () -> cardService.findIsPublicCardsByTagId(tag2.getId()));
+            assertThrows(NotAccessableException.class, () -> cardService.findIsPublicCardsByTagId(tag2.getId(), PageRequest.of(0, 200)));
 
             // verify
             verify(tagRepository, times(1)).findById(anyLong());
-            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong());
+            verify(cardRepository, times(0)).findIsPublicCardsByTagId(anyLong(), any());
         }
     }
 
@@ -200,9 +201,9 @@ public class CardServiceFindTest {
                      .findByIdAndMemberId(anyLong(), anyLong());
             lenient().doReturn(cardList)
                      .when(cardRepository)
-                     .findCardsByFolderId(anyLong());
+                     .findCardsByFolderId(anyLong(), any());
             // when
-            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), false);
+            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), false, PageRequest.of(0, 200));
 
             // then
             for (int index = 0; index < cardResponses.size(); index++) {
@@ -219,7 +220,7 @@ public class CardServiceFindTest {
 
             // verify
             verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardRepository, times(1)).findCardsByFolderId(anyLong());
+            verify(cardRepository, times(1)).findCardsByFolderId(anyLong(), any());
             verify(cardRepository, times(0)).findDeepFoldersCardsByFolderId(anyLong());
         }
 
@@ -233,9 +234,9 @@ public class CardServiceFindTest {
                      .findByIdAndMemberId(anyLong(), anyLong());
             lenient().doReturn(cardList)
                     .when(cardRepository)
-                    .findAllInFolderIds(any());
+                    .findAllInFolderIds(any(), any());
             // when
-            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), true);
+            List<CardResponse> cardResponses = cardService.findCardsByFolderId(member.getId(), folder1.getId(), true, PageRequest.of(0, 200));
 
             // then
             for (int index = 0; index < cardResponses.size(); index++) {
@@ -252,8 +253,8 @@ public class CardServiceFindTest {
 
             // verify
             verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardRepository, times(0)).findCardsByFolderId(anyLong());
-            verify(cardRepository, times(1)).findAllInFolderIds(any());
+            verify(cardRepository, times(0)).findCardsByFolderId(anyLong(), any());
+            verify(cardRepository, times(1)).findAllInFolderIds(any(), any());
         }
 
         @Test
@@ -263,11 +264,11 @@ public class CardServiceFindTest {
             doReturn(Optional.empty()).when(folderRepository)
                                       .findByIdAndMemberId(anyLong(), anyLong());
             // then
-            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByFolderId(100L, 1L, true));
+            assertThrows(ResourceConflictException.class, () -> cardService.findCardsByFolderId(100L, 1L, true, PageRequest.of(0, 200)));
             
             // verify
             verify(folderRepository, times(1)).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardRepository, times(0)).findCardsByFolderId(anyLong());
+            verify(cardRepository, times(0)).findCardsByFolderId(anyLong(), any());
             verify(cardRepository, times(0)).findDeepFoldersCardsByFolderId(anyLong());
         }
     }
@@ -281,9 +282,9 @@ public class CardServiceFindTest {
             // given
             lenient().doReturn(cardList)
                      .when(cardRepository)
-                     .findCardsByMemberId(anyLong());
+                     .findCardsByMemberId(anyLong(), any());
             // when
-            List<CardResponse> cardResponses = cardService.findCardsByMemberId(member.getId());
+            List<CardResponse> cardResponses = cardService.findCardsByMemberId(member.getId(), PageRequest.of(0, 200));
 
             // then
             for (int index = 0; index < cardResponses.size(); index++) {
@@ -299,7 +300,7 @@ public class CardServiceFindTest {
             }
 
             // verify
-            verify(cardRepository, times(1)).findCardsByMemberId(anyLong());
+            verify(cardRepository, times(1)).findCardsByMemberId(anyLong(), any());
         }
     }
 }
