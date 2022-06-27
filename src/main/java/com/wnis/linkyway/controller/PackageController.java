@@ -18,7 +18,7 @@ public class PackageController {
 
     private final PackageService packageService;
     @GetMapping("/social")
-    @ApiOperation(value = "소셜 태그 검색", notes = "태그를 기반으로 검색한다. isLike 속성에 따라 정확히 혹은 Like 검색 수행")
+    @ApiOperation(value = "소셜 태그 기반 검색", notes = "태그를 기반으로 검색한다. isLike 속성에 따라 정확히 혹은 Like 검색 수행")
     ResponseEntity<Response> searchSocialByTagName(@RequestParam(value = "tagName", required = false) String tagName) {
         List<PackageResponse> allPackageByTagName = packageService.findAllPackageByTagName(tagName);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, allPackageByTagName, "개인 검색 성공"));
