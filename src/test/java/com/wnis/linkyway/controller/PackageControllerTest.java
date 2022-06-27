@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -60,9 +61,9 @@ class PackageControllerTest {
                 .build();
         List<PackageResponse> responseList = new ArrayList<>();
         responseList.add(packageResponse);
-        doReturn(responseList).when(packageService).findAllPackageByTagName(any());
+        doReturn(responseList).when(packageService).findAllPackageByTagName(any(), anyBoolean(), any());
         
-        mockMvc.perform(get("/api/search/social").param("tagName", "hello"))
+        mockMvc.perform(get("/api/search/social?isLike=false").param("tagName", "hello"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..memberId").isNotEmpty())
                 .andExpect(jsonPath("$..nickname").isNotEmpty())
