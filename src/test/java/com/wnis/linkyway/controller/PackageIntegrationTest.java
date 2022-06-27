@@ -1,6 +1,7 @@
 package com.wnis.linkyway.controller;
 
 import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.entity.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ public class PackageIntegrationTest {
     void responseTest() throws Exception {
         Card card = em.find(Card.class, 1L);
         card.updateIsPublic(true);
+    
+        Tag tag = em.find(Tag.class, 1L);
+        tag.updateIsPublic(true);
         em.flush();
         
         mockMvc.perform(get("/api/search/social?isLike=true").param("tagName", "ja"))

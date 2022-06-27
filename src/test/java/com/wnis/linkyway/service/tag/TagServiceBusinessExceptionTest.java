@@ -101,4 +101,18 @@ public class TagServiceBusinessExceptionTest {
                       .isInstanceOf(NotFoundEntityException.class);
         }
     }
+    
+    @Test
+    @DisplayName("중복 입력시 예외")
+    void shouldThrowDuplicateExceptionWhenTagNameDuplicated() {
+        doReturn(true).when(memberRepository)
+                      .existsById(any()); // 회원 검증 통과
+        doReturn(true).when(tagRepository)
+                      .existsByMemberIdAndTagName(any(), any()); // 중복 입력 예외
+        
+        Assertions.assertThatThrownBy(() -> tagService.addTag(TagRequest.builder()
+                                                                        .build(),
+                                                              1L))
+                  .isInstanceOf(NotAddDuplicateEntityException.class);
+    }
 }

@@ -25,7 +25,7 @@ public class PackageController {
             Pageable pageable) {
         List<PackageResponse> allPackageByTagName = packageService.findAllPackageByTagName(tagName,isLike, pageable);
 
-        return ResponseEntity.ok(Response.of(HttpStatus.OK, allPackageByTagName, "개인 검색 성공"));
+        return ResponseEntity.ok(Response.of(HttpStatus.OK, allPackageByTagName, "소셜 검색 성공"));
     }
     
 }

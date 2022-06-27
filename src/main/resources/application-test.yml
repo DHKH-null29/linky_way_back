@@ -30,6 +30,7 @@ spring:
       - classpath:redis.yml
       - classpath:email.yml
       - classpath:batch.yml
+      - classpath:tag.yml
 
 logging:
   level:
