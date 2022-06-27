@@ -73,6 +73,14 @@ class CardTagRepositoryTest {
             .title("card")
             .build();
     
+    Card card3 = Card.builder()
+                     .folder(folder)
+                     .isPublic(true)
+                     .content("")
+                     .link("2")
+                     .title("card")
+                     .build();
+    
     CardTag cardTag1 = CardTag.builder()
                               .card(card)
                               .tag(tag1)
@@ -88,6 +96,11 @@ class CardTagRepositoryTest {
             .tag(tag2)
             .build();
     
+    CardTag cardTag4 = CardTag.builder()
+                              .card(card3)
+                              .tag(tag1)
+                              .build();
+    
     @BeforeEach
     void setUp() {
         em.persist(member);
@@ -96,9 +109,11 @@ class CardTagRepositoryTest {
         em.persist(tag2);
         em.persist(card);
         em.persist(card2);
+        em.persist(card3);
         em.persist(cardTag1);
         em.persist(cardTag2);
         em.persist(cardTag3);
+        em.persist(cardTag4);
         em.flush();
     }
     
@@ -157,19 +172,6 @@ class CardTagRepositoryTest {
         }
     }
     
-    @Nested
-    @DisplayName("findAllPackageDtoByTagName 테스트")
-    class findAllPackageDtoByTagName {
-        
-        @Test
-        @DisplayName("응답 테스트")
-        void shouldReturnListPackageDtoTest() {
-            List<PackageDto> packageDtoList = cardTagRepository.findAllPackageDtoByTagName("t1");
-            assertThat(packageDtoList).isNotEmpty();
-            assertThat(packageDtoList.get(0)).extracting("tagName").isEqualTo("t1");
-            assertThat(packageDtoList.get(0)).extracting("nickname").isEqualTo("hello");
-        }
-    }
     
     @Nested
     @DisplayName("findAllCardTagIdInCardIds 테스트")
@@ -179,7 +181,7 @@ class CardTagRepositoryTest {
         @DisplayName("응답 테스트")
         void shouldReturnCardIds() {
             List<CardTag> all = cardTagRepository.findAll();
-            assertThat(all.size()).isEqualTo(3);
+            assertThat(all.size()).isEqualTo(4);
             List<Long> ids = cardTagRepository.findAllCardTagIdInCardIds(
                     new ArrayList<>(Arrays.asList(1L)));
             logger.info("ids: {} ", ids);
@@ -188,6 +190,21 @@ class CardTagRepositoryTest {
     
             
         }
+    }
+    
+    @Nested
+    @DisplayName("findAllPublicCardByTagId 테스트")
+    class countByTagIdTest {
+        
+        @Test
+        @DisplayName("응답 테스트")
+        void findAllPublicCardByTagId() {
+            
+            List<Card> cardList = cardTagRepository.findAllPublicCardByTagId(1L);
+            assertThat(cardList.size()).isEqualTo(1);
+            assertThat(cardList.get(0).getIsPublic()).isEqualTo(true);
+        }
+        
     }
     
 }
