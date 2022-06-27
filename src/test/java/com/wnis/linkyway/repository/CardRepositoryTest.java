@@ -286,7 +286,7 @@ public class CardRepositoryTest {
     @DisplayName("폴더 id로 카드 조회 테스트")
     void findAllInFolderIdsTest() {
         List<Card> cardList = cardRepository.findAllInFolderIds(Arrays.asList(1L, 2L, 3L), PageRequest.of(0, 200));
-        assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L, 6L);
+        assertThat(cardList.stream().map(Card::getId).collect(Collectors.toList())).contains(1L, 2L);
     }
     
     @Test
