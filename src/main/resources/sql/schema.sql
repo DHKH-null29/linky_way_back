@@ -13,6 +13,9 @@ CREATE TABLE member (
    nickname VARCHAR(10) NOT NULL,
    password VARCHAR(72) NOT NULL,
    email VARCHAR(255) NOT NULL,
+   created_by datetime NULL,
+   modified_by datetime NULL,
+
    CONSTRAINT pk_member PRIMARY KEY (member_id)
 );
 
@@ -23,7 +26,7 @@ CREATE FULLTEXT INDEX MEMBER_IX_FT_EMAIL on member(email);
 -- Tag 테이블
 CREATE TABLE tag (
   tag_id BIGINT AUTO_INCREMENT NOT NULL,
-    created_by datetime NULL,
+   created_by datetime NULL,
    modified_by datetime NULL,
    name VARCHAR(10) NOT NULL,
    is_public BIT(1) NOT NULL,
