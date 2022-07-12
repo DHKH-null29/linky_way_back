@@ -33,7 +33,7 @@ public class CardRequest {
     @NotNull(message = "소셜 공유 여부를 입력해주세요", groups = NotBlankGroup.class)
     private Boolean isPublic;
 
-    @NotNull
+    @Builder.Default
     private Set<Long> tagIdSet = new HashSet<>();
 
     @NotNull(message = "폴더아이디는 필수입니다.", groups = NotBlankGroup.class)
