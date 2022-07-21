@@ -1,5 +1,6 @@
 package com.wnis.linkyway.dto.card;
 
+import com.wnis.linkyway.dto.card.io.CardRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

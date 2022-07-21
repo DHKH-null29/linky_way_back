@@ -1,4 +1,4 @@
-package com.wnis.linkyway.dto.card;
+package com.wnis.linkyway.dto.card.io;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wnis.linkyway.dto.tag.TagResponse;

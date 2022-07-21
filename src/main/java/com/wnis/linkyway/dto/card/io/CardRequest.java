@@ -1,4 +1,4 @@
-package com.wnis.linkyway.dto.card;
+package com.wnis.linkyway.dto.card.io;
 
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Folder;
