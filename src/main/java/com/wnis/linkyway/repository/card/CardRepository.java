@@ -1,4 +1,4 @@
-package com.wnis.linkyway.repository;
+package com.wnis.linkyway.repository.card;
 
 import com.wnis.linkyway.entity.Card;
 import org.springframework.data.domain.Pageable;
@@ -12,29 +12,35 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
-    
+
+    @Deprecated
     @Query("select c from Card c join c.folder f join f.member m " +
             "where m.id = :memberId and c.isDeleted = false and (c.title like %:keyword% or c.content like %:keyword%) " +
             "order by c.id desc")
     List<Card> findAllCardByKeyword(@Param(value = "keyword") String keyword, @Param(value = "memberId") Long memberId, Pageable pageable);
 
+    @Deprecated
     @Query("select ct.card from CardTag ct join ct.card join ct.tag where ct.tag.id = :tagId and ct.card.isDeleted = false " +
             "order by ct.card.id desc")
     public List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
-    
+
+    @Deprecated
     @Query("select distinct c from CardTag ct join ct.card c join ct.tag t "
             + "where t.id = :tagId and c.isPublic = true and c.isDeleted = false " +
             "order by ct.card desc")
     public List<Card> findIsPublicCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
 
+    @Deprecated
     @Query("select c from Card c join c.folder f where f.id = :folderId and c.isDeleted = false " +
             "order by c.id desc")
     public List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId, Pageable pageable);
 
     // 삭제 예정 쿼리
+    @Deprecated
     @Query("select c from Card c join c.folder f where f.parent.id = :folderId or f.id = :folderId")
     public List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
 
+    @Deprecated
     @Query("select c from Card c join c.folder f where f.member.id = :memberId and c.isDeleted = false order by c.id desc")
     public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId, Pageable pageable);
     
@@ -53,7 +59,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "where c.isDeleted = true and c.modifiedBy <= :deletedDateAt " +
             "order by c.id desc")
     public Slice<Long> findAllIdToDeletedCardUsingPage(@Param(value = "deletedDateAt") LocalDateTime deletedDateAt, Pageable pageable);
-    
+
     @Query("select c.id from Card c " +
             "where c.id < :lastId and c.isDeleted = true and c.modifiedBy <= :deletedDateAt " +
             "order by c.id desc")
