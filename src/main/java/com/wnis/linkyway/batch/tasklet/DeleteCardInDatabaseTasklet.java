@@ -1,7 +1,7 @@
 package com.wnis.linkyway.batch.tasklet;
 
-import com.wnis.linkyway.repository.CardRepository;
-import com.wnis.linkyway.repository.CardTagRepository;
+import com.wnis.linkyway.repository.card.CardRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;

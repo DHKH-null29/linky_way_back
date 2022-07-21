@@ -3,7 +3,7 @@ package com.wnis.linkyway.service;
 import com.wnis.linkyway.dto.PackageResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.repository.CardTagRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import com.wnis.linkyway.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

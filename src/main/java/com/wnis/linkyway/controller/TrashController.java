@@ -1,7 +1,7 @@
 package com.wnis.linkyway.controller;
 
 import com.wnis.linkyway.dto.Response;
-import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.security.annotation.Authenticated;
 import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.TrashService;
