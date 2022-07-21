@@ -146,16 +146,7 @@ public class CardIntegrationTest {
                .andExpect(status().is(200))
                .andExpect(jsonPath("$.data").isNotEmpty());
     }
-    
-    @Test
-    @DisplayName("태그 아이디로 isPublic인 카드 목록 조회 성공")
-    @WithMockMember(id = 1L, email = "marrin1101@naver.com")
-    void findIsPublicCardsByTagIdSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/cards/package/2?page=0&size=10"))
-               .andExpect(status().is(200))
-               .andExpect(jsonPath("$.data").isNotEmpty());
-    }
     
     @Test
     @DisplayName("폴더 아이디로 사용자의 카드 목록 조회 성공")
