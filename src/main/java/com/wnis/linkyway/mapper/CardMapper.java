@@ -44,7 +44,7 @@ public class CardMapper {
         } else if (tClass == CardDto.class) {
             return toCardResponseFromCardDto((List<CardDto>) cardList, map);
         }
-        throw new RuntimeException("이 메서드는 Card, CardDto 타입 외에 사용 할 수 없습니다");
+        throw new RuntimeException("이 메서드는 Card, CardDto 타입 외에 사용 할 수 없습니다"); // 수정 필요
     }
 
     private static List<CardResponse> toCardResponseFromCard(List<Card> cardList,
@@ -71,6 +71,8 @@ public class CardMapper {
                 .folderId(card.getFolder().getId())
                 .isPublic(card.getIsPublic())
                 .tags(tags)
+                .createdAt(card.getCreatedBy())
+                .modifiedAt(card.getModifiedBy())
                 .build();
 
             cardResponseList.add(cardResponse);
@@ -102,6 +104,8 @@ public class CardMapper {
                 .folderId(card.getFolderId())
                 .isPublic(card.getIsPublic())
                 .tags(tags)
+                .createdAt(card.getCreatedAt())
+                .modifiedAt(card.getModifiedAt())
                 .build();
 
             cardResponseList.add(cardResponse);

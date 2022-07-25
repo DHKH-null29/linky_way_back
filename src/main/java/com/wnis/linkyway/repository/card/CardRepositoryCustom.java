@@ -29,12 +29,15 @@ public class CardRepositoryCustom {
                 card.content,
                 card.isPublic,
                 card.isDeleted,
-                card.folder.id))
+                card.folder.id,
+                card.createdBy,
+                card.modifiedBy))
             .from(card)
             .orderBy(card.id.desc())
             .where(card.folder.member.id.eq(memberId)
                 .and(card.title.contains(keyword).or(card.content.contains(keyword)))
-                .and(cursorId(lastIdx)))
+                .and(cursorId(lastIdx))
+                .and(card.isDeleted.eq(false)))
             .limit(pageable.getPageSize())
             .fetch();
     }
@@ -55,11 +58,15 @@ public class CardRepositoryCustom {
                 card.content,
                 card.isPublic,
                 card.isDeleted,
-                card.folder.id))
+                card.folder.id,
+                card.createdBy,
+                card.modifiedBy))
             .from(cardTag)
             .orderBy(card.id.desc())
             .join(cardTag.card, card)
-            .where(cardTag.tag.id.eq(tagId).and(cursorId(lastIdx)))
+            .where(cardTag.tag.id.eq(tagId)
+                .and(cursorId(lastIdx))
+                .and(card.isDeleted.eq(false)))
             .limit(pageable.getPageSize())
             .fetch();
     }
@@ -72,10 +79,14 @@ public class CardRepositoryCustom {
                 card.content,
                 card.isPublic,
                 card.isDeleted,
-                card.folder.id))
+                card.folder.id,
+                card.createdBy,
+                card.modifiedBy))
             .from(card)
             .orderBy(card.id.desc())
-            .where(card.folder.member.id.eq(memberId).and(cursorId(lastIdx)))
+            .where(card.folder.member.id.eq(memberId)
+                .and(cursorId(lastIdx))
+                .and(card.isDeleted.eq(false)))
             .limit(pageable.getPageSize())
             .fetch();
     }
@@ -88,10 +99,13 @@ public class CardRepositoryCustom {
                 card.content,
                 card.isPublic,
                 card.isDeleted,
-                card.folder.id))
+                card.folder.id,
+                card.createdBy,
+                card.modifiedBy))
             .from(card)
             .orderBy(card.id.desc())
-            .where(card.folder.id.eq(folderId).and(cursorId(lastIdx)))
+            .where(card.folder.id.eq(folderId).and(cursorId(lastIdx))
+                .and(card.isDeleted.eq(false)))
             .limit(pageable.getPageSize())
             .fetch();
     }
@@ -105,10 +119,13 @@ public class CardRepositoryCustom {
                 card.content,
                 card.isPublic,
                 card.isDeleted,
-                card.folder.id))
+                card.folder.id,
+                card.createdBy,
+                card.modifiedBy))
             .from(card)
             .orderBy(card.id.desc())
-            .where(card.folder.id.in(folderList).and(cursorId(lastIdx)))
+            .where(card.folder.id.in(folderList).and(cursorId(lastIdx))
+                .and(card.isDeleted.eq(false)))
             .limit(pageable.getPageSize())
             .fetch();
     }
