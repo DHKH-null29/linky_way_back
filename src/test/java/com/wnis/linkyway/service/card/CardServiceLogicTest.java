@@ -91,7 +91,7 @@ public class CardServiceLogicTest {
         List<CardResponse> cardResponseList = cardService.findCardsByFolderId(null, 1L, 2L, true,
             PageRequest.of(0, 200));
         logger.info("{}", cardResponseList);
-        assertThat(cardResponseList.size()).isEqualTo(5);
+        assertThat(cardResponseList.size()).isEqualTo(4);
     }
 
     @Nested

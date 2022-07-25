@@ -43,8 +43,8 @@ class CardRepositoryCustomTest {
                 "", 1L, PageRequest.of(0, 2));
             assertThat(list.size()).isEqualTo(2);
             assertThat(list).extracting("id")
-                .contains(6L, Index.atIndex(0))
-                .contains(5L, Index.atIndex(1));
+                .contains(5L, Index.atIndex(0))
+                .contains(4L, Index.atIndex(1));
 
             // second search(lastIndex가 존재하는 경우 -> 커서페이징 탐색
             List<CardDto> cursorList = cardRepositoryCustom.findAllCardContainKeyword(5L, "", 1L,
@@ -78,7 +78,7 @@ class CardRepositoryCustomTest {
             List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByTadId(null, 2L,
                 PageRequest.of(0, 3));
             assertThat(cardDtoList.size()).isEqualTo(3);
-            assertThat(cardDtoList).extracting("id").contains(6L, Index.atIndex(0));
+            assertThat(cardDtoList).extracting("id").contains(5L, Index.atIndex(0));
 
             // second search(lastIndex가 존재하는 경우 -> 커서페이징 탐색
             List<CardDto> cardDtoList2 = cardRepositoryCustom.findAllCardByTadId(6L, 2L,
