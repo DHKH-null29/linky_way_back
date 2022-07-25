@@ -1,6 +1,7 @@
 package com.wnis.linkyway.dto.card;
 
 import com.wnis.linkyway.entity.Tag;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Builder;
@@ -17,13 +18,17 @@ public class CardDto {
     private Boolean isDeleted;
     private Long folderId;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime modifiedAt;
+
     private Set<Tag> tagSet = new HashSet<>();
 
     public CardDto() {}
 
     @Builder
     public CardDto(Long id, String link, String title, String content, Boolean isPublic,
-        Boolean isDeleted, Long folderId) {
+        Boolean isDeleted, Long folderId, LocalDateTime createdAt, LocalDateTime modifiedAt) {
         this.id = id;
         this.link = link;
         this.title = title;
@@ -31,5 +36,7 @@ public class CardDto {
         this.isPublic = isPublic;
         this.isDeleted = isDeleted;
         this.folderId = folderId;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
     }
 }
