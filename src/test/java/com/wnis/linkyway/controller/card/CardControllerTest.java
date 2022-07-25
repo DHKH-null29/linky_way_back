@@ -20,15 +20,12 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.wnis.linkyway.controller.CardController;
-import com.wnis.linkyway.controller.TagController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -44,11 +41,11 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.dto.Response;
-import com.wnis.linkyway.dto.card.AddCardResponse;
-import com.wnis.linkyway.dto.card.CardRequest;
-import com.wnis.linkyway.dto.card.CardResponse;
-import com.wnis.linkyway.dto.card.CopyCardsRequest;
-import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.card.io.AddCardResponse;
+import com.wnis.linkyway.dto.card.io.CardRequest;
+import com.wnis.linkyway.dto.card.io.CardResponse;
+import com.wnis.linkyway.dto.card.io.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.io.CopyPackageCardsRequest;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.utils.ResponseBodyMatchers;
@@ -262,7 +259,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByTagId(any(), anyLong(), any());
+                     .findCardsByTagId(any(), any(), anyLong(), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/tag/"
                     + tagId1).contentType("application/json")
@@ -276,25 +273,7 @@ public class CardControllerTest {
                                                .andReturn();
         }
 
-        @Test
-        @DisplayName("태그 아이디로 isPublic인 카드 목록 조회 성공")
-        void findIsPublicCardsByTagIdSuccess() throws Exception {
-            // given
-            lenient().doReturn(cardResponses)
-                     .when(cardService)
-                     .findIsPublicCardsByTagId(anyLong(), any());
-            // when
-            ResultActions resultActions = mockMvc.perform(get("/api/cards/package/1?page=0&size=10"
-                    + tagId1).contentType("application/json")
-                             .content(objectMapper.writeValueAsString(cardResponses)));
 
-            // then
-            MvcResult mvcResult = resultActions.andExpect(status().isOk())
-                                               .andExpect(ResponseBodyMatchers.responseBody() // create
-                                                                              // ResponseBodyMatcher
-                                                                              .containsPropertiesAsJson(Response.class)) // method
-                                               .andReturn();
-        }
 
         @Test
         @DisplayName("폴더 아이디로 사용자의 카드 목록 조회 성공")
@@ -302,7 +281,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByFolderId(anyLong(), anyLong(), any(Boolean.class), any());
+                     .findCardsByFolderId(any(), anyLong(), anyLong(), any(Boolean.class), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/folder/"
                     + folderId).param("findDeep", String.valueOf(true))
@@ -322,7 +301,7 @@ public class CardControllerTest {
             // given
             lenient().doReturn(cardResponses)
                      .when(cardService)
-                     .findCardsByMemberId(anyLong(), any());
+                     .findCardsByMemberId(any(), anyLong(), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/all").contentType("application/json")
                                                                                .content(objectMapper.writeValueAsString(cardResponses)));

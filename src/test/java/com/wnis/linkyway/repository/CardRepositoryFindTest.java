@@ -2,6 +2,8 @@ package com.wnis.linkyway.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.wnis.linkyway.repository.card.CardRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

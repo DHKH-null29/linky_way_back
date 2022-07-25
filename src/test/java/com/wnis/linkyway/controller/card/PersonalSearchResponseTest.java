@@ -1,13 +1,10 @@
 package com.wnis.linkyway.controller.card;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
 import com.wnis.linkyway.controller.CardController;
-import com.wnis.linkyway.dto.card.CardResponse;
-import com.wnis.linkyway.entity.Tag;
 import com.wnis.linkyway.service.card.CardService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,21 +16,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(controllers = CardController.class,
-            excludeFilters = { @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                                                     classes = WebSecurityConfigurerAdapter.class) })
+    excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+        classes = WebSecurityConfigurerAdapter.class)})
 public class PersonalSearchResponseTest {
 
     @MockBean
@@ -49,9 +34,9 @@ public class PersonalSearchResponseTest {
     void setUp() {
         // MockMvc 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(ctx)
-                                 .addFilters(new CharacterEncodingFilter("UTF-8", true)) // 필터 추가
-                                 .alwaysDo(print())
-                                 .build();
+            .addFilters(new CharacterEncodingFilter("UTF-8", true)) // 필터 추가
+            .alwaysDo(print())
+            .build();
     }
 
 //    @Nested

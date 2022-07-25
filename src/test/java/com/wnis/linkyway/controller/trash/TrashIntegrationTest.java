@@ -2,7 +2,7 @@ package com.wnis.linkyway.controller.trash;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wnis.linkyway.entity.Card;
-import com.wnis.linkyway.repository.CardRepository;
+import com.wnis.linkyway.repository.card.CardRepository;
 import com.wnis.linkyway.security.testutils.WithMockMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

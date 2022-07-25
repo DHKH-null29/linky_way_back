@@ -1,18 +1,16 @@
-package com.wnis.linkyway.dto.card;
+package com.wnis.linkyway.dto.card.io;
+
+import static com.wnis.linkyway.validation.ValidationGroup.NotBlankGroup;
 
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.Folder;
-
-import lombok.*;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.wnis.linkyway.validation.ValidationGroup.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
@@ -30,11 +28,11 @@ public class CopyCardsRequest {
 
     public Card toEntity(Folder folder, boolean isPublic) {
         return Card.builder()
-                   .link(link)
-                   .title(title)
-                   .content(content)
-                   .isPublic(isPublic)
-                   .folder(folder)
-                   .build();
+            .link(link)
+            .title(title)
+            .content(content)
+            .isPublic(isPublic)
+            .folder(folder)
+            .build();
     }
 }

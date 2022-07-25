@@ -1,36 +1,5 @@
 package com.wnis.linkyway.service.card;
 
-import com.wnis.linkyway.dto.card.CardRequest;
-import com.wnis.linkyway.dto.card.CardResponse;
-import com.wnis.linkyway.dto.card.CopyCardsRequest;
-import com.wnis.linkyway.dto.card.CopyPackageCardsRequest;
-import com.wnis.linkyway.entity.Card;
-import com.wnis.linkyway.entity.CardTag;
-import com.wnis.linkyway.entity.Folder;
-import com.wnis.linkyway.entity.Member;
-import com.wnis.linkyway.entity.Tag;
-import com.wnis.linkyway.exception.common.NotFoundEntityException;
-import com.wnis.linkyway.exception.common.ResourceNotFoundException;
-import com.wnis.linkyway.repository.CardRepository;
-import com.wnis.linkyway.repository.CardTagRepository;
-import com.wnis.linkyway.repository.FolderRepository;
-import com.wnis.linkyway.repository.MemberRepository;
-import com.wnis.linkyway.repository.TagRepository;
-
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +7,42 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
+import com.wnis.linkyway.dto.card.io.CardRequest;
+import com.wnis.linkyway.dto.card.io.CardResponse;
+import com.wnis.linkyway.dto.card.io.CopyCardsRequest;
+import com.wnis.linkyway.dto.card.io.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.tag.TagResponse;
+import com.wnis.linkyway.entity.Card;
+import com.wnis.linkyway.entity.CardTag;
+import com.wnis.linkyway.entity.Folder;
+import com.wnis.linkyway.entity.Member;
+import com.wnis.linkyway.entity.Tag;
+import com.wnis.linkyway.exception.common.NotFoundEntityException;
+import com.wnis.linkyway.exception.common.ResourceNotFoundException;
+import com.wnis.linkyway.repository.card.CardRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepository;
+import com.wnis.linkyway.repository.FolderRepository;
+import com.wnis.linkyway.repository.MemberRepository;
+import com.wnis.linkyway.repository.TagRepository;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class CardServiceTest {
@@ -198,12 +202,17 @@ public class CardServiceTest {
 
         private Optional<Card> oldCard;
         private CardRequest newCardRequest;
-        private List<Tag> newTagList;
+        private List<TagResponse> newTagResponseList;
         private List<CardTag> savedCardTagList;
 
         @BeforeEach
         void setCard() {
             oldCard = Optional.of(makeCard());
+            TagResponse tagResponse3 = TagResponse.builder()
+                .tagId(103L)
+                .tagName("t3")
+                .isPublic(false)
+                .build();
             Tag tag3 = new Tag(103L, "t3", false, member);
             Set<Long> tagSet = new HashSet<>(Arrays.asList(tag3.getId()));
             newCardRequest = CardRequest.builder()
@@ -214,7 +223,7 @@ public class CardServiceTest {
                                         .folderId(12L)
                                         .tagIdSet(tagSet)
                                         .build();
-            newTagList = Arrays.asList(tag3);
+            newTagResponseList = Arrays.asList(tagResponse3);
             Card savedCard = new Card(1L, "https://www.naver.com/", "네이버", "검색 서비스", false, folder2.get());
             CardTag cardTag = CardTag.builder()
                                      .card(savedCard)
@@ -232,11 +241,14 @@ public class CardServiceTest {
             
             doReturn(folder2).when(folderRepository)
                              .findByIdAndMemberId(anyLong(), anyLong());
-            doReturn(newTagList).when(tagRepository)
-                                .findAllById(anySet());
-            doReturn(savedCardTagList).when(cardTagRepository)
-                                      .saveAll(anyList());
-            
+
+            doReturn(newTagResponseList).when(cardTagRepository)
+                                .findAllTagResponseByCardId(anyLong());
+
+            doReturn(Arrays.asList(tag1)).when(tagRepository).findAllById(any());
+            doReturn(savedCardTagList).when(cardTagRepository).findAllCardTagIdInTagSet(any());
+            doNothing().when(cardTagRepository).deleteAllById(any());
+
             
             // when
             cardService.updateCard(1L, 1L, newCardRequest);
@@ -244,9 +256,9 @@ public class CardServiceTest {
             // verify
             verify(cardRepository).findByCardIdAndMemberId(any(), any());
             verify(folderRepository).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardTagRepository).deleteAll(anyList());
-            verify(tagRepository).findAllById(anySet());
-            verify(cardTagRepository).saveAll(anyList());
+            verify(cardTagRepository).findAllTagResponseByCardId(anyLong());
+            verify(tagRepository).findAllById(any());
+            verify(cardTagRepository).deleteAllById(any());
         }
     }
     

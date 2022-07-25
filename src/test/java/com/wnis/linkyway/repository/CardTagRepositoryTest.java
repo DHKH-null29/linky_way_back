@@ -1,8 +1,9 @@
 package com.wnis.linkyway.repository;
 
-import com.wnis.linkyway.dto.PackageDto;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.*;
+import com.wnis.linkyway.repository.card.CardRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,8 +31,10 @@ class CardTagRepositoryTest {
     
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired EntityManager em;
-    @Autowired CardTagRepository cardTagRepository;
-    @Autowired CardRepository cardRepository;
+    @Autowired
+    CardTagRepository cardTagRepository;
+    @Autowired
+    CardRepository cardRepository;
     
     Member member = Member.builder()
                           .email("h")

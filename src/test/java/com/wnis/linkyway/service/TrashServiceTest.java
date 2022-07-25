@@ -1,8 +1,8 @@
 package com.wnis.linkyway.service;
 
-import com.wnis.linkyway.dto.card.CardResponse;
+import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.entity.Card;
-import com.wnis.linkyway.repository.CardRepository;
+import com.wnis.linkyway.repository.card.CardRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
