@@ -3,6 +3,7 @@ package com.wnis.linkyway.service.card;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.wnis.linkyway.config.QueryDslConfiguration;
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.io.CardRequest;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.entity.Card;
@@ -88,10 +89,10 @@ public class CardServiceLogicTest {
         em.persist(newCard2);
         em.flush();
 
-        List<CardResponse> cardResponseList = cardService.findCardsByFolderId(null, 1L, 2L, true,
+        Page<CardResponse> cardResponseList = cardService.findCardsByFolderId(null, 1L, 2L, true,
             PageRequest.of(0, 200));
         logger.info("{}", cardResponseList);
-        assertThat(cardResponseList.size()).isEqualTo(4);
+        assertThat(cardResponseList.getContent().size()).isEqualTo(4);
     }
 
     @Nested

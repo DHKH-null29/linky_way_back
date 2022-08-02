@@ -9,6 +9,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.CardDto;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.dto.cardtag.CardTagDto;
@@ -72,6 +73,8 @@ public class CardServiceFindTest {
 
     private List<CardDto> cardDtoList;
 
+    private Page<CardDto> cardDtoPage;
+
     @BeforeEach
     void setUp() {
         // given
@@ -104,6 +107,8 @@ public class CardServiceFindTest {
             .isPublic(false)
             .build();
         cardDtoList.add(cardDto);
+
+        cardDtoPage = Page.of(cardDtoList, true, 10L);
     }
 
     @Nested
@@ -118,19 +123,19 @@ public class CardServiceFindTest {
             lenient().doReturn(tag)
                 .when(tagRepository)
                 .findByIdAndMemberId(anyLong(), anyLong());
-            lenient().doReturn(cardDtoList)
+            lenient().doReturn(cardDtoPage)
                 .when(cardRepositoryCustom)
                 .findAllCardByTadId(any(), any(), any());
 
             // when
-            List<CardResponse> cardResponses = cardService.findCardsByTagId(null, member.getId(),
+            Page<CardResponse> page = cardService.findCardsByTagId(null, member.getId(),
                 tag1.getId(), PageRequest.of(0, 200));
-            System.out.println(cardResponses);
+            System.out.println(page);
             // then
-            assertThat(cardResponses).size()
+            assertThat(page.getContent()).size()
                 .isEqualTo(cardDtoList.size());
-            for (int index = 0; index < cardResponses.size(); index++) {
-                CardResponse cardResponse = cardResponses.get(index);
+            for (int index = 0; index < page.getContent().size(); index++) {
+                CardResponse cardResponse = page.getContent().get(index);
                 CardDto card = cardDtoList.get(index);
 
                 assertThat(cardResponse.getCardId()).isEqualTo(card.getId());
