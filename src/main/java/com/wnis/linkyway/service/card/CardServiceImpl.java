@@ -1,5 +1,6 @@
 package com.wnis.linkyway.service.card;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.CardDto;
 import com.wnis.linkyway.dto.card.io.AddCardResponse;
 import com.wnis.linkyway.dto.card.io.CardRequest;
@@ -170,52 +171,54 @@ public class CardServiceImpl implements CardService {
 
     // 커서 페이징
     @Override
-    public List<CardResponse> SearchCardByKeywordPersonalPage(Long lastIdx, String keyword,
+    public Page<CardResponse> SearchCardByKeywordPersonalPage(Long lastIdx, String keyword,
         Long memberId,
         Pageable pageable) {
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardContainKeyword(
+        Page<CardDto> pageList = cardRepositoryCustom.findAllCardContainKeyword(
             lastIdx, keyword, memberId, pageable);
 
         List<CardResponse> cardResponseList = new ArrayList<>();
-        for (CardDto card : cardDtoList) {
+        for (CardDto card : pageList.getContent()) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
             CardResponse cardResponse = CardMapper.toCardResponse(card, tags);
             cardResponseList.add(cardResponse);
         }
 
-        return cardResponseList;
+        return Page.of(cardResponseList, pageList.isHasNext(), pageList.getLastIndex());
     }
 
     // 커서 페이징
     @Override
     @Transactional
-    public List<CardResponse> findCardsByTagId(Long lastIdx, Long memberId, Long tagId,
+    public Page<CardResponse> findCardsByTagId(Long lastIdx, Long memberId, Long tagId,
         Pageable pageable) {
         tagRepository.findByIdAndMemberId(memberId, tagId)
             .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByTadId(lastIdx, tagId,
+        Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByTadId(lastIdx, tagId,
             pageable);
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList =  toResponseList(cardDtoPage.getContent(), CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByFolderId(Long lastIdx, Long memberId, Long folderId,
+    public Page<CardResponse> findCardsByFolderId(Long lastIdx, Long memberId, Long folderId,
         boolean findDeep,
         Pageable pageable) {
         Folder folder = folderRepository.findByIdAndMemberId(memberId, folderId)
             .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
 
-        List<CardDto> cardDtoList;
+        Page<CardDto> cardDtoPage;
         if (!findDeep) {
-            cardDtoList = cardRepositoryCustom.findAllCardByFolderId(lastIdx, folderId, pageable);
+            cardDtoPage = cardRepositoryCustom.findAllCardByFolderId(lastIdx, folderId, pageable);
         } else {
             List<Long> folderList = findAllFolderId(folder);
-            cardDtoList = cardRepositoryCustom.findAllCardByFolderIds(lastIdx, folderList,
+            cardDtoPage = cardRepositoryCustom.findAllCardByFolderIds(lastIdx, folderList,
                 pageable);
         }
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(), CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
     private List<Long> findAllFolderId(Folder folder) {
@@ -234,10 +237,12 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByMemberId(Long lastIdx, Long memberId, Pageable pageable) {
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByMemberId(lastIdx, memberId,
+    public Page<CardResponse> findCardsByMemberId(Long lastIdx, Long memberId, Pageable pageable) {
+        Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByMemberId(lastIdx, memberId,
             pageable);
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
     private <T> List<CardResponse> toResponseList(List<T> cardList, Class<T> tClass) {
