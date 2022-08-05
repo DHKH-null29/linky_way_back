@@ -3,7 +3,6 @@ package com.wnis.linkyway.dto;
 import java.util.Collections;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 
