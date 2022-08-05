@@ -1,5 +1,6 @@
 package com.wnis.linkyway.service;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.repository.card.CardRepository;
@@ -71,8 +72,8 @@ public class TrashServiceTest {
     @DisplayName("삭제된 카드 조회")
     void shouldReturnDeletedCardFormatTest() {
         // 제대로 응답 되는지 테스트
-        List<CardResponse> cardResponseList = trashService.findAllDeletedCard(VALID_MEMBER_ID, 7L, PageRequest.of(0, 2));
-        
+        Page<CardResponse> cardResponsePage = trashService.findAllDeletedCard(VALID_MEMBER_ID, 7L, PageRequest.of(0, 2));
+        List<CardResponse> cardResponseList = cardResponsePage.getContent();
         assertThat(cardResponseList.size()).isEqualTo(1);
         assertThat(cardResponseList.get(0).getCardId()).isNotNull();
         assertThat(cardResponseList.get(0).getFolderId()).isNotNull();
@@ -82,4 +83,5 @@ public class TrashServiceTest {
         assertThat(cardResponseList.get(0).getContent()).isNotNull();
         assertThat(cardResponseList.get(0).getTags()).isNotNull();
     }
+
 }

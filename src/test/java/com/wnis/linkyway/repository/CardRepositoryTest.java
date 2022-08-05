@@ -264,9 +264,9 @@ public class CardRepositoryTest {
         cardList.get(1).updateIsDeleted(true);
         em.flush();
         
-        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingPage(true, 1L, PageRequest.of(0, 2));
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0)).extracting("id").isEqualTo(6L);
+        Slice<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingPage(true, 1L, PageRequest.of(0, 2));
+        assertThat(result.getContent().size()).isEqualTo(2);
+        assertThat(result.getContent().get(0)).extracting("id").isEqualTo(6L);
         
     }
     
@@ -278,9 +278,9 @@ public class CardRepositoryTest {
         cardList.get(1).updateIsDeleted(true);
         em.flush();
     
-        List<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingCursorPage(true, 6L,1L, PageRequest.of(0, 2));
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0)).extracting("id").isEqualTo(2L);
+        Slice<Card> result = cardRepository.findAllByIsDeletedAndMemberIdUsingCursorPage(true, 6L,1L, PageRequest.of(0, 2));
+        assertThat(result.getContent().size()).isEqualTo(2);
+        assertThat(result.getContent().get(0)).extracting("id").isEqualTo(2L);
 
     }
     
