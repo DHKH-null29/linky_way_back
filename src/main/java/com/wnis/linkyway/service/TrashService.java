@@ -1,5 +1,6 @@
 package com.wnis.linkyway.service;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
@@ -10,6 +11,7 @@ import com.wnis.linkyway.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,11 +69,11 @@ public class TrashService {
         return cardTagIds;
     }
     
-    public List<CardResponse> findAllDeletedCard(Long memberId, Long lastCardId, Pageable pageable) {
+    public Page<CardResponse> findAllDeletedCard(Long memberId, Long lastCardId, Pageable pageable) {
         if (!memberRepository.existsById(memberId)) {
             throw new NotFoundEntityException("회원이 존재하지 않습니다");
         }
-        List<Card> cardList;
+        Slice<Card> cardList;
         
         // lastCardId 상태에 따라 최초 페이징이냐 커서페이징이냐 결정
         if (checkInvalidLastCardId(lastCardId)) {
@@ -85,9 +87,9 @@ public class TrashService {
                                                                                    PageRequest.of(0, pageable.getPageSize()));
         }
         
-        List<CardResponse> result = new ArrayList<>();
+        List<CardResponse> content = new ArrayList<>();
         
-        for (Card c : cardList) {
+        for (Card c : cardList.getContent()) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(c.getId());
             CardResponse cardResponse = CardResponse.builder()
                     .link(c.getLink())
@@ -98,9 +100,10 @@ public class TrashService {
                     .content(c.getContent())
                     .tags(tags)
                     .build();
-            result.add(cardResponse);
+            content.add(cardResponse);
         }
-        return result;
+        Long lastIdx = content.get(content.size()-1).getCardId();
+        return Page.of(content, cardList.hasNext(), lastIdx);
     }
     
     private boolean checkInvalidLastCardId(Long lastId) {

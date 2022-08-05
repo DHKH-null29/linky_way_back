@@ -22,31 +22,31 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Deprecated
     @Query("select ct.card from CardTag ct join ct.card join ct.tag where ct.tag.id = :tagId and ct.card.isDeleted = false " +
             "order by ct.card.id desc")
-    public List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
+    List<Card> findCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
 
     @Deprecated
     @Query("select distinct c from CardTag ct join ct.card c join ct.tag t "
             + "where t.id = :tagId and c.isPublic = true and c.isDeleted = false " +
             "order by ct.card desc")
-    public List<Card> findIsPublicCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
+    List<Card> findIsPublicCardsByTagId(@Param(value = "tagId") Long tagId, Pageable pageable);
 
     @Deprecated
     @Query("select c from Card c join c.folder f where f.id = :folderId and c.isDeleted = false " +
             "order by c.id desc")
-    public List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId, Pageable pageable);
+    List<Card> findCardsByFolderId(@Param(value = "folderId") Long folderId, Pageable pageable);
 
     // 삭제 예정 쿼리
     @Deprecated
     @Query("select c from Card c join c.folder f where f.parent.id = :folderId or f.id = :folderId")
-    public List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
+    List<Card> findDeepFoldersCardsByFolderId(@Param(value = "folderId") Long folderId);
 
     @Deprecated
     @Query("select c from Card c join c.folder f where f.member.id = :memberId and c.isDeleted = false order by c.id desc")
-    public List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId, Pageable pageable);
+    List<Card> findCardsByMemberId(@Param(value = "memberId") Long memberId, Pageable pageable);
     
     @Query("select c from Card c join c.folder f join f.member m " +
             "where c.id = :cardId and m.id = :memberId")
-    public Optional<Card> findByCardIdAndMemberId(Long cardId, Long memberId);
+    Optional<Card> findByCardIdAndMemberId(Long cardId, Long memberId);
     
     @Query("select c from Card c " +
             "join c.folder f join f.member m " +
@@ -58,12 +58,12 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Query("select c.id from Card c " +
             "where c.isDeleted = true and c.modifiedBy <= :deletedDateAt " +
             "order by c.id desc")
-    public Slice<Long> findAllIdToDeletedCardUsingPage(@Param(value = "deletedDateAt") LocalDateTime deletedDateAt, Pageable pageable);
+    Slice<Long> findAllIdToDeletedCardUsingPage(@Param(value = "deletedDateAt") LocalDateTime deletedDateAt, Pageable pageable);
 
     @Query("select c.id from Card c " +
             "where c.id < :lastId and c.isDeleted = true and c.modifiedBy <= :deletedDateAt " +
             "order by c.id desc")
-    public Slice<Long> findAllIdToDeletedCardUsingCursorPage(@Param(value = "deletedDateAt") LocalDateTime deletedDateAt,Long lastId, Pageable pageable);
+    Slice<Long> findAllIdToDeletedCardUsingCursorPage(@Param(value = "deletedDateAt") LocalDateTime deletedDateAt,Long lastId, Pageable pageable);
     
     // findAll Cursor Paging
     @Query("select c from Card c order by c.id desc")
@@ -79,13 +79,13 @@ public interface CardRepository extends JpaRepository<Card, Long> {
             "join fetch c.folder f join f.member m " +
             "where c.isDeleted = :isDeleted and m.id = :memberId " +
             "order by c.id desc")
-    List<Card> findAllByIsDeletedAndMemberIdUsingPage(boolean isDeleted, Long memberId, Pageable pageable);
+    Slice<Card> findAllByIsDeletedAndMemberIdUsingPage(boolean isDeleted, Long memberId, Pageable pageable);
     
     @Query("select c from Card c " +
             "join fetch c.folder f join f.member m " +
             "where c.id < :lastId and c.isDeleted = :isDeleted and m.id = :memberId " +
             "order by c.id desc")
-    List<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
+    Slice<Card> findAllByIsDeletedAndMemberIdUsingCursorPage(boolean isDeleted, Long lastId, Long memberId, Pageable pageable);
     
     @Query("select c from Card c " +
             "join c.folder f " +
