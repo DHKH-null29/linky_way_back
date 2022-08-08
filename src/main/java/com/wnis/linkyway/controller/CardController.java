@@ -102,10 +102,12 @@ public class CardController {
     @Authenticated
     public ResponseEntity<Response<Page<CardResponse>>> findCardsByTagId(
         @RequestParam(value = "lastIdx", required = false) Long lastIdx,
-        @CurrentMember Long memberId, @PathVariable Long tagId) {
+        @CurrentMember Long memberId,
+        Pageable pageable,
+        @PathVariable Long tagId) {
 
         Page<CardResponse> cardResponses = cardService.findCardsByTagId(lastIdx, memberId, tagId,
-            PageRequest.of(0, 200));
+            pageable);
         return ResponseEntity.ok()
             .body(Response.of(HttpStatus.OK, cardResponses, "태그 조회 성공"));
     }
