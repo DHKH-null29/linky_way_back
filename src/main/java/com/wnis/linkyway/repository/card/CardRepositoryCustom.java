@@ -79,6 +79,11 @@ public class CardRepositoryCustom {
         if (hasNext) {
             cardDtoList.remove(cardDtoList.size() - 1);
         }
+
+        if (cardDtoList.isEmpty()) {
+            return Page.of(cardDtoList, hasNext, null);
+        }
+
         Long returnLastIdx = cardDtoList.get(cardDtoList.size() - 1).getId();
         return Page.of(cardDtoList, hasNext, returnLastIdx);
     }
