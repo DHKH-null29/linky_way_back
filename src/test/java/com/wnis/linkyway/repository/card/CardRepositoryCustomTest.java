@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.wnis.linkyway.config.QueryDslConfiguration;
 import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.CardDto;
-import java.util.List;
 import javax.persistence.EntityManager;
 import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Nested;
@@ -68,6 +67,16 @@ class CardRepositoryCustomTest {
                 assertThat(hasWord).isEqualTo(true);
             });
         }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardContainKeyword(null,
+                "asdfasqweQ!Qq", 1L, PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
+        }
     }
 
     @Nested
@@ -89,6 +98,16 @@ class CardRepositoryCustomTest {
             assertThat(cardDtoPage2.getContent().size()).isEqualTo(3);
             assertThat(cardDtoPage2.getContent()).extracting("id").contains(5L, Index.atIndex(0));
         }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardByTadId(null, 100L,
+                PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
+        }
     }
 
 
@@ -102,6 +121,16 @@ class CardRepositoryCustomTest {
                 PageRequest.of(0, 5));
             logger.info("{}", cardDtoPage.getContent());
             assertThat(cardDtoPage.getContent().size()).isEqualTo(5);
+        }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardByMemberId(null, 100L,
+                PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
         }
     }
 
