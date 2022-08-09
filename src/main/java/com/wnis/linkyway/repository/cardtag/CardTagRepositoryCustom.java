@@ -27,6 +27,7 @@ public class CardTagRepositoryCustom {
     public List<CardTagDto> findCardTagByCardId(Collection<Long> ids) {
         return jpaQueryFactory.select(
                 Projections.constructor(CardTagDto.class,
+                    cardTag.id,
                     card.id,
                     card.link,
                     card.title,
@@ -47,6 +48,7 @@ public class CardTagRepositoryCustom {
     public List<CardTagDto> findCardTagByCard(Collection<Card> cards) {
         return jpaQueryFactory.select(
                 Projections.constructor(CardTagDto.class,
+                    cardTag.id,
                     card.id,
                     card.link,
                     card.title,
