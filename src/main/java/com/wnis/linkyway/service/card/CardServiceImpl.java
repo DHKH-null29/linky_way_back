@@ -25,6 +25,7 @@ import com.wnis.linkyway.repository.card.CardRepositoryCustom;
 import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import com.wnis.linkyway.repository.cardtag.CardTagRepositoryCustom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -130,16 +131,23 @@ public class CardServiceImpl implements CardService {
         // 기존 태그 리스트 기준으로 생성할 카드 태그 관계들 -> 추가
         Set<Long> addTagIdSet = new HashSet<>(newTagIdSet);
         addTagIdSet.removeAll(oldTagSet);
-        List<Tag> newTagList = tagRepository.findAllById(newTagIdSet);
-        addCardTagConnection(oldCard, newTagList);
+
+        List<Tag> addTagList = tagRepository.findAllById(addTagIdSet);
+        addCardTagConnection(oldCard, addTagList);
 
         // 기존 태그 리스트 기준으로 없어질 카드 태그 관계들 -> 삭제
         Set<Long> deleteTagIdSet = new HashSet<>(oldTagSet);
-        deleteTagIdSet.removeAll(addTagIdSet);
+        deleteTagIdSet.removeAll(newTagIdSet);
 
-        List<Long> deleteCardTagIdList = cardTagRepository.findAllCardTagIdInTagSet(
-            deleteTagIdSet);
-        cardTagRepository.deleteAllById(deleteCardTagIdList);
+        List<CardTagDto> cardTagDtoList = cardTagRepositoryCustom.findCardTagByCardId(
+            Arrays.asList(oldCard.getId()));
+
+        List<Long> deletedCardTagIdList = cardTagDtoList.stream()
+            .filter(cardTagDto -> deleteTagIdSet.contains(cardTagDto.getTagId()))
+            .map(CardTagDto::getCardTagId)
+            .collect(Collectors.toList());
+
+        cardTagRepository.deleteAllCardTagInIds(deletedCardTagIdList);
 
     }
 
@@ -196,7 +204,8 @@ public class CardServiceImpl implements CardService {
             .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
         Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByTadId(lastIdx, tagId,
             pageable);
-        List<CardResponse> cardResponseList =  toResponseList(cardDtoPage.getContent(), CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
         return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
@@ -217,7 +226,8 @@ public class CardServiceImpl implements CardService {
             cardDtoPage = cardRepositoryCustom.findAllCardByFolderIds(lastIdx, folderList,
                 pageable);
         }
-        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(), CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
         return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
