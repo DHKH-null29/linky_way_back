@@ -44,26 +44,27 @@ public class TrashServiceTest {
     @DisplayName("카드 복원")
     void shouldChangeCardIsDeletedPropertiesTest() {
         // 내부 속성이 제대로 변했는지 테스트
-        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L));
+        List<Long> ids = new ArrayList<>(Arrays.asList(6L));
+        Card before = em.find(Card.class, 6L);
+        assertThat(before.getIsDeleted()).isEqualTo(true);
         trashService.updateDeleteCardFalse(ids, VALID_MEMBER_ID);
         em.flush();
         em.clear();
         
-        Card c1 = em.find(Card.class, 1L);
-        Card c2 = em.find(Card.class, 2L);
+        Card c1 = em.find(Card.class, 6L);
         
         assertThat(c1.getIsDeleted()).isEqualTo(false);
-        assertThat(c2.getIsDeleted()).isEqualTo(false);
+
     }
     
     @Test
     @DisplayName("완전한 카드 삭제")
     void shouldDeleteCardCompletelyInDB() {
-        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 6L));
         List<Long> deletedIds = trashService.deleteCompletely(ids, 1L);
         List<Long> idList = cardRepository.findAll().stream().map(Card::getId).collect(Collectors.toList());
-        assertThat(idList.size()).isEqualTo(3);
-        assertThat(idList).doesNotContain(1L, 2L, 3L);
+        assertThat(idList.size()).isEqualTo(5);
+        assertThat(idList).doesNotContain(6L);
         em.flush();
         
     }
