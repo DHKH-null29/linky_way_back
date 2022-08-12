@@ -11,9 +11,7 @@ import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.validation.ValidationSequence;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +71,7 @@ public class CardController {
     }
 
     @DeleteMapping("/{cardId}")
-    @ApiOperation(value = "카드 완전 삭제", notes = "카드 하나를 휴지통으로 보낸다")
+    @ApiOperation(value = "카드 휴지통으로 보내기", notes = "카드 하나를 휴지통으로 보낸다")
     @Authenticated
     public ResponseEntity<Response<Long>> deleteCard(@PathVariable Long cardId,
         @CurrentMember Long memberId) {
