@@ -1,5 +1,6 @@
 package com.wnis.linkyway.controller;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.io.AddCardResponse;
 import com.wnis.linkyway.dto.card.io.CardRequest;
@@ -10,9 +11,7 @@ import com.wnis.linkyway.security.annotation.CurrentMember;
 import com.wnis.linkyway.service.card.CardService;
 import com.wnis.linkyway.validation.ValidationSequence;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,135 +36,109 @@ public class CardController {
     @PostMapping
     @ApiOperation(value = "카드 생성", notes = "카드 요청 정보를 입력 받아 카드 하나를 생성한다")
     @Authenticated
-    public ResponseEntity<Response> addCard(@CurrentMember Long memberId,
+    public ResponseEntity<Response<AddCardResponse>> addCard(@CurrentMember Long memberId,
         @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
         AddCardResponse addCardResponse = cardService.addCard(memberId, cardRequest);
 
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.CREATED.value())
-                .data(addCardResponse)
-                .message("카드가 생성 완료")
-                .build());
+            .body(Response.of(HttpStatus.OK, addCardResponse, "카드가 생성 완료"));
     }
 
     @GetMapping("/{cardId}")
     @ApiOperation(value = "ID를 통해 카드 조회", notes = "Card ID를 활용해 하나의 카드를 조회한다")
     @Authenticated
-    public ResponseEntity<Response> findCardByCardId(@PathVariable Long cardId,
+    public ResponseEntity<Response<CardResponse>> findCardByCardId(@PathVariable Long cardId,
         @CurrentMember Long memberId) {
 
         CardResponse cardResponse = cardService.findCardByCardId(cardId, memberId);
 
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .data(cardResponse)
-                .message("카드 조회 성공")
-                .build());
+            .body(Response.of(HttpStatus.OK, cardResponse, "카드 조회 성공"));
     }
 
     @PutMapping("/{cardId}")
     @ApiOperation(value = "카드 수정", notes = "카드 수정 정보를 이용해 카드를 수정한다")
     @Authenticated
-    public ResponseEntity<Response> updateCard(@CurrentMember Long memberId,
+    public ResponseEntity<Response<Long>> updateCard(@CurrentMember Long memberId,
         @PathVariable Long cardId,
         @Validated(ValidationSequence.class) @RequestBody CardRequest cardRequest) {
 
         Long updatedCardId = cardService.updateCard(memberId, cardId, cardRequest);
 
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .data(updatedCardId)
-                .message("카드 변경 완료")
-                .build());
+            .body(Response.of(HttpStatus.OK, updatedCardId, "카드 변경 완료"));
     }
 
     @DeleteMapping("/{cardId}")
-    @ApiOperation(value = "카드 완전 삭제", notes = "카드 하나를 휴지통으로 보낸다")
+    @ApiOperation(value = "카드 휴지통으로 보내기", notes = "카드 하나를 휴지통으로 보낸다")
     @Authenticated
-    public ResponseEntity<Response> deleteCard(@PathVariable Long cardId,
+    public ResponseEntity<Response<Long>> deleteCard(@PathVariable Long cardId,
         @CurrentMember Long memberId) {
 
         Long response = cardService.deleteCard(cardId, memberId);
 
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .data(response)
-                .message("카드 삭제 완료")
-                .build());
+            .body(Response.of(HttpStatus.OK, response, "카드 삭제 완료"));
     }
 
     @GetMapping("/personal/keyword")
     @ApiOperation(value = "키워드를 통한 카드 조회", notes = "키워드를 활용해 여러 카드를 조회한다")
     @Authenticated
-    public ResponseEntity<Response> searchCardByKeywordPersonalPage(
+    public ResponseEntity<Response<Page<CardResponse>>> searchCardByKeywordPersonalPage(
         @RequestParam(value = "lastIdx", required = false) Long lastIdx,
         @RequestParam(value = "keyword") String keyword,
         @CurrentMember Long memberId, Pageable pageable) {
-        List<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(lastIdx,
+        Page<CardResponse> cardResponses = cardService.SearchCardByKeywordPersonalPage(lastIdx,
             keyword, memberId, pageable);
         return ResponseEntity.ok()
-            .body(Response.of(HttpStatus.OK, cardResponses, "조회 성공"));
+            .body(Response.of(HttpStatus.OK, cardResponses, "키워드 조회 성공"));
     }
 
     @GetMapping("/tag/{tagId}")
     @ApiOperation(value = "태그아이디를 통해 카드 조회", notes = "TAG ID를 가지고 있는 여러 카드를 조회")
     @Authenticated
-    public ResponseEntity<Response> findCardsByTagId(
+    public ResponseEntity<Response<Page<CardResponse>>> findCardsByTagId(
         @RequestParam(value = "lastIdx", required = false) Long lastIdx,
-        @CurrentMember Long memberId, @PathVariable Long tagId) {
+        @CurrentMember Long memberId,
+        Pageable pageable,
+        @PathVariable Long tagId) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByTagId(lastIdx, memberId, tagId,
-            PageRequest.of(0, 200));
+        Page<CardResponse> cardResponses = cardService.findCardsByTagId(lastIdx, memberId, tagId,
+            pageable);
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .message("태그에 해당하는 카드 조회 성공")
-                .data(cardResponses)
-                .build());
+            .body(Response.of(HttpStatus.OK, cardResponses, "태그 조회 성공"));
     }
 
 
     @GetMapping("/folder/{folderId}")
     @ApiOperation(value = "폴더 아이디를 활용한 카드 조회", notes = "폴더 ID에 속해있는 카드들 모두 조회")
     @Authenticated
-    public ResponseEntity<Response> findCardsByFolderId(
+    public ResponseEntity<Response<Page<CardResponse>>> findCardsByFolderId(
         @RequestParam(value = "lastIdx", required = false) Long lastIdx,
         @CurrentMember Long memberId,
         @PathVariable Long folderId,
         @RequestParam boolean findDeep, Pageable pageable) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByFolderId(lastIdx, memberId,
+        Page<CardResponse> cardResponses = cardService.findCardsByFolderId(lastIdx, memberId,
             folderId,
             findDeep, pageable);
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .message("폴더에 해당하는 카드 조회 성공")
-                .data(cardResponses)
-                .build());
+            .body(Response.of(HttpStatus.OK, cardResponses, "폴더에 해당하는 카드 조회 성공"));
     }
 
     @GetMapping("/all")
     @ApiOperation(value = "회원 카드 조회", notes = "회원이 가지고 있는 모든 카드 조회")
     @Authenticated
-    public ResponseEntity<Response> findCardsByMemberId(
+    public ResponseEntity<Response<Page<CardResponse>>> findCardsByMemberId(
         @RequestParam(value = "lastIdx", required = false) Long lastIdx,
         @CurrentMember Long memberId,
         Pageable pageable) {
 
-        List<CardResponse> cardResponses = cardService.findCardsByMemberId(lastIdx, memberId,
+        Page<CardResponse> cardResponses = cardService.findCardsByMemberId(lastIdx, memberId,
             pageable);
         return ResponseEntity.ok()
-            .body(Response.builder()
-                .code(HttpStatus.OK.value())
-                .message("태그에 해당하는 카드 조회 성공")
-                .data(cardResponses)
-                .build());
+            .body(Response.of(HttpStatus.OK, cardResponses, "회원이 가지고 있는 카드 조회 성공"));
     }
 
     @PostMapping("/package/copy")

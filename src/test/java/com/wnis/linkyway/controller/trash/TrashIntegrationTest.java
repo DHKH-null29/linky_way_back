@@ -56,7 +56,7 @@ public class TrashIntegrationTest {
     @Test
     @WithMockMember
     void deleteCardTest() throws Exception {
-        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 3L));
+        List<Long> ids = new ArrayList<>(Arrays.asList(1L, 2L, 6L));
         mockMvc.perform(put("/api/trash?isDeleted=false").contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(ids)))
                 .andExpect(status().isOk());

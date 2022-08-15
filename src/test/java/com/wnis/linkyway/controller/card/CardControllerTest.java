@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.wnis.linkyway.dto.Page;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -217,6 +218,8 @@ public class CardControllerTest {
     class findCards {
 
         private List<CardResponse> cardResponses = new ArrayList<CardResponse>();
+
+        private Page<CardResponse> cardResponsePage;
         private Long cardId = 1000L;
         private Long tagId1 = 1L;
         private Long tagId2 = 2L;
@@ -251,13 +254,15 @@ public class CardControllerTest {
                                                       .folderId(folderId)
                                                       .tags(Arrays.asList(tagResponse1))
                                                       .build());
+
+            cardResponsePage = Page.of(cardResponses, true, 10L);
         }
 
         @Test
         @DisplayName("태그 아이디로 사용자의 카드 목록 조회 성공")
         void findCardsByTagIdSuccess() throws Exception {
             // given
-            lenient().doReturn(cardResponses)
+            lenient().doReturn(cardResponsePage)
                      .when(cardService)
                      .findCardsByTagId(any(), any(), anyLong(), any());
             // when
@@ -279,14 +284,14 @@ public class CardControllerTest {
         @DisplayName("폴더 아이디로 사용자의 카드 목록 조회 성공")
         void findCardsByFolderIdSuccess() throws Exception {
             // given
-            lenient().doReturn(cardResponses)
+            lenient().doReturn(cardResponsePage)
                      .when(cardService)
                      .findCardsByFolderId(any(), anyLong(), anyLong(), any(Boolean.class), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/folder/"
                     + folderId).param("findDeep", String.valueOf(true))
                                .contentType("application/json")
-                               .content(objectMapper.writeValueAsString(cardResponses)));
+                               .content(objectMapper.writeValueAsString(cardResponsePage)));
             // then
             MvcResult mvcResult = resultActions.andExpect(status().isOk())
                                                .andExpect(ResponseBodyMatchers.responseBody() // create
@@ -299,12 +304,12 @@ public class CardControllerTest {
         @DisplayName("사용자의 모든 카드 목록 조회 성공")
         void findCardsByMemberIdSuccess() throws Exception {
             // given
-            lenient().doReturn(cardResponses)
+            lenient().doReturn(cardResponsePage)
                      .when(cardService)
                      .findCardsByMemberId(any(), anyLong(), any());
             // when
             ResultActions resultActions = mockMvc.perform(get("/api/cards/all").contentType("application/json")
-                                                                               .content(objectMapper.writeValueAsString(cardResponses)));
+                                                                               .content(objectMapper.writeValueAsString(cardResponsePage)));
             // then
             MvcResult mvcResult = resultActions.andExpect(status().isOk())
                                                .andExpect(ResponseBodyMatchers.responseBody() // create

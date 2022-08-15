@@ -1,5 +1,6 @@
 package com.wnis.linkyway.service.card;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.CardDto;
 import com.wnis.linkyway.dto.card.io.AddCardResponse;
 import com.wnis.linkyway.dto.card.io.CardRequest;
@@ -24,6 +25,7 @@ import com.wnis.linkyway.repository.card.CardRepositoryCustom;
 import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import com.wnis.linkyway.repository.cardtag.CardTagRepositoryCustom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -129,16 +131,23 @@ public class CardServiceImpl implements CardService {
         // 기존 태그 리스트 기준으로 생성할 카드 태그 관계들 -> 추가
         Set<Long> addTagIdSet = new HashSet<>(newTagIdSet);
         addTagIdSet.removeAll(oldTagSet);
-        List<Tag> newTagList = tagRepository.findAllById(newTagIdSet);
-        addCardTagConnection(oldCard, newTagList);
+
+        List<Tag> addTagList = tagRepository.findAllById(addTagIdSet);
+        addCardTagConnection(oldCard, addTagList);
 
         // 기존 태그 리스트 기준으로 없어질 카드 태그 관계들 -> 삭제
         Set<Long> deleteTagIdSet = new HashSet<>(oldTagSet);
-        deleteTagIdSet.removeAll(addTagIdSet);
+        deleteTagIdSet.removeAll(newTagIdSet);
 
-        List<Long> deleteCardTagIdList = cardTagRepository.findAllCardTagIdInTagSet(
-            deleteTagIdSet);
-        cardTagRepository.deleteAllById(deleteCardTagIdList);
+        List<CardTagDto> cardTagDtoList = cardTagRepositoryCustom.findCardTagByCardId(
+            Arrays.asList(oldCard.getId()));
+
+        List<Long> deletedCardTagIdList = cardTagDtoList.stream()
+            .filter(cardTagDto -> deleteTagIdSet.contains(cardTagDto.getTagId()))
+            .map(CardTagDto::getCardTagId)
+            .collect(Collectors.toList());
+
+        cardTagRepository.deleteAllCardTagInIds(deletedCardTagIdList);
 
     }
 
@@ -170,52 +179,56 @@ public class CardServiceImpl implements CardService {
 
     // 커서 페이징
     @Override
-    public List<CardResponse> SearchCardByKeywordPersonalPage(Long lastIdx, String keyword,
+    public Page<CardResponse> SearchCardByKeywordPersonalPage(Long lastIdx, String keyword,
         Long memberId,
         Pageable pageable) {
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardContainKeyword(
+        Page<CardDto> pageList = cardRepositoryCustom.findAllCardContainKeyword(
             lastIdx, keyword, memberId, pageable);
 
         List<CardResponse> cardResponseList = new ArrayList<>();
-        for (CardDto card : cardDtoList) {
+        for (CardDto card : pageList.getContent()) {
             List<TagResponse> tags = cardTagRepository.findAllTagResponseByCardId(card.getId());
             CardResponse cardResponse = CardMapper.toCardResponse(card, tags);
             cardResponseList.add(cardResponse);
         }
 
-        return cardResponseList;
+        return Page.of(cardResponseList, pageList.isHasNext(), pageList.getLastIndex());
     }
 
     // 커서 페이징
     @Override
     @Transactional
-    public List<CardResponse> findCardsByTagId(Long lastIdx, Long memberId, Long tagId,
+    public Page<CardResponse> findCardsByTagId(Long lastIdx, Long memberId, Long tagId,
         Pageable pageable) {
         tagRepository.findByIdAndMemberId(memberId, tagId)
             .orElseThrow(() -> new ResourceConflictException("존재하지 않는 태그입니다. 태그를 확인해주세요."));
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByTadId(lastIdx, tagId,
+        Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByTadId(lastIdx, tagId,
             pageable);
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByFolderId(Long lastIdx, Long memberId, Long folderId,
+    public Page<CardResponse> findCardsByFolderId(Long lastIdx, Long memberId, Long folderId,
         boolean findDeep,
         Pageable pageable) {
         Folder folder = folderRepository.findByIdAndMemberId(memberId, folderId)
             .orElseThrow(() -> new ResourceConflictException("존재하지 않는 폴더입니다. 폴더를 확인해주세요."));
 
-        List<CardDto> cardDtoList;
+        Page<CardDto> cardDtoPage;
         if (!findDeep) {
-            cardDtoList = cardRepositoryCustom.findAllCardByFolderId(lastIdx, folderId, pageable);
+            cardDtoPage = cardRepositoryCustom.findAllCardByFolderId(lastIdx, folderId, pageable);
         } else {
             List<Long> folderList = findAllFolderId(folder);
-            cardDtoList = cardRepositoryCustom.findAllCardByFolderIds(lastIdx, folderList,
+            cardDtoPage = cardRepositoryCustom.findAllCardByFolderIds(lastIdx, folderList,
                 pageable);
         }
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
     private List<Long> findAllFolderId(Folder folder) {
@@ -234,10 +247,12 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public List<CardResponse> findCardsByMemberId(Long lastIdx, Long memberId, Pageable pageable) {
-        List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByMemberId(lastIdx, memberId,
+    public Page<CardResponse> findCardsByMemberId(Long lastIdx, Long memberId, Pageable pageable) {
+        Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByMemberId(lastIdx, memberId,
             pageable);
-        return toResponseList(cardDtoList, CardDto.class);
+        List<CardResponse> cardResponseList = toResponseList(cardDtoPage.getContent(),
+            CardDto.class);
+        return Page.of(cardResponseList, cardDtoPage.isHasNext(), cardDtoPage.getLastIndex());
     }
 
     private <T> List<CardResponse> toResponseList(List<T> cardList, Class<T> tClass) {

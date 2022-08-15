@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class CardTagDto {
 
+    private final Long cardTagId;
     private final Long cardId;
     private final String link;
     private final String title;
@@ -19,8 +20,9 @@ public class CardTagDto {
     private final String tagName;
 
     @Builder
-    public CardTagDto(Long cardId, String link, String title, String content, Boolean isPublic, Long folderId,
+    public CardTagDto(Long cardTagId, Long cardId, String link, String title, String content, Boolean isPublic, Long folderId,
         Boolean isDeleted, Long tagId, String tagName) {
+        this.cardTagId = cardTagId;
         this.cardId = cardId;
         this.link = link;
         this.title = title;

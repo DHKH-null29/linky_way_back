@@ -15,6 +15,7 @@ import com.wnis.linkyway.dto.card.io.CardRequest;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.dto.card.io.CopyCardsRequest;
 import com.wnis.linkyway.dto.card.io.CopyPackageCardsRequest;
+import com.wnis.linkyway.dto.cardtag.CardTagDto;
 import com.wnis.linkyway.dto.tag.TagResponse;
 import com.wnis.linkyway.entity.Card;
 import com.wnis.linkyway.entity.CardTag;
@@ -28,6 +29,8 @@ import com.wnis.linkyway.repository.cardtag.CardTagRepository;
 import com.wnis.linkyway.repository.FolderRepository;
 import com.wnis.linkyway.repository.MemberRepository;
 import com.wnis.linkyway.repository.TagRepository;
+import com.wnis.linkyway.repository.cardtag.CardTagRepositoryCustom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +67,9 @@ public class CardServiceTest {
 
     @Mock
     private CardTagRepository cardTagRepository;
+
+    @Mock
+    private CardTagRepositoryCustom cardTagRepositoryCustom;
 
     private final Long cardId = 1001L;
     private final String link = "https://github.com/DHKH-null29/linky_way_back/issues/12";
@@ -246,8 +252,7 @@ public class CardServiceTest {
                                 .findAllTagResponseByCardId(anyLong());
 
             doReturn(Arrays.asList(tag1)).when(tagRepository).findAllById(any());
-            doReturn(savedCardTagList).when(cardTagRepository).findAllCardTagIdInTagSet(any());
-            doNothing().when(cardTagRepository).deleteAllById(any());
+            doReturn(new ArrayList<CardTagDto>()).when(cardTagRepositoryCustom).findCardTagByCardId(any());
 
             
             // when
@@ -256,9 +261,7 @@ public class CardServiceTest {
             // verify
             verify(cardRepository).findByCardIdAndMemberId(any(), any());
             verify(folderRepository).findByIdAndMemberId(anyLong(), anyLong());
-            verify(cardTagRepository).findAllTagResponseByCardId(anyLong());
             verify(tagRepository).findAllById(any());
-            verify(cardTagRepository).deleteAllById(any());
         }
     }
     

@@ -1,5 +1,6 @@
 package com.wnis.linkyway.controller;
 
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.Response;
 import com.wnis.linkyway.dto.card.io.CardResponse;
 import com.wnis.linkyway.security.annotation.Authenticated;
@@ -26,9 +27,9 @@ public class TrashController {
     @Authenticated
     ResponseEntity<Response<List<Long>>> updateCardIsDeletedTrueOrFalse(@RequestBody List<Long> ids, @CurrentMember Long memberId,
             @RequestParam Boolean isDeleted) {
-        List<Long> response = null;
+        List<Long> response;
         
-        if (isDeleted == true) {
+        if (isDeleted) {
             response = trashService.deleteCompletely(ids, memberId);
         } else { //isDeleted == false
             response = trashService.updateDeleteCardFalse(ids, memberId);
@@ -41,9 +42,9 @@ public class TrashController {
     @GetMapping
     @ApiOperation(value = "삭제된 카드 조회", notes = "isDeleted 키가 true인 카드들을 조회한다")
     @Authenticated
-    ResponseEntity<Response<List<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId,
+    ResponseEntity<Response<Page<CardResponse>>> findAllDeletedCard(@CurrentMember Long memberId,
             @RequestParam(value = "lastCardId", required = false) Long lastCardId, Pageable pageable) {
-        List<CardResponse> response = trashService.findAllDeletedCard(memberId,lastCardId, pageable);
+        Page<CardResponse> response = trashService.findAllDeletedCard(memberId,lastCardId, pageable);
         return ResponseEntity.ok(Response.of(HttpStatus.OK, response, "삭제된 카드 조회 성공"));
     }
 }

@@ -3,8 +3,8 @@ package com.wnis.linkyway.repository.card;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.wnis.linkyway.config.QueryDslConfiguration;
+import com.wnis.linkyway.dto.Page;
 import com.wnis.linkyway.dto.card.CardDto;
-import java.util.List;
 import javax.persistence.EntityManager;
 import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Nested;
@@ -39,18 +39,18 @@ class CardRepositoryCustomTest {
         @Test
         void checkCursorPaging() {
             // first search(lastIndex 가 null인 경우 -> offset으로 동작해야함
-            List<CardDto> list = cardRepositoryCustom.findAllCardContainKeyword(null,
+            Page<CardDto> page = cardRepositoryCustom.findAllCardContainKeyword(null,
                 "", 1L, PageRequest.of(0, 2));
-            assertThat(list.size()).isEqualTo(2);
-            assertThat(list).extracting("id")
+            assertThat(page.getContent().size()).isEqualTo(2);
+            assertThat(page.getContent()).extracting("id")
                 .contains(5L, Index.atIndex(0))
                 .contains(4L, Index.atIndex(1));
 
             // second search(lastIndex가 존재하는 경우 -> 커서페이징 탐색
-            List<CardDto> cursorList = cardRepositoryCustom.findAllCardContainKeyword(5L, "", 1L,
+            Page<CardDto> cursorPage = cardRepositoryCustom.findAllCardContainKeyword(5L, "", 1L,
                 PageRequest.of(0, 3));
-            assertThat(cursorList.size()).isEqualTo(3);
-            assertThat(cursorList).extracting("id")
+            assertThat(cursorPage.getContent().size()).isEqualTo(3);
+            assertThat(cursorPage.getContent()).extracting("id")
                 .contains(4L, Index.atIndex(0))
                 .contains(3L, Index.atIndex(1))
                 .contains(2L, Index.atIndex(2));
@@ -58,14 +58,24 @@ class CardRepositoryCustomTest {
 
         @Test
         void checkKeyword() {
-            List<CardDto> list = cardRepositoryCustom.findAllCardContainKeyword(null, "숯불", 1L,
+            Page<CardDto> page = cardRepositoryCustom.findAllCardContainKeyword(null, "숯불", 1L,
                 PageRequest.of(0, 5));
-            list.forEach(cardDto -> {
+            page.getContent().forEach(cardDto -> {
                 boolean hasWord = cardDto.getContent().contains("숯불") ||
                     cardDto.getTitle().contains("숯불");
 
                 assertThat(hasWord).isEqualTo(true);
             });
+        }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardContainKeyword(null,
+                "asdfasqweQ!Qq", 1L, PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
         }
     }
 
@@ -75,18 +85,28 @@ class CardRepositoryCustomTest {
         @Test
         void checkCursorPaging() {
             // first search(lastIndex 가 null인 경우 -> offset으로 동작해야함
-            List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByTadId(null, 2L,
+            Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByTadId(null, 2L,
                 PageRequest.of(0, 3));
-            assertThat(cardDtoList.size()).isEqualTo(3);
-            assertThat(cardDtoList).extracting("id").contains(5L, Index.atIndex(0));
+            assertThat(cardDtoPage.getContent().size()).isEqualTo(3);
+            assertThat(cardDtoPage.getContent()).extracting("id").contains(5L, Index.atIndex(0));
 
             // second search(lastIndex가 존재하는 경우 -> 커서페이징 탐색
-            List<CardDto> cardDtoList2 = cardRepositoryCustom.findAllCardByTadId(6L, 2L,
+            Page<CardDto> cardDtoPage2 = cardRepositoryCustom.findAllCardByTadId(6L, 2L,
                 PageRequest.of(0, 3));
 
 //            System.out.println(cardDtoList2);
-            assertThat(cardDtoList2.size()).isEqualTo(3);
-            assertThat(cardDtoList2).extracting("id").contains(5L, Index.atIndex(0));
+            assertThat(cardDtoPage2.getContent().size()).isEqualTo(3);
+            assertThat(cardDtoPage2.getContent()).extracting("id").contains(5L, Index.atIndex(0));
+        }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardByTadId(null, 100L,
+                PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
         }
     }
 
@@ -97,10 +117,20 @@ class CardRepositoryCustomTest {
         @Test
         void checkCursorPaging() {
             // first search(lastIndex 가 null인 경우 -> offset으로 동작해야함
-            List<CardDto> cardDtoList = cardRepositoryCustom.findAllCardByMemberId(null, 1L,
+            Page<CardDto> cardDtoPage = cardRepositoryCustom.findAllCardByMemberId(null, 1L,
                 PageRequest.of(0, 5));
-            logger.info("{}", cardDtoList);
-            assertThat(cardDtoList.size()).isEqualTo(5);
+            logger.info("{}", cardDtoPage.getContent());
+            assertThat(cardDtoPage.getContent().size()).isEqualTo(5);
+        }
+
+        @Test
+        void emptyContentTest() {
+            Page<CardDto> page = cardRepositoryCustom.findAllCardByMemberId(null, 100L,
+                PageRequest.of(0, 5));
+            logger.info("{}", page);
+            assertThat(page.getContent()).isNotNull();
+            assertThat(page.getLastIndex()).isNull();
+            assertThat(page.isHasNext()).isFalse();
         }
     }
 
